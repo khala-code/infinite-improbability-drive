@@ -1,31 +1,35 @@
 # preprocess_milky_way.py
 # Converts Gaia DR3 PSV.GZ → HEALPix stellar density map → equirectangular PNG
 # 23.5M stars, processed in chunks to manage RAM
+# Uses native Gaia DR3 Galactic l/b columns — no astropy coordinate transform needed
 
 import numpy as np
 import pandas as pd
 import healpy as hp
-from astropy.coordinates import SkyCoord, Galactocentric
-import astropy.units as u
-from astropy.coordinates import Galactic
 from PIL import Image
-import gzip
 import os
 
-# ── Paths ──────────────────────────────────────────────────────────────────────
+# ── Paths ──────────────────────────────────────────────────────────────
 BASE     = r"D:\Unity Projects\infinite-improbability-drive\Assets\CMB"
 INPUT    = os.path.join(BASE, r"Data\MilkyWay\result_gaiadr3.psv.gz")
 OUT_FULL = os.path.join(BASE, r"Textures\milkyway_stellar_density.png")
 OUT_MASK = os.path.join(BASE, r"Textures\milkyway_stellar_density_masked.png")
 
-# ── HEALPix config ─────────────────────────────────────────────────────────────
+# ── Column names (no header in JVO PSV export) ─────────────────────────────
+COLNAMES = [
+    'source_id', 'ra', 'dec', 'parallax', 'parallax_over_error',
+    'pmra', 'pmdec', 'phot_g_mean_mag', 'bp_rp',
+    'radial_velocity', 'l', 'b'
+]
+
+# ── HEALPix config ──────────────────────────────────────────────────────────
 NSIDE      = 2048
 NPIX       = hp.nside2npix(NSIDE)
 CHUNK_SIZE = 500_000
 
 density_map = np.zeros(NPIX, dtype=np.float64)
 
-# ── Process in chunks ──────────────────────────────────────────────────────────
+# ── Process in chunks ──────────────────────────────────────────────────────
 print("Reading Gaia DR3 data in chunks...")
 total_processed = 0
 
@@ -33,27 +37,20 @@ reader = pd.read_csv(
     INPUT,
     sep='|',
     compression='gzip',
-    usecols=['ra', 'dec', 'parallax'],
+    names=COLNAMES,
+    usecols=['l', 'b'],
     chunksize=CHUNK_SIZE,
+    header=None,
     comment='#'
 )
 
 for i, chunk in enumerate(reader):
-    # Drop NaN and zero/negative parallax (already filtered but be safe)
-    chunk = chunk.dropna(subset=['ra', 'dec', 'parallax'])
-    chunk = chunk[chunk['parallax'] > 0]
+    chunk = chunk.dropna(subset=['l', 'b'])
 
-    # Convert ra/dec → Galactic l, b
-    coords = SkyCoord(
-        ra=chunk['ra'].values * u.degree,
-        dec=chunk['dec'].values * u.degree,
-        frame='icrs'
-    ).galactic
+    # Galactic l (0–360°) and b (-90–+90°) → HEALPix spherical coords
+    l_rad = np.deg2rad(chunk['l'].values)
+    b_rad = np.deg2rad(chunk['b'].values)
 
-    l_rad = coords.l.rad
-    b_rad = coords.b.rad
-
-    # HEALPix pixel indices (RING scheme, Galactic coords)
     theta = np.pi / 2 - b_rad   # colatitude
     phi   = l_rad
 
@@ -65,7 +62,7 @@ for i, chunk in enumerate(reader):
 
 print(f"\nTotal stars mapped: {total_processed:,}")
 
-# ── Normalise ──────────────────────────────────────────────────────────────────
+# ── Normalise ────────────────────────────────────────────────────────────
 print("Normalising density map...")
 density_map = np.log1p(density_map)                     # log scale — huge dynamic range otherwise
 density_map = (density_map / density_map.max() * 255).astype(np.uint8)
@@ -82,15 +79,15 @@ lon_grid, lat_grid = np.meshgrid(lon, lat)
 theta_grid = np.pi / 2 - lat_grid
 phi_grid   = lon_grid
 
-pix_grid = hp.ang2pix(NSIDE, theta_grid, phi_grid, nest=False)
+pix_grid  = hp.ang2pix(NSIDE, theta_grid, phi_grid, nest=False)
 img_array = density_map[pix_grid].reshape(H, W)
 
-# ── Save full PNG ──────────────────────────────────────────────────────────────
+# ── Save full PNG ───────────────────────────────────────────────────────────
 img_full = Image.fromarray(img_array, mode='L').convert('RGBA')
 img_full.save(OUT_FULL)
 print(f"Saved full:   {OUT_FULL}")
 
-# ── Masked PNG (alpha = density, black where empty) ────────────────────────────
+# ── Masked PNG (alpha = density, transparent where no stars) ─────────────────
 rgba = np.zeros((H, W, 4), dtype=np.uint8)
 rgba[:, :, 0] = img_array   # R
 rgba[:, :, 1] = img_array   # G
