@@ -1,8 +1,8 @@
 Shader "CMB/MilkyWayBoundary"
 {
-    // Samples the Gaia DR3 stellar density cubemap and blends with the lensing
-    // inner boundary. Rendered on an inverted sphere (observer inside), so culling
-    // is set to Front. Blends additively over whatever is behind it.
+    // Samples the Gaia DR3 stellar density cubemap and composites OVER the CMB.
+    // Physically correct — the Milky Way sits between the observer and the CMB,
+    // partially occluding it where stellar density is high (galactic plane/core).
     //
     // Coordinate frame: Galactic — matches CMB and lensing cubemaps.
     // Pipeline: Built-in (not URP/HDRP).
@@ -24,11 +24,12 @@ Shader "CMB/MilkyWayBoundary"
 
     SubShader
     {
-        // Render after opaque geometry, before transparent.
+        // Render after skybox (Queue 1000), before other transparent objects.
+        // This ensures we composite over the CMB skybox cleanly.
         Tags { "Queue" = "Transparent" "RenderType" = "Transparent" "IgnoreProjector" = "True" }
 
-        // Additive blend — stars glow over the scene without darkening it.
-        Blend One OneMinusSrcAlpha
+        // Standard alpha composite — galaxy occludes CMB where stars are dense.
+        Blend SrcAlpha OneMinusSrcAlpha
         ZWrite Off
         Cull Front          // Observer is INSIDE the sphere.
 
@@ -94,7 +95,6 @@ Shader "CMB/MilkyWayBoundary"
             {
                 v2f o;
                 o.pos      = UnityObjectToClipPos(v.vertex);
-                // World-space direction from sphere centre to vertex.
                 o.worldDir = normalize(mul((float3x3)unity_ObjectToWorld, v.normal));
                 return o;
             }
@@ -102,30 +102,29 @@ Shader "CMB/MilkyWayBoundary"
             // ── Fragment ─────────────────────────────────────────────
             fixed4 frag(v2f i) : SV_Target
             {
-                // Apply Galactic alignment rotation to sample direction.
                 float3 sampleDir = RotateByEuler(
                     normalize(i.worldDir),
                     _GalacticAlignmentOffset.xyz
                 );
 
-                // Sample stellar density (RGBA: density in all channels, alpha = density).
+                // Sample stellar density (alpha = density, 0 where no stars).
                 float4 stellar = texCUBE(_StellarDensityMap, sampleDir);
 
                 // Brightness + tint.
                 float3 colour = stellar.rgb * _BrightnessScale * _Tint.rgb;
 
-                // Pole blend — fade out near Galactic poles (|b| → 90°)
-                // to soften the double-zenith seam.
-                float absSinB  = abs(sampleDir.y);              // 0 at equator, 1 at poles
+                // Pole blend — soften seam near Galactic poles.
+                float absSinB  = abs(sampleDir.y);
                 float poleFade = 1.0 - smoothstep(
                     1.0 - _PoleBlendWidth,
                     1.0,
                     absSinB
                 );
 
+                // Alpha composite — galaxy occludes CMB proportionally to density.
                 float alpha = stellar.a * _Opacity * poleFade;
 
-                return float4(colour * alpha, alpha);           // pre-multiplied alpha
+                return float4(colour, alpha);   // standard (non-premultiplied) alpha
             }
             ENDCG
         }
