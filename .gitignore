@@ -47,3 +47,5 @@ Thumbs.db
 *.user
 *.userosscache
 *.sln.docstates
+[Pp]ackageCache/
+.vsconfig
