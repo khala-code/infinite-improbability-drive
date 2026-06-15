@@ -1,0 +1,49 @@
+# Unity generated
+[Ll]ibrary/
+[Tt]emp/
+[Oo]bj/
+[Bb]uild/
+[Bb]uilds/
+[Ll]ogs/
+[Uu]ser[Ss]ettings/
+*.pidb.meta
+*.pdb
+*.mdb
+*.apk
+*.aab
+*.unitypackage
+
+# Large CMB data files (download separately from Planck archive)
+Assets/CMB/Data/*.fits
+Assets/CMB/Data/*.fits.gz
+Assets/CMB/Data/*.hdf5
+
+# Large pre-baked textures (generated locally by Python pipeline)
+Assets/CMB/Textures/*.exr
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
