@@ -92,7 +92,6 @@ namespace InfiniteImprobability.Core
         // Cached material property IDs
         private static readonly int PropExposure = Shader.PropertyToID("_Exposure");
         private static readonly int PropOpacity  = Shader.PropertyToID("_Opacity");
-        private static readonly int PropColor    = Shader.PropertyToID("_Color");
 
         // -----------------------------------------------------------------------
         // Unity lifecycle
@@ -213,21 +212,13 @@ namespace InfiniteImprobability.Core
                 milkyWayBoundary.ApplyProperties();
             }
 
-            // Lensing — drive via renderer.material (already instanced by Unity)
+            // Lensing — shader uses _Opacity float directly
             if (lensingBoundaryRenderer != null)
-            {
-                Color c = lensingBoundaryRenderer.material.GetColor(PropColor);
-                c.a = _lensingOpacity;
-                lensingBoundaryRenderer.material.SetColor(PropColor, c);
-            }
+                lensingBoundaryRenderer.material.SetFloat(PropOpacity, _lensingOpacity);
 
-            // CνB — placeholder
+            // CνB — same pattern, _Opacity float
             if (neutrinoBoundaryRenderer != null)
-            {
-                Color c = neutrinoBoundaryRenderer.material.GetColor(PropColor);
-                c.a = _cnbOpacity;
-                neutrinoBoundaryRenderer.material.SetColor(PropColor, c);
-            }
+                neutrinoBoundaryRenderer.material.SetFloat(PropOpacity, _cnbOpacity);
         }
 
         // -----------------------------------------------------------------------
