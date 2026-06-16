@@ -35,12 +35,32 @@ namespace InfiniteImprobability.Core
         /// <summary>
         /// Redshift of photon decoupling — the outer boundary of the observer bubble.
         /// The CMB surface. Ξ = Ξ_c here. Beyond this, no classical observer bubble exists.
+        /// In holographic terms: the OBJECT WAVE interference pattern.
+        /// The 2D last scattering surface encodes the 3D mass distribution of the early universe.
         /// </summary>
         public const float Z_PHOTON_DECOUPLING = 1089.80f;
 
         // -----------------------------------------------------------------------
-        // Neutrino decoupling — deep outer boundary
-        // The neutrino shell lies inside the photon shell (earlier / higher z).
+        // Neutrino decoupling — deep reference wave boundary
+        // The CνB decoupled ~1 second after the Big Bang, ~380,000 years before
+        // the CMB. It is the deepest coherent signal accessible to the observer.
+        //
+        // HOLOGRAPHIC FRAMEWORK (insight: 2026-06-16):
+        //   The Cosmic Neutrino Background (CνB) is the REFERENCE WAVE —
+        //   coherent, isotropic, essentially unperturbed since the electroweak epoch.
+        //   The CMB temperature fluctuation map IS the interference pattern produced
+        //   by the object wave (primordial density perturbations) interfering with
+        //   this reference wave on the 2D last scattering surface (holographic plate).
+        //
+        //   Layer stack roles:
+        //     CνB  (z ~ 6e9)   — Reference wave:        coherent carrier
+        //     CMB  (z ~ 1090)  — Holographic plate:     object wave interference pattern
+        //     Lensing           — Reconstruction lens:   gravitational optics
+        //     Milky Way (z~0)  — Near-field foreground: local developed structure
+        //     Observer          — Reconstruction point:  where the hologram is read
+        //
+        //   The double-zenith poles are the conjugate image points of the
+        //   holographic reconstruction — real image and virtual image axes.
         // -----------------------------------------------------------------------
 
         /// <summary>Neutrino decoupling temperature (Kelvin)</summary>
@@ -49,7 +69,10 @@ namespace InfiniteImprobability.Core
         /// <summary>Neutrino background temperature today = (4/11)^(1/3) × T_CMB (Kelvin)</summary>
         public const float T_NEUTRINO_TODAY_K = 1.945f;
 
-        /// <summary>Redshift of neutrino decoupling — the deep outer boundary (neutrino layer)</summary>
+        /// <summary>
+        /// Redshift of neutrino decoupling — the deep reference wave boundary.
+        /// In holographic terms: the source of the REFERENCE WAVE.
+        /// </summary>
         public const float Z_NEUTRINO_DECOUPLING = 6e9f;
 
         // -----------------------------------------------------------------------
@@ -129,15 +152,16 @@ namespace InfiniteImprobability.Core
         /// </summary>
         public static readonly float[] Z_LADDER = new float[]
         {
-            0f,       // Now
+            0f,       // Now — observer reconstruction point
             0.1f,     // z~0.1 — nearby universe, Hubble flow
             0.5f,     // z~0.5 — 5 Gyr ago
             1.0f,     // z~1   — 8 Gyr ago, peak star formation
             2.0f,     // z~2   — cosmic noon, peak AGN
             5.0f,     // z~5   — reionisation epoch
-            10.0f,    // z~10  — first galaxies
-            100.0f,   // z~100 — matter-radiation equality
-            1089.80f  // z~1090 — CMB / photon decoupling (outer boundary)
+            10.0f,    // z~10  — first galaxies (Milky Way fully faded)
+            100.0f,   // z~100 — matter-radiation equality (lensing peaks)
+            1089.80f, // z~1090 — CMB / photon decoupling (holographic plate)
+            6e9f      // z~6e9 — CνB / neutrino decoupling (reference wave source)
         };
 
         // -----------------------------------------------------------------------
