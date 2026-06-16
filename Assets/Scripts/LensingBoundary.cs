@@ -1,36 +1,36 @@
 using UnityEngine;
 
 /// <summary>
-/// MilkyWayBoundary — renders the Gaia DR3 stellar density map as the innermost
-/// visible boundary layer of the observer bubble.
+/// LensingBoundary — renders the gravitational lensing kappa map as the
+/// intermediate boundary layer, sitting between the Milky Way and the CMB.
 ///
-/// Sits between the observer and the lensing boundary sphere.
-/// Samples a single cubemap in Galactic coordinates.
+/// Acts as the reconstruction lens in the holographic layer stack:
+/// gravitational lensing = optical element that focuses the CMB object wave.
 ///
-/// Coordinate frame: Galactic (l, b) — matches CMB and lensing cubemaps.
-/// Texture: milkyway_stellar_density_masked.png imported as Cubemap,
+/// Coordinate frame: Galactic (l, b) — matches CMB and Milky Way cubemaps.
+/// Texture: lensing_inner_boundary_masked.png imported as Cubemap,
 ///          Mapping → Latitude-Longitude Layout, Wrap Mode → Clamp.
 /// </summary>
 [RequireComponent(typeof(MeshRenderer))]
-public class MilkyWayBoundary : MonoBehaviour
+public class LensingBoundary : MonoBehaviour
 {
     [Header("Textures")]
-    [Tooltip("Gaia DR3 stellar density cubemap (masked, alpha = density)")]
-    public Cubemap stellarDensityMap;
+    [Tooltip("Gravitational lensing kappa map cubemap (masked, alpha = kappa)")]
+    public Cubemap lensingMap;
 
     [Header("Appearance")]
     [Range(0f, 1f)]
-    [Tooltip("Overall opacity of the Milky Way layer — driven by HolographicLayerController at runtime")]
+    [Tooltip("Overall opacity — driven by HolographicLayerController at runtime")]
     public float opacity = 1.0f;
 
-    [Tooltip("Brightness multiplier for the stellar density")]
-    public float brightnessScale = 1.5f;
+    [Tooltip("Brightness multiplier for the kappa map")]
+    public float brightnessScale = 1.0f;
 
-    [Tooltip("Tint colour applied to the stellar density map")]
-    public Color tint = new Color(0.9f, 0.85f, 0.7f, 1f);
+    [Tooltip("Tint colour — cool blue-white suits gravitational lensing")]
+    public Color tint = new Color(0.7f, 0.85f, 1.0f, 1f);
 
     [Header("Rotation — Galactic Alignment")]
-    [Tooltip("Offset rotation to align Galactic centre (l=0, b=0) with scene forward")]
+    [Tooltip("Should match MilkyWayBoundary alignment offset")]
     public Vector3 galacticAlignmentOffset = new Vector3(0f, -90f, 0f);
 
     [Header("Double-Zenith Blend")]
@@ -40,7 +40,7 @@ public class MilkyWayBoundary : MonoBehaviour
 
     // ── Private ──────────────────────────────────────────────────────────────
     private Material _mat;
-    private static readonly int PropStellarMap     = Shader.PropertyToID("_StellarDensityMap");
+    private static readonly int PropLensingMap      = Shader.PropertyToID("_LensingMap");
     private static readonly int PropOpacity         = Shader.PropertyToID("_Opacity");
     private static readonly int PropBrightness      = Shader.PropertyToID("_BrightnessScale");
     private static readonly int PropTint            = Shader.PropertyToID("_Tint");
@@ -65,8 +65,8 @@ public class MilkyWayBoundary : MonoBehaviour
     // ── Property Push ─────────────────────────────────────────────────────────
     public void ApplyProperties()
     {
-        if (stellarDensityMap != null)
-            _mat.SetTexture(PropStellarMap, stellarDensityMap);
+        if (lensingMap != null)
+            _mat.SetTexture(PropLensingMap, lensingMap);
 
         _mat.SetFloat(PropOpacity,          opacity);
         _mat.SetFloat(PropBrightness,       brightnessScale);
@@ -78,7 +78,7 @@ public class MilkyWayBoundary : MonoBehaviour
     // ── Public API ────────────────────────────────────────────────────────────
 
     /// <summary>
-    /// Fade the Milky Way layer in or out over <paramref name="duration"/> seconds.
+    /// Fade the lensing layer in or out over <paramref name="duration"/> seconds.
     /// </summary>
     public void FadeTo(float targetOpacity, float duration)
     {

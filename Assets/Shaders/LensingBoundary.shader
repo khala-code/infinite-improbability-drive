@@ -1,26 +1,29 @@
-Shader "CMB/MilkyWayBoundary"
+Shader "CMB/LensingBoundary"
 {
-    // Samples the Gaia DR3 stellar density cubemap and composites OVER the CMB.
-    // Physically correct — the Milky Way sits between the observer and the CMB,
-    // partially occluding it where stellar density is high.
+    // Renders the gravitational lensing kappa map as the intermediate boundary layer.
+    // Sits between the Milky Way sphere (inner) and the CMB skybox (outer).
     //
-    // Coordinate frame: Galactic — matches CMB and lensing cubemaps.
+    // Holographic role: reconstruction lens — gravitational lensing as optical element.
+    // High kappa regions (mass concentrations) = strong lensing = bright in this layer.
+    //
+    // Coordinate frame: Galactic — matches CMB and Milky Way cubemaps.
     // Pipeline: Built-in (not URP/HDRP).
 
     Properties
     {
-        _StellarDensityMap       ("Stellar Density Map (Masked Cubemap)", Cube) = "black" {}
+        _LensingMap              ("Lensing Kappa Map (Masked Cubemap)", Cube) = "black" {}
 
         _Opacity                 ("Opacity",          Range(0,1)) = 1.0
-        _BrightnessScale         ("Brightness Scale", Float)      = 1.5
-        _Tint                    ("Tint",             Color)      = (0.9, 0.85, 0.7, 1.0)
+        _BrightnessScale         ("Brightness Scale", Float)      = 1.0
+        _Tint                    ("Tint",             Color)      = (0.7, 0.85, 1.0, 1.0)
         _PoleBlendWidth          ("Pole Blend Width", Range(0,1)) = 0.05
         _GalacticAlignmentOffset ("Galactic Alignment Offset", Vector) = (0, -90, 0, 0)
     }
 
     SubShader
     {
-        Tags { "Queue" = "Transparent" "RenderType" = "Transparent" "IgnoreProjector" = "True" }
+        // Render just after MilkyWayBoundary (Queue 2001 > 2000)
+        Tags { "Queue" = "Transparent+1" "RenderType" = "Transparent" "IgnoreProjector" = "True" }
 
         Blend SrcAlpha OneMinusSrcAlpha
         ZWrite Off
@@ -33,7 +36,7 @@ Shader "CMB/MilkyWayBoundary"
             #pragma fragment frag
             #include "UnityCG.cginc"
 
-            samplerCUBE _StellarDensityMap;
+            samplerCUBE _LensingMap;
             float  _Opacity;
             float  _BrightnessScale;
             float4 _Tint;
@@ -66,11 +69,11 @@ Shader "CMB/MilkyWayBoundary"
             fixed4 frag(v2f i) : SV_Target
             {
                 float3 sampleDir = RotateByEuler(normalize(i.worldDir), _GalacticAlignmentOffset.xyz);
-                float4 stellar   = texCUBE(_StellarDensityMap, sampleDir);
-                float3 colour    = stellar.rgb * _BrightnessScale * _Tint.rgb;
+                float4 kappa     = texCUBE(_LensingMap, sampleDir);
+                float3 colour    = kappa.rgb * _BrightnessScale * _Tint.rgb;
                 float  absSinB   = abs(sampleDir.y);
                 float  poleFade  = 1.0 - smoothstep(1.0 - _PoleBlendWidth, 1.0, absSinB);
-                float  alpha     = stellar.a * _Opacity * poleFade;
+                float  alpha     = kappa.a * _Opacity * poleFade;
                 return float4(colour, alpha);
             }
             ENDCG
