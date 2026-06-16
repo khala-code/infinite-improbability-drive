@@ -102,7 +102,6 @@ namespace InfiniteImprobability.Core
             _bubble = GetComponent<ObserverBubble>();
 
             // Clone the skybox material so we never dirty the shared asset.
-            // Then point the scene skybox at the instance.
             if (cmbSkyboxMaterial != null)
             {
                 _cmbSkyboxInstance = new Material(cmbSkyboxMaterial);
@@ -110,12 +109,19 @@ namespace InfiniteImprobability.Core
                 RenderSettings.skybox = _cmbSkyboxInstance;
             }
 
-            // Initialise to z=0 values
+            // Initialise smoothed values — do NOT call ApplyAll here.
+            // MilkyWayBoundary._mat may not be assigned yet if its Awake runs after ours.
+            // ApplyAll is deferred to Start() so all Awakes have completed first.
             _cmbExposure    = cmbExposureAtZNow;
             _mwOpacity      = mwOpacityAtZNow;
             _lensingOpacity = 0f;
             _cnbOpacity     = cnbOpacityAtZNow;
+        }
 
+        private void Start()
+        {
+            // All Awake() calls are guaranteed complete before any Start().
+            // Safe to push initial values to all layer materials now.
             ApplyAll();
         }
 
@@ -133,7 +139,6 @@ namespace InfiniteImprobability.Core
 
         private void OnDestroy()
         {
-            // Clean up the runtime instance to avoid memory leaks.
             if (_cmbSkyboxInstance != null)
                 Destroy(_cmbSkyboxInstance);
         }
@@ -205,7 +210,7 @@ namespace InfiniteImprobability.Core
             if (_cmbSkyboxInstance != null)
                 _cmbSkyboxInstance.SetFloat(PropExposure, _cmbExposure);
 
-            // Milky Way — set opacity field, ApplyProperties() pushes to material
+            // Milky Way — ApplyProperties() handles its own null guard
             if (milkyWayBoundary != null)
             {
                 milkyWayBoundary.opacity = _mwOpacity;
@@ -216,7 +221,7 @@ namespace InfiniteImprobability.Core
             if (lensingBoundaryRenderer != null)
                 lensingBoundaryRenderer.material.SetFloat(PropOpacity, _lensingOpacity);
 
-            // CνB — same pattern, _Opacity float
+            // CνB — same pattern
             if (neutrinoBoundaryRenderer != null)
                 neutrinoBoundaryRenderer.material.SetFloat(PropOpacity, _cnbOpacity);
         }

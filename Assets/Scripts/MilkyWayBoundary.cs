@@ -38,7 +38,7 @@ public class MilkyWayBoundary : MonoBehaviour
     [Tooltip("Softens the seam near Galactic poles")]
     public float poleBlendWidth = 0.05f;
 
-    // ── Private ──────────────────────────────────────────────────────────────
+    // ── Private ────────────────────────────────────────────────────────────────────
     private Material _mat;
     private static readonly int PropStellarMap     = Shader.PropertyToID("_StellarDensityMap");
     private static readonly int PropOpacity         = Shader.PropertyToID("_Opacity");
@@ -47,7 +47,7 @@ public class MilkyWayBoundary : MonoBehaviour
     private static readonly int PropPoleBlend       = Shader.PropertyToID("_PoleBlendWidth");
     private static readonly int PropAlignmentOffset = Shader.PropertyToID("_GalacticAlignmentOffset");
 
-    // ── Unity Lifecycle ───────────────────────────────────────────────────────
+    // ── Unity Lifecycle ─────────────────────────────────────────────────────────────────
     private void Awake()
     {
         _mat = GetComponent<MeshRenderer>().material;
@@ -62,9 +62,15 @@ public class MilkyWayBoundary : MonoBehaviour
     }
 #endif
 
-    // ── Property Push ─────────────────────────────────────────────────────────
+    // ── Property Push ──────────────────────────────────────────────────────────────────
     public void ApplyProperties()
     {
+        // Guard: _mat may be null if called before Awake (e.g. from another script's Awake)
+        if (_mat == null)
+            _mat = GetComponent<MeshRenderer>()?.material;
+
+        if (_mat == null) return;
+
         if (stellarDensityMap != null)
             _mat.SetTexture(PropStellarMap, stellarDensityMap);
 
@@ -75,7 +81,7 @@ public class MilkyWayBoundary : MonoBehaviour
         _mat.SetVector(PropAlignmentOffset, galacticAlignmentOffset);
     }
 
-    // ── Public API ────────────────────────────────────────────────────────────
+    // ── Public API ────────────────────────────────────────────────────────────────────
 
     /// <summary>
     /// Fade the Milky Way layer in or out over <paramref name="duration"/> seconds.
