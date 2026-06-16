@@ -22,7 +22,6 @@ Shader "CMB/LensingBoundary"
 
     SubShader
     {
-        // Render just after MilkyWayBoundary (Queue 2001 > 2000)
         Tags { "Queue" = "Transparent+1" "RenderType" = "Transparent" "IgnoreProjector" = "True" }
 
         Blend SrcAlpha OneMinusSrcAlpha
@@ -34,7 +33,9 @@ Shader "CMB/LensingBoundary"
             CGPROGRAM
             #pragma vertex   vert
             #pragma fragment frag
+            #pragma multi_compile_instancing
             #include "UnityCG.cginc"
+            #include "UnityInstancing.cginc"
 
             samplerCUBE _LensingMap;
             float  _Opacity;
@@ -43,8 +44,19 @@ Shader "CMB/LensingBoundary"
             float  _PoleBlendWidth;
             float4 _GalacticAlignmentOffset;
 
-            struct appdata { float4 vertex : POSITION; float3 normal : NORMAL; };
-            struct v2f    { float4 pos : SV_POSITION;  float3 worldDir : TEXCOORD0; };
+            struct appdata
+            {
+                float4 vertex : POSITION;
+                float3 normal : NORMAL;
+                UNITY_VERTEX_INPUT_INSTANCE_ID
+            };
+
+            struct v2f
+            {
+                float4 pos      : SV_POSITION;
+                float3 worldDir : TEXCOORD0;
+                UNITY_VERTEX_OUTPUT_STEREO
+            };
 
             float3 RotateByEuler(float3 dir, float3 eulerDeg)
             {
@@ -61,6 +73,8 @@ Shader "CMB/LensingBoundary"
             v2f vert(appdata v)
             {
                 v2f o;
+                UNITY_SETUP_INSTANCE_ID(v);
+                UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
                 o.pos      = UnityObjectToClipPos(v.vertex);
                 o.worldDir = normalize(mul((float3x3)unity_ObjectToWorld, v.normal));
                 return o;
@@ -68,6 +82,7 @@ Shader "CMB/LensingBoundary"
 
             fixed4 frag(v2f i) : SV_Target
             {
+                UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(i);
                 float3 sampleDir = RotateByEuler(normalize(i.worldDir), _GalacticAlignmentOffset.xyz);
                 float4 kappa     = texCUBE(_LensingMap, sampleDir);
                 float3 colour    = kappa.rgb * _BrightnessScale * _Tint.rgb;

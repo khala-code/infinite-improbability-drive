@@ -31,7 +31,9 @@ Shader "CMB/MilkyWayBoundary"
             CGPROGRAM
             #pragma vertex   vert
             #pragma fragment frag
+            #pragma multi_compile_instancing
             #include "UnityCG.cginc"
+            #include "UnityInstancing.cginc"
 
             samplerCUBE _StellarDensityMap;
             float  _Opacity;
@@ -40,8 +42,19 @@ Shader "CMB/MilkyWayBoundary"
             float  _PoleBlendWidth;
             float4 _GalacticAlignmentOffset;
 
-            struct appdata { float4 vertex : POSITION; float3 normal : NORMAL; };
-            struct v2f    { float4 pos : SV_POSITION;  float3 worldDir : TEXCOORD0; };
+            struct appdata
+            {
+                float4 vertex : POSITION;
+                float3 normal : NORMAL;
+                UNITY_VERTEX_INPUT_INSTANCE_ID
+            };
+
+            struct v2f
+            {
+                float4 pos      : SV_POSITION;
+                float3 worldDir : TEXCOORD0;
+                UNITY_VERTEX_OUTPUT_STEREO
+            };
 
             float3 RotateByEuler(float3 dir, float3 eulerDeg)
             {
@@ -58,6 +71,8 @@ Shader "CMB/MilkyWayBoundary"
             v2f vert(appdata v)
             {
                 v2f o;
+                UNITY_SETUP_INSTANCE_ID(v);
+                UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
                 o.pos      = UnityObjectToClipPos(v.vertex);
                 o.worldDir = normalize(mul((float3x3)unity_ObjectToWorld, v.normal));
                 return o;
@@ -65,6 +80,7 @@ Shader "CMB/MilkyWayBoundary"
 
             fixed4 frag(v2f i) : SV_Target
             {
+                UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(i);
                 float3 sampleDir = RotateByEuler(normalize(i.worldDir), _GalacticAlignmentOffset.xyz);
                 float4 stellar   = texCUBE(_StellarDensityMap, sampleDir);
                 float3 colour    = stellar.rgb * _BrightnessScale * _Tint.rgb;
