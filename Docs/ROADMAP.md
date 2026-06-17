@@ -64,14 +64,16 @@ Each filter conditions the probability space for all subsequent filters. Order i
 | Order | Event | t | What it constrains |
 |-------|-------|---|-------------------|
 | 0 | Planck epoch / Null | t = 0 | Stack rebuilds from Null; ζ undefined |
-| 1 | Baryogenesis | t ~ 10⁻¹² s | **First ξ calibration** — matter/antimatter proper time tax differential; first moment ζ becomes nonzero |
+| 1 | Baryogenesis / neutrino handedness lock | t ~ 10⁻¹² s | **First ξ calibration** — matter/antimatter proper time tax differential, Majorana handedness selection, first moment ζ becomes nonzero |
 | 2 | BBN / Lithium deficit | t ~ 3 min | **Second calibration** — ζ measurable in nucleosynthesis complexity threshold; must be consistent with baryogenesis ζ evolved forward |
 | 3 | CMB last scattering | t ~ 380,000 yr | Third calibration — ζ encoded in CMB power spectrum anisotropies; Axis of Evil as directional void density structure |
-| 4 | Structure formation / lensing | t ~ Gyr | GR term in bulk at present epoch; lensing map consistency |
+| 4 | Structure formation / first stars / lensing | t ~ 10⁸–10⁹ yr | GR term in bulk at present epoch; first stars, halo formation, lensing map consistency |
 | 5 | Geological / biological emergence | t ~ 4.5 Gyr | Eyeball Earth / dolomite problem; ξ field strength at biological emergence threshold |
 | 6 | Present observer / Ohmazata bubble | t = now | Closes back to observer; ZaTaOa coordinate anchor |
 
 The ζ evolution equation (carrying the coupling constant through phase transitions without breaking CPT) is the primary unsolved piece. Phase transition handling at each filter boundary is the hardest conceptual work.
+
+**Important implementation consequence:** filter order is also **precompute order**. Each boundary sphere must be generated in sequence because ζ accumulates continuously. The output of filter _n_ becomes part of the prior for filter _n+1_.
 
 ---
 
@@ -145,7 +147,7 @@ A civilisation is a void density anomaly — a high-ξ attractor that concentrat
 ## Proof of Concept — Stage Plan
 
 ### Stage 0: Ontology Lock
-Define precisely: observer state, void density, ξ tensor axes, ζ coupling, phase-transition operator, and bifurcation algorithm. Write the axiom sheet and filter order document before adding speculative layers.
+Define precisely: observer state, void density, ξ tensor axes, ζ coupling, phase-transition operator, and bifurcation algorithm. Write the axiom sheet, calibration sequence, and complexity documents before adding speculative layers.
 
 ### Stage 1: Earth Anomaly Solver
 Target anomalies:
@@ -154,6 +156,42 @@ Target anomalies:
 - Baryogenesis asymmetry (first ζ calibration point)
 
 Validation: does the solver produce a coherent causality chain? Does a known historical configuration produce a detectable ξ signature against the substrate?
+
+### Stage 1b: Early Universe Timeline Navigator
+Build a **T-axis walkthrough** that lets the observer step through the calibration sequence from leptogenesis/baryogenesis toward BBN, recombination, dark ages, and first stars.
+
+This is not free camera movement through space. It is motion along the ordered filter stack.
+
+**Core idea:** each major transition gets its own **precomputed boundary sphere**, just like the existing lensing and Milky Way layers. The early universe becomes explorable because the boundary states are baked in sequence and crossfaded by epoch.
+
+**Required epoch spheres:**
+- **Leptogenesis / baryogenesis sphere** — opaque plasma regime; first asymmetry; neutrino handedness lock
+- **BBN sphere** — nucleosynthesis regime; proper time tax visualisation; Li-7 affordability edge
+- **Recombination sphere** — photon decoupling; CMB crystallisation
+- **Dark ages sphere** — post-recombination, pre-stellar structure growth
+- **First stars sphere** — Population III ignition and early halo collapse
+- **Reionisation sphere** — transition from darkness to the first luminous cosmic web
+
+**Pipeline rule:** precompute order follows filter order. Each sphere must be generated with the previous calibration as prior input:
+
+```text
+Null / initial conditions
+    → baryogenesis sphere
+        → BBN sphere
+            → recombination sphere
+                → dark ages sphere
+                    → first stars sphere
+                        → reionisation sphere
+```
+
+**Implementation implications:**
+- add a **timeline scrubber** bound to cosmological proper/coordinate time keyframes
+- define an `EpochBoundary` system parallel to `LensingBoundary` and `MilkyWayBoundary`
+- precompute equirectangular textures or volumetric proxy maps for each epoch
+- allow continuous crossfading between adjacent epochs while preserving causal ordering
+- expose ζ / ξ overlays so transitions can be viewed both visually and structurally
+
+**Why this matters:** it operationalises the calibration sequence as an explorable object. The observer can literally watch the filter stack unfold.
 
 ### Stage 2: Solar System Extension
 Target anomalies:
@@ -170,6 +208,32 @@ Small agent graph (~12 consequential agents, historical or synthetic) with param
 - Void density corridor mapping
 - K3/K4 civilisation coherence injection signatures
 - Preferred light-speed direction via CMB dipole / Axis of Evil
+
+---
+
+## Boundary Sphere Precompute Plan
+
+The boundary-sphere pipeline is now a recurring architectural pattern:
+
+| Boundary sphere | Source type | Status |
+|---|---|---|
+| CMB skybox | Observational (Planck) | ✅ |
+| LensingBoundary | Observational / derived (kappa map) | ✅ |
+| MilkyWayBoundary | Observational (Gaia DR3) | ✅ |
+| Baryogenesis sphere | Simulated / theory-constrained | 🔲 |
+| BBN sphere | Simulated / theory-constrained | 🔲 |
+| Recombination sphere | Simulated + observationally anchored | 🔲 |
+| Dark ages sphere | Simulated / structure-growth constrained | 🔲 |
+| First stars sphere | Simulated / observationally anchored | 🔲 |
+| Reionisation sphere | Simulated / observationally anchored | 🔲 |
+| ObserverBubble | Runtime generated from ξ field | 🔲 |
+
+Each new boundary sphere should use the same practical pipeline shape:
+1. generate source field data in Python
+2. project to equirectangular or cube-map representation
+3. cache as texture assets
+4. render in Unity as a shader-driven boundary layer
+5. crossfade or stack with neighbouring epochs under timeline control
 
 ---
 
@@ -191,6 +255,7 @@ These are staged deliberately after the core framework has earned predictive cre
 3. **Filter independence verification** — are the calibration constraints genuinely independent or secretly correlated (false consilience)?
 4. **ObserverBubble geometry** — ξ is an axis-dependent tensor, so the bubble surface is a deformed manifold. What is the correct geometric description?
 5. **Computational reducibility bound** — exactly how much of the simulation is eliminable via the holographic principle before the POC becomes intractable?
+6. **Epoch sphere generation** — what is the minimum physically credible precompute pipeline for baryogenesis/BBN/first-stars spheres before observational anchors become too weak?
 
 ---
 
@@ -205,6 +270,8 @@ These are staged deliberately after the core framework has earned predictive cre
 | SpacetimeNavigator controls | ✅ |
 | HolographicLayerController | ✅ |
 | Retrograde inference solver | 🔲 Stage 1 |
+| EpochBoundary timeline scrubber | 🔲 Stage 1b |
+| Epoch sphere precompute pipeline | 🔲 Stage 1b |
 | Agent graph engine | 🔲 Stage 3 |
 
 ---
