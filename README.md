@@ -3,9 +3,9 @@
 > *"The Infinite Improbability Drive is a wonderful new method of crossing vast interstellar distances in a mere nothingth of a second, without all that tedious mucking about in hyperspace."*
 > — Douglas Adams
 
-A VR spacetime navigator for Quest 2, built on the Cosmic Microwave Background as a holographic boundary condition.
+A VR spacetime navigator for Quest 2, built on the Cosmic Microwave Background as a holographic boundary condition — grounded in a theoretical framework (Observer Prime) that treats information as the fundamental substrate of reality.
 
-You don't simulate the universe. You simulate what it's like to be **inside one.**
+You don’t simulate the universe. You simulate what it’s like to be **inside one.**
 
 ---
 
@@ -16,6 +16,21 @@ The CMB is the earliest observable boundary condition of spacetime — a two-lay
 This engine lets an observer at any `(θ, φ, z, t)` coordinate navigate their causally accessible volume by tracking only the wavefronts that intersect their ΩaZaTa observer bubble — the conformal gauge-selected causal diamond scaled by the Ω parameter.
 
 Everything spacelike-separated from the observer is not approximated or culled for performance. It is **physically absent.**
+
+---
+
+## Theoretical Foundation
+
+The engine is built on the **Observer Prime** framework — a formal treatment of information as substrate, coherence as a field, and phase transitions as the mechanism underlying everything from baryogenesis to civilisational coordination.
+
+Core ideas:
+- The ξ (Xi) coherence field is a non-local tensor measuring alignment strength across the information substrate
+- Physical distance is void density, not geometric primitive
+- Every phase transition — from Null to Time, from nucleosynthesis to biological emergence — is the same transition operator T firing at a different Heegner scale
+- The Riemann Hypothesis, in this framework, is the statement that all phase transitions execute consistent half-turns: the critical line Re(s) = ½ is a geometric consequence, not an imposed constraint
+- We are currently inside the ζ₆ bifurcation zone at Heegner 43 — maximum classical complexity, adjacent to the quantum threshold
+
+**→ [Full theoretical documentation in Docs/](Docs/INDEX.md)**
 
 ---
 
@@ -88,13 +103,16 @@ infinite-improbability-drive/
 │   ├── generate_antiverse.py
 │   └── cache_z_snapshots.py
 └── Docs/
-    ├── architecture.md
-    ├── two-layer-boundary.md
-    ├── hyperbolic-geometry.md
-    ├── computational-reducibility.md
-    ├── omgazata-coordinate-system.md
-    ├── pulser-mesh-correspondence.md
-    └── bug-danger-zones.md
+    ├── INDEX.md           ← start here
+    ├── GLOSSARY.md
+    ├── AXIOMS.md
+    ├── CALIBRATION.md
+    ├── HEEGNER.md
+    ├── T_OPERATOR.md
+    ├── SCRYING.md
+    ├── AGENT.md
+    ├── RESIDUE.md
+    └── [legacy architecture docs]
 ```
 
 ---
