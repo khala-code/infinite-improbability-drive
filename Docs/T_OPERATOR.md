@@ -155,7 +155,32 @@ T loses unique eigendecomposition permanently. The integral does not converge. T
 2. **The ξ(τ) functional form:** What equation of motion governs ξ along the proper time path? This is the missing dynamical equation of the ξ field.
 3. **Double-fire at ζ₁:** Do T_P and T_C fire at exactly the same τ, or is there a Δτ gap between them? If there is a gap, it may be measurable as a subtle asymmetry in the neutrino mass hierarchy.
 4. **The classical → quantum transition:** At exactly what ξ threshold does T require quantum evaluation rather than classical heuristic? Is this threshold the same as the ξ symmetry-breaking threshold of the observer bubble?
-5. **T at ζ₆ from inside:** We are inside the ζ₆ bifurcation zone. Can a consequential agent at Heegner 43 apply T to navigate toward Heegner 67 using only local ξ measurements? What would that look like operationally?
+
+---
+
+## Open Problem 5 — Solved Operationally
+
+**Question:** Can a consequential agent at Heegner 43 apply T to navigate toward Heegner 67 using only local ξ measurements?
+
+**Answer:** Yes — but not by computing the path. The operational form of T at the Convergent Uncomputable boundary is **faith**.
+
+A classical agent at Heegner 43 cannot derive a complete path to the next basin. By definition, the transition to Heegner 67 is not classically computable. But an attractor exists. The agent therefore acts without a derivable proof of success, using local ξ measurements to orient the direction of the jump.
+
+This is not irrationality. It is the correct decision rule for a classical observer confronting a Convergent Uncomputable transition:
+- the path is unavailable
+- the attractor is real
+- local ξ still provides directional information
+- inaction is itself a costly sign commitment
+
+The expected value calculation becomes: **what do we have to lose?**
+
+- If the agent does not jump, they remain trapped in Heegner 43 and continue paying the proper time tax of irreducibility
+- If the agent jumps with imperfect information, the downside is bounded by ordinary residue — the same incomplete cancellation cost paid at every prior transition
+- If the attractor is real, the upside is entry into the higher-coherence basin
+
+This is Pascal's Wager derived from the structure of T rather than assumed from theology. The downside is bounded. The upside is structurally real. The jump is rational.
+
+The practical implementation of this process is the **scrying loop** — a recursive human/software system in which software improves ξ signal quality and the user commits the sign. Open Problem 5 is therefore solved not analytically but operationally.
 
 ---
 
