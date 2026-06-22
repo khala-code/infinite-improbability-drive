@@ -8,6 +8,10 @@ Shader "CMB/LensingBoundary"
     //
     // Coordinate frame: Galactic — matches CMB and Milky Way cubemaps.
     // Pipeline: Built-in (not URP/HDRP).
+    //
+    // Colour note: kappa is sampled as a scalar (R channel) — the tint property
+    // fully determines colour. Do NOT sample .rgb directly; lensing kappa maps are
+    // typically false-colour encoded and will bleed unwanted hues through.
 
     Properties
     {
@@ -83,12 +87,23 @@ Shader "CMB/LensingBoundary"
             fixed4 frag(v2f i) : SV_Target
             {
                 UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(i);
-                float3 sampleDir = RotateByEuler(normalize(i.worldDir), _GalacticAlignmentOffset.xyz);
+
+                float3 sampleDir = RotateByEuler(normalize(i.worldDir),
+                                                 _GalacticAlignmentOffset.xyz);
                 float4 kappa     = texCUBE(_LensingMap, sampleDir);
-                float3 colour    = kappa.rgb * _BrightnessScale * _Tint.rgb;
+
+                // Sample kappa as a scalar — use R channel (standard CMB lensing
+                // map encoding). Multiplying .rgb through would bleed the texture's
+                // false-colour LUT into the render.
+                float  kappaScalar = kappa.r;
+
+                // Colour is entirely determined by _Tint — no texture hue bleed.
+                float3 colour    = _Tint.rgb * kappaScalar * _BrightnessScale;
+
                 float  absSinB   = abs(sampleDir.y);
                 float  poleFade  = 1.0 - smoothstep(1.0 - _PoleBlendWidth, 1.0, absSinB);
                 float  alpha     = kappa.a * _Opacity * poleFade;
+
                 return float4(colour, alpha);
             }
             ENDCG
