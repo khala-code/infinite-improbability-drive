@@ -7,8 +7,8 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: ObserverBubble
-  m_Shader: {fileID: 4800000, guid: 451f1453d7699744cb1820e105425c36, type: 3}
+  m_Name: HUD_Notch
+  m_Shader: {fileID: 46, guid: 0000000000000000f000000000000000, type: 0}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
@@ -63,35 +63,22 @@ Material:
     m_Floats:
     - _BumpScale: 1
     - _Cutoff: 0.5
-    - _DeformStrength: 0.35
     - _DetailNormalMapScale: 1
     - _DstBlend: 0
-    - _FluctuationScale: 0.12
-    - _FluctuationSpeed: 1.4
-    - _GlobalOpacity: 0.65
     - _GlossMapScale: 1
     - _Glossiness: 0.5
     - _GlossyReflections: 1
-    - _HorizonWidth: 0.08
     - _Metallic: 0
     - _Mode: 0
     - _OcclusionStrength: 1
     - _Parallax: 0.02
-    - _RadiusBase: 1
     - _SmoothnessTextureChannel: 0
     - _SpecularHighlights: 1
     - _SrcBlend: 1
     - _UVSec: 0
-    - _Xi: 0.7
-    - _XiCritical: 0.35
     - _ZWrite: 1
     m_Colors:
-    - _CoherenceAxis: {r: 0, g: 1, b: 0, a: 0}
-    - _Color: {r: 1, g: 1, b: 1, a: 1}
+    - _Color: {r: 0.6320754, g: 0.6320754, b: 0.6320754, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
-    - _ExteriorColour: {r: 0.29999998, g: 0.45, b: 1, a: 1}
-    - _HorizonColour: {r: 1, g: 1, b: 1, a: 1}
-    - _InteriorColour: {r: 1, g: 0.85, b: 0.39999998, a: 1}
-    - _SpinVector: {r: 0, g: 1, b: 0, a: 0}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
