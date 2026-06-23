@@ -1,0 +1,195 @@
+// CvBField.compute
+// GPU compute shader for the causal field engine.
+//
+// Three kernels, dispatched in order each frame:
+//
+//   1. UpdatePsi     — raytmarch CMB boundary inward, compute ψ(r,θ,φ)
+//                      ψ = ψ_boundary · exp(-∫ρ_v dr)  [holographic projection]
+//                      Re(ψ) = CMB sample (object wave)
+//                      Im(ψ) = CνB helix phase (reference wave, Majorana L-handed)
+//
+//   2. UpdateVoid    — pair annihilation: nodes where |ψ|² < threshold
+//                      deposit Δρ_v; nodes with active consensus drain ρ_v
+//
+//   3. ClassifyNodes — tag each node as BULK / BIFURCATED / HEEGNER_LOCKED
+//                      based on Re(ψ) and Im(ψ) thresholds
+
+#pragma kernel UpdatePsi
+#pragma kernel UpdateVoid
+#pragma kernel ClassifyNodes
+
+// ── Buffers ──────────────────────────────────────────────────────────────────
+// CausalNode layout (matches CausalNode.cs StructLayout Sequential):
+//   float  voidDensity   [0]
+//   float4 xi            [1..4]
+//   float2 psi           [5..6]
+// Packed as float[7] per node in the RWStructuredBuffer.
+RWStructuredBuffer<float> _Nodes;  // stride = 7 floats
+int _Resolution;                   // nodes per axis (default 64)
+float _BubbleScale;                // world-space radius of observer bubble
+float _DeltaTime;
+
+// CMB boundary texture (equirectangular, Planck data)
+Texture2D<float4> _CMBTexture;
+SamplerState sampler_CMBTexture;
+
+// Per-frame observer state
+float  _OmegaValue;   // current Ω coordinate
+float4 _XiObserver;  // observer's ξ tensor from ObserverBubble
+float3 _SpinVector;  // CνB helix axis (Majorana handedness fixed: left-helical)
+
+// Thresholds
+float _BifurcationEpsilon;  // |Re(ψ)| < this → bifurcated
+float _HeegnerEpsilon;      // |Im(ψ)| < this → Heegner locked
+float _SpawnThreshold;      // |ψ|² above this → active interference
+float _AnnihilationRate;    // Δρ_v deposited per annihilating pair per second
+float _VoidDecayRate;       // natural ρ_v decay toward vacuum per second
+
+// ── Node accessors ───────────────────────────────────────────────────────────
+int NodeBase(int3 id)
+{
+    return (id.x + id.y * _Resolution + id.z * _Resolution * _Resolution) * 7;
+}
+
+float  GetVoid(int base_)               { return _Nodes[base_];     }
+void   SetVoid(int base_, float v)       { _Nodes[base_]     = v;    }
+float4 GetXi(int base_)                 { return float4(_Nodes[base_+1], _Nodes[base_+2], _Nodes[base_+3], _Nodes[base_+4]); }
+void   SetXi(int base_, float4 xi)      { _Nodes[base_+1] = xi.x; _Nodes[base_+2] = xi.y; _Nodes[base_+3] = xi.z; _Nodes[base_+4] = xi.w; }
+float2 GetPsi(int base_)                { return float2(_Nodes[base_+5], _Nodes[base_+6]); }
+void   SetPsi(int base_, float2 psi)    { _Nodes[base_+5] = psi.x; _Nodes[base_+6] = psi.y; }
+
+// ── Helpers ───────────────────────────────────────────────────────────────────
+// Convert 3D grid index to normalised direction vector toward CMB boundary
+float3 GridToDir(int3 id)
+{
+    float3 pos = ((float3)id / (_Resolution - 1.0) - 0.5) * 2.0; // [-1,1]
+    float len = length(pos);
+    return len < 0.0001 ? float3(0,0,1) : pos / len;
+}
+
+// Sample CMB texture for a direction vector (equirectangular projection)
+float2 DirToEquirect(float3 dir)
+{
+    float u = 0.5 + atan2(dir.z, dir.x) / (2.0 * 3.14159265);
+    float v = 0.5 - asin(clamp(dir.y, -1.0, 1.0)) / 3.14159265;
+    return float2(u, v);
+}
+
+// CνB reference wave: left-helical phase along SpinVector axis
+// Phase = 2π × (projection of position onto spin axis) / helix_pitch
+// Majorana condition fixes handedness: neutrinos are left-helical
+float CvBPhase(float3 worldPos)
+{
+    const float HELIX_PITCH = 1.0;  // normalised to bubble scale
+    float projection = dot(normalize(worldPos + 0.0001), _SpinVector);
+    // Left-helical: phase increases in the -SpinVector direction
+    return -2.0 * 3.14159265 * projection / HELIX_PITCH;
+}
+
+// ── Kernel 1: UpdatePsi ───────────────────────────────────────────────────────
+// Raytmarch from CMB boundary inward to each node.
+// ψ(r) = ψ_boundary · exp(-∫₀ʳ ρ_v(r') dr')
+// Re(ψ) = CMB amplitude × attenuation   (object wave)
+// Im(ψ) = CνB helix phase × attenuation  (reference wave)
+[numthreads(8,8,8)]
+void UpdatePsi(uint3 id : SV_DispatchThreadID)
+{
+    if (any(id >= (uint)_Resolution)) return;
+
+    int   base_    = NodeBase(id);
+    float3 dir     = GridToDir(id);
+    float3 worldPos = (((float3)id / (_Resolution - 1.0)) - 0.5) * _BubbleScale;
+    float  r       = length(worldPos);  // distance from observer
+
+    // Raytmarch: accumulate void density absorption from boundary inward
+    const int MARCH_STEPS = 16;
+    float absorption = 0.0;
+    for (int step = 0; step < MARCH_STEPS; step++)
+    {
+        float t = 1.0 - (float)step / MARCH_STEPS;  // boundary=1, observer=0
+        float3 samplePos = dir * t * _BubbleScale * 0.5;
+        int3   sampleId  = clamp(
+            (int3)((samplePos / _BubbleScale + 0.5) * (_Resolution - 1)),
+            0, _Resolution - 1);
+        int sampleBase = NodeBase(sampleId);
+        absorption += GetVoid(sampleBase) * (1.0 / MARCH_STEPS);
+    }
+    float attenuation = exp(-absorption);
+
+    // Object wave: CMB boundary sample, attenuated by void
+    float2 uv       = DirToEquirect(dir);
+    float4 cmbSample = _CMBTexture.SampleLevel(sampler_CMBTexture, uv, 0);
+    float  cmbAmp   = dot(cmbSample.rgb, float3(0.299, 0.587, 0.114)); // luminance
+    float  rePsi    = cmbAmp * attenuation;
+
+    // Reference wave: CνB helix phase, attenuated by void
+    float  cvbPhase = CvBPhase(worldPos);
+    float  imPsi    = sin(cvbPhase + _OmegaValue) * attenuation;
+
+    SetPsi(base_, float2(rePsi, imPsi));
+}
+
+// ── Kernel 2: UpdateVoid ─────────────────────────────────────────────────────
+// Virtual pair annihilation: nodes with low |ψ|² deposit void residue.
+// Natural decay: ρ_v slowly relaxes toward vacuum (zero) everywhere.
+[numthreads(8,8,8)]
+void UpdateVoid(uint3 id : SV_DispatchThreadID)
+{
+    if (any(id >= (uint)_Resolution)) return;
+
+    int    base_    = NodeBase(id);
+    float2 psi      = GetPsi(base_);
+    float  psiMagSq = psi.x * psi.x + psi.y * psi.y;
+    float  rho      = GetVoid(base_);
+
+    // Pairs below spawn threshold annihilate → deposit void
+    float annihilation = 0.0;
+    if (psiMagSq < _SpawnThreshold)
+    {
+        // Annihilation rate proportional to how far below threshold
+        annihilation = _AnnihilationRate
+                     * (1.0 - psiMagSq / _SpawnThreshold)
+                     * _DeltaTime;
+    }
+
+    // Natural void decay (vacuum relaxation)
+    float decay = rho * _VoidDecayRate * _DeltaTime;
+
+    rho = max(0.0, rho + annihilation - decay);
+    SetVoid(base_, rho);
+}
+
+// ── Kernel 3: ClassifyNodes ───────────────────────────────────────────────────
+// Tag each node by its branch state.
+// Result is packed into the sign bits of ρ_v as a cheap flag:
+//   ρ_v > 0          → BULK (normal)
+//   encoded via Xi.w → BIFURCATED  (Re(ψ) ≈ 0, choice window)
+//   encoded via Xi.w → HEEGNER     (Im(ψ) ≈ 0, forced resolution)
+//
+// Xi.w sign is repurposed as a classification flag here:
+//   Xi.w > 0 → bulk/coherent
+//   Xi.w = 0 → bifurcated
+//   Xi.w < 0 → Heegner locked
+// The C# driver reads this to fire UnityEvents.
+[numthreads(8,8,8)]
+void ClassifyNodes(uint3 id : SV_DispatchThreadID)
+{
+    if (any(id >= (uint)_Resolution)) return;
+
+    int    base_ = NodeBase(id);
+    float2 psi  = GetPsi(base_);
+    float4 xi   = GetXi(base_);
+
+    bool bifurcated    = abs(psi.x) < _BifurcationEpsilon;
+    bool heegnerLocked = abs(psi.y) < _HeegnerEpsilon;
+
+    // Preserve xi.xyz, overwrite xi.w as classification flag
+    if (heegnerLocked)
+        xi.w = -1.0;  // Heegner: forced resolution
+    else if (bifurcated)
+        xi.w = 0.0;   // Bifurcated: choice window
+    else
+        xi.w = 1.0;   // Bulk: normal evolution
+
+    SetXi(base_, xi);
+}
