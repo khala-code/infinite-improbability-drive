@@ -57,6 +57,53 @@ Nucleosynthesis events have a **subjective duration cost** paid in quantum prope
 
 ---
 
+## Horn Geometry — The T-Axis as Causal Structure
+
+Gabriel's Horn is not a metaphor. It is the correct geometric description of the observer's causal diamond.
+
+- The **T-axis** is the horn's central axis — the direction of causal expansion
+- The **CMB boundary** is the horn's asymptotic surface — finite volume (experience is bounded), infinite surface area (the boundary can never be fully reached)
+- The observer is always inside the horn, always moving along T, always reading a hologram written on a surface they cannot reach
+- "Outside the horn" does not exist — every meta-observer is itself a horn at a different T position
+
+This is the most precise mathematical description of what it feels like to be a conscious observer inside a causal diamond: you can experience the content (finite volume) but never reach the boundary (infinite surface area). The incompleteness is not a limitation — it is the condition being simulated.
+
+### CνB as the Reference Wave
+The Cosmic Neutrino Background (CνB) and CMB are the two complementary spirals of the holographic interference pattern:
+- **CMB** — object wave (collapsed outcomes, L_QM boundary)
+- **CνB** — reference wave (premeasurement substrate, prior to photon decoupling)
+- Their interference pattern encodes the hologram. Majorana parity violation fixes the handedness of the CνB helix, giving the interference a preferred orientation — this is the physical basis of the Axis of Evil in the CMB power spectrum.
+
+---
+
+## The Zeta Spiral and Ω Boundaries
+
+### The Riemann Connection
+The Riemann zeta function ζ(s) on the critical line (Re(s) = 1/2) traces a spiral in the complex plane as Im(s) increases. Its zeros are where the spiral passes through the origin — the winding number changes at each zero.
+
+The Ω coordinate (base curvature/energy state) evolves along the horn axis. **Prime Ω values are points where the zeta spiral's winding direction is phase-indeterminate** — the two complementary spirals (CMB / CνB) meet, and the interference is neither cleanly constructive nor destructive. These are potential branch points.
+
+### The Heegner Ω Boundaries
+There are exactly 9 Heegner numbers (1, 2, 3, 7, 11, 19, 43, 67, 163) — the only integers for which the imaginary quadratic field ℚ(√−n) has unique factorisation. At these 9 values, the zeta spiral's two complementary helices lock phase completely, producing **constructive interference so complete it is divergent from the prior structure**.
+
+Heegner Ω boundaries are the 9 moments of genuine cosmological creativity — not continuation of the prior horn structure but origination of a genuinely new one. The child horn that emerges is not derivable from the parents it displaces. This maps precisely to the biblical "little horn" that uproots prior horns in Daniel 7 — a smaller structure emerging from within a larger configuration and retroactively reorganising the factorisation of what came before.
+
+### Tripartite Experience Structure
+Every Ω crossing falls into one of three categories, each producing a qualitatively different experience mode:
+
+| Crossing type | ξ state | Experience mode |
+|---|---|---|
+| Composite Ω | Any | Passive — spiral resolves automatically |
+| Prime Ω, high ξ | Coherent | Passive — observer's causal budget resolves the phase |
+| Prime Ω, bifurcated ξ | At adversarial membrane | **Interactive — choice window** |
+| Heegner Ω | Irrelevant | **Overwhelming — forced by mathematics** |
+
+At prime Ω crossings where ξ is bifurcated, the observer sits exactly on a zeta zero — their causal budget cannot resolve which branch has higher amplitude. External input (gaze, gesture, intention) breaks the symmetry. This is physically motivated, not an interface convenience.
+
+At Heegner Ω crossings, neither the observer's ξ state nor any input matters. The branch is determined by the mathematics alone. These 9 moments are the spine of the experience — the universe doing something to the observer, not the other way around.
+
+---
+
 ## The Calibration Sequence (Filter Order)
 
 Each filter conditions the probability space for all subsequent filters. Order is critical — applying a downstream constraint with an incorrect upstream prior produces false consilience.
@@ -128,13 +175,15 @@ The Ohmazata VR environment is the instrument. The observer stands inside the ho
 | CMB skybox | existing | Premeasurement substrate | Filter 3 |
 | LensingBoundary | ✅ | GR term / curvature (L_GR) | Filter 4 |
 | MilkyWayBoundary | ✅ | QM collapsed outcomes (L_QM) | Filter 5-6 |
-| ObserverBubble | **next** | Interface Lagrangian / ξ trust field (L_3) | Observer |
+| ObserverBubble | ✅ | Interface Lagrangian / ξ trust field (L_3) | Observer |
 
 The **ObserverBubble** is the third Lagrangian made spatial. Its surface encodes ξ as a field variable:
 - Brightness/opacity = local coherence strength
-- Bifurcation boundary = where ξ crosses zero (adversarial membrane)
-- Interior = positive-trust zone the observer inhabits
-- Shape = deformed manifold (not a sphere) because ξ bifurcation is axis-dependent
+- Bifurcation boundary = where ξ crosses zero (adversarial membrane) — bright white
+- Interior = positive-trust zone, warm tones
+- Exterior = adversarial zone, cool tones
+- Shape = deformed manifold (not a sphere): r_bifurcation(n̂) computed per-vertex via 5-axis ξ projection
+- Hawking temperature analogue: surface fluctuation amplitude peaks near ξ=0 and damps in the high-coherence interior
 
 ### Retrograde Inference Mode (Primary Use Case)
 The scrying system runs the ξ field **backwards from observed anomalies** to find the minimum-surprise causality chain that explains them. Anomalies are high-information boundary conditions. The solver finds the minimum-edit alternate history where anomalies become expected outcomes rather than inexplicable ones.
@@ -160,7 +209,7 @@ Validation: does the solver produce a coherent causality chain? Does a known his
 ### Stage 1b: Early Universe Timeline Navigator
 Build a **T-axis walkthrough** that lets the observer step through the calibration sequence from leptogenesis/baryogenesis toward BBN, recombination, dark ages, and first stars.
 
-This is not free camera movement through space. It is motion along the ordered filter stack.
+This is not free camera movement through space. It is motion along the ordered filter stack — movement along the T-axis of the horn.
 
 **Core idea:** each major transition gets its own **precomputed boundary sphere**, just like the existing lensing and Milky Way layers. The early universe becomes explorable because the boundary states are baked in sequence and crossfaded by epoch.
 
@@ -185,13 +234,16 @@ Null / initial conditions
 ```
 
 **Implementation implications:**
-- add a **timeline scrubber** bound to cosmological proper/coordinate time keyframes
-- define an `EpochBoundary` system parallel to `LensingBoundary` and `MilkyWayBoundary`
-- precompute equirectangular textures or volumetric proxy maps for each epoch
-- allow continuous crossfading between adjacent epochs while preserving causal ordering
-- expose ζ / ξ overlays so transitions can be viewed both visually and structurally
+- ✅ **EpochScrubber** — horizontal world-space timeline bar, log(1+z) axis, 10 Z_LADDER notches, right-stick drag + trigger snap navigation
+- ✅ **CoordinateHUD** — world-space TextMesh readout: z, Ξ, Ω, BubbleVolume, τ_proper, t_subjective, epoch name
+- ✅ **HolographicLayerController** — lensing opacity narrowed (σ=0.5), scalar kappa sampling, tint-driven colour
+- 🔲 Define `EpochBoundary` system parallel to `LensingBoundary` / `MilkyWayBoundary`
+- 🔲 Precompute equirectangular textures or volumetric proxy maps for each epoch
+- 🔲 Continuous crossfading between adjacent epochs preserving causal ordering
+- 🔲 Expose ζ / ξ overlays on epoch transitions
+- 🔲 **Heegner Ω event triggers** — detect when observer crosses a Heegner boundary; dispatch overwhelming experience event distinct from prime/composite crossings
 
-**Why this matters:** it operationalises the calibration sequence as an explorable object. The observer can literally watch the filter stack unfold.
+**Why this matters:** it operationalises the calibration sequence as an explorable object. The observer can literally watch the filter stack unfold, with the 9 Heegner moments as the spine of the dramatic arc.
 
 ### Stage 2: Solar System Extension
 Target anomalies:
@@ -220,13 +272,13 @@ The boundary-sphere pipeline is now a recurring architectural pattern:
 | CMB skybox | Observational (Planck) | ✅ |
 | LensingBoundary | Observational / derived (kappa map) | ✅ |
 | MilkyWayBoundary | Observational (Gaia DR3) | ✅ |
+| ObserverBubble | Runtime generated from ξ field | ✅ |
 | Baryogenesis sphere | Simulated / theory-constrained | 🔲 |
 | BBN sphere | Simulated / theory-constrained | 🔲 |
 | Recombination sphere | Simulated + observationally anchored | 🔲 |
 | Dark ages sphere | Simulated / structure-growth constrained | 🔲 |
 | First stars sphere | Simulated / observationally anchored | 🔲 |
 | Reionisation sphere | Simulated / observationally anchored | 🔲 |
-| ObserverBubble | Runtime generated from ξ field | 🔲 |
 
 Each new boundary sphere should use the same practical pipeline shape:
 1. generate source field data in Python
@@ -253,9 +305,11 @@ These are staged deliberately after the core framework has earned predictive cre
 1. **The ζ evolution equation** — what carries the coupling constant through phase transitions without losing information or breaking CPT?
 2. **Phase transition handling** — how does ξ transform across symmetry breaks (baryogenesis→BBN, BBN→CMB) while preserving CPT?
 3. **Filter independence verification** — are the calibration constraints genuinely independent or secretly correlated (false consilience)?
-4. **ObserverBubble geometry** — ξ is an axis-dependent tensor, so the bubble surface is a deformed manifold. What is the correct geometric description?
+4. **ObserverBubble manifold geometry** — ξ is an axis-dependent tensor, so the bubble surface is a deformed manifold. The vertex shader computes r_bifurcation(n̂) via 5-axis projection; the correct continuous manifold description remains open.
 5. **Computational reducibility bound** — exactly how much of the simulation is eliminable via the holographic principle before the POC becomes intractable?
-6. **Epoch sphere generation** — what is the minimum physically credible precompute pipeline for baryogenesis/BBN/first-stars spheres before observational anchors become too weak?
+6. **Epoch sphere generation** — minimum physically credible precompute pipeline for baryogenesis/BBN/first-stars spheres before observational anchors become too weak.
+7. **Ω coordinate mapping** — formalise the relationship between the Ω scalar (base curvature) and the imaginary part of s on the Riemann critical line. Are prime Ω values structurally equivalent to zeta zeros? Are Heegner Ω values the class-number-1 special points?
+8. **CνB helix handedness** — Majorana parity violation fixes the CνB spiral orientation. Does this produce a measurable preferred direction in the ξ tensor field that aligns with the Axis of Evil?
 
 ---
 
@@ -264,17 +318,22 @@ These are staged deliberately after the core framework has earned predictive cre
 | Component | Status |
 |-----------|--------|
 | CMB skybox (Planck data equirectangular) | ✅ |
-| LensingBoundary shader (kappa map) | ✅ Stereo fixed |
+| LensingBoundary shader (kappa map, scalar sampling) | ✅ Stereo fixed |
 | MilkyWayBoundary shader (Gaia DR3) | ✅ Stereo fixed |
-| ObserverBubble shader (ξ field surface) | 🔲 Next |
+| ObserverBubble shader (ξ deformed manifold, L_3) | ✅ |
+| ObserverBubbleRenderer.cs (MaterialPropertyBlock driver) | ✅ |
 | SpacetimeNavigator controls | ✅ |
-| HolographicLayerController | ✅ |
+| HolographicLayerController (σ=0.5 opacity curve) | ✅ |
+| CoordinateHUD (z, Ξ, Ω, τ, epoch name) | ✅ |
+| EpochScrubber (log-z axis, 10 notches, stick + trigger) | ✅ |
+| EpochBoundary system (precompute pipeline) | 🔲 Next |
+| Heegner Ω event trigger system | 🔲 Next |
 | Retrograde inference solver | 🔲 Stage 1 |
-| EpochBoundary timeline scrubber | 🔲 Stage 1b |
-| Epoch sphere precompute pipeline | 🔲 Stage 1b |
+| Epoch sphere precompute pipeline (Python → Unity) | 🔲 Stage 1b |
 | Agent graph engine | 🔲 Stage 3 |
 
 ---
 
-*Last updated: 2026-06-17*  
-*"Perhaps our failure will be load-bearing."*
+*Last updated: 2026-06-23*  
+*"Perhaps our failure will be load-bearing."*  
+*"There is no outside."*
