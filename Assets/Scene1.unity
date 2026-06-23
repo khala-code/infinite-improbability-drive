@@ -162,7 +162,7 @@ GameObject:
   - component: {fileID: 269446413}
   - component: {fileID: 269446412}
   - component: {fileID: 269446411}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: CoordinateHUD
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -316,6 +316,7 @@ MonoBehaviour:
   mwFadeOutZ: 10
   lensingPeakOpacity: 1
   lensingPeakZ: 100
+  lensingBellSigma: 0.5
   cnbOpacityAtZNow: 0
   cnbOpacityAtDecoupling: 1
   transitionSpeed: 2
@@ -832,7 +833,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1211690762}
   - component: {fileID: 1211690761}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: EpochScrubber
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -856,8 +857,6 @@ MonoBehaviour:
   _barHeight: 0.006
   _notchHeight: 0.03
   _thumbSize: 0.022
-  _labelOffset: 0.05
-  _labelScale: 0.007
   _barMaterial: {fileID: 2100000, guid: 92218835398b29d479d2ecf316beb4df, type: 2}
   _thumbMaterial: {fileID: 2100000, guid: bc678efce6f552c4c8cc8e84007b07ab, type: 2}
   _notchMaterial: {fileID: 2100000, guid: 6bc0bd6088705714d9307a1de90ab7e1, type: 2}
@@ -867,7 +866,6 @@ MonoBehaviour:
   _barColour: {r: 0.7, g: 0.75, b: 0.85, a: 1}
   _thumbColour: {r: 1, g: 0.85, b: 0.4, a: 1}
   _notchColour: {r: 0.55, g: 0.6, b: 0.7, a: 1}
-  _labelColour: {r: 0.85, g: 0.9, b: 1, a: 1}
   _activeColour: {r: 1, g: 0.95, b: 0.6, a: 1}
 --- !u!4 &1211690762
 Transform:
