@@ -63,6 +63,9 @@ namespace InfiniteImprobability.Core
         [Tooltip("Redshift of peak lensing weight")]
         public float lensingPeakZ              = 100.0f;
 
+        [Tooltip("Width of the lensing bell in log10(z) units. Smaller = narrower window, less occlusion at adjacent epochs.")]
+        public float lensingBellSigma          = 0.5f;
+
         [Header("CνB Opacity Curve")]
         [Tooltip("CνB reference wave opacity at z=0 (effectively undetectable)")]
         public float cnbOpacityAtZNow          = 0.0f;
@@ -109,9 +112,6 @@ namespace InfiniteImprobability.Core
                 RenderSettings.skybox = _cmbSkyboxInstance;
             }
 
-            // Initialise smoothed values — do NOT call ApplyAll here.
-            // MilkyWayBoundary._mat may not be assigned yet if its Awake runs after ours.
-            // ApplyAll is deferred to Start() so all Awakes have completed first.
             _cmbExposure    = cmbExposureAtZNow;
             _mwOpacity      = mwOpacityAtZNow;
             _lensingOpacity = 0f;
@@ -120,8 +120,6 @@ namespace InfiniteImprobability.Core
 
         private void Start()
         {
-            // All Awake() calls are guaranteed complete before any Start().
-            // Safe to push initial values to all layer materials now.
             ApplyAll();
         }
 
@@ -186,8 +184,10 @@ namespace InfiniteImprobability.Core
         {
             float logZ    = Mathf.Log10(Mathf.Max(z, 0.01f));
             float logPeak = Mathf.Log10(lensingPeakZ);
-            float sigma   = 0.8f;
-            float bell    = Mathf.Exp(-0.5f * Mathf.Pow((logZ - logPeak) / sigma, 2f));
+            // lensingBellSigma exposed in inspector (default 0.5, was 0.8).
+            // Narrower sigma means the sphere is near-zero opacity by z~1090,
+            // preventing occlusion of the HUD at the CMB epoch.
+            float bell    = Mathf.Exp(-0.5f * Mathf.Pow((logZ - logPeak) / lensingBellSigma, 2f));
             return lensingPeakOpacity * bell;
         }
 
@@ -206,22 +206,18 @@ namespace InfiniteImprobability.Core
 
         private void ApplyAll()
         {
-            // CMB — write to instance only, never the shared asset
             if (_cmbSkyboxInstance != null)
                 _cmbSkyboxInstance.SetFloat(PropExposure, _cmbExposure);
 
-            // Milky Way — ApplyProperties() handles its own null guard
             if (milkyWayBoundary != null)
             {
                 milkyWayBoundary.opacity = _mwOpacity;
                 milkyWayBoundary.ApplyProperties();
             }
 
-            // Lensing — shader uses _Opacity float directly
             if (lensingBoundaryRenderer != null)
                 lensingBoundaryRenderer.material.SetFloat(PropOpacity, _lensingOpacity);
 
-            // CνB — same pattern
             if (neutrinoBoundaryRenderer != null)
                 neutrinoBoundaryRenderer.material.SetFloat(PropOpacity, _cnbOpacity);
         }
