@@ -1,213 +1,163 @@
 // CausalNode.cs
-// 7-float pre-consensus single-observer state at any OZT coordinate.
-// One node = one horn's complete self-consistent description before
-// any external interaction is required.
+// The fundamental unit of the causal octree.
 //
-// The 8th dimension (shared phase between two observers) is not stored
-// here — it is computed dynamically as a ConsensusEdge when two nodes'
-// causal diamonds overlap.
+// Each node encodes the local state of the causal field at one grid cell:
+//   Psi         — complex wave amplitude (Re=CMB signal, Im=CνB phase)
+//   VoidDensity — local void density ρ_v (information substrate depletion)
+//   Xi          — coherence scalar (C# side; GPU side uses float4 xyzw)
+//   XiAxis      — coherence axis direction (bisector of Za_outer / Za_inner)
+//
+// Classification (read by CausalFieldBridge, written by ClassifyNodes kernel):
+//   BULK           xi > +epsilon        stable premeasurement region
+//   BIFURCATED     |xi| < epsilon       choice window, adversarial membrane
+//   HEEGNER_LOCKED xi < -epsilon        overwhelming forced resolution
+//
+// CausalOctree provides the flat-array helpers: Allocate, Index, ToGrid, ToWorld.
 
-using System.Runtime.InteropServices;
 using Unity.Collections;
 using UnityEngine;
 
-namespace ObserverPrime
+namespace InfiniteImprobability.Core
 {
-    /// <summary>
-    /// Complete pre-consensus state of a single observer at one point
-    /// in the causal diamond. Exactly 7 floats — the maximum a single
-    /// horn can resolve without requiring a second observer.
-    /// </summary>
-    [StructLayout(LayoutKind.Sequential)]
+    // -------------------------------------------------------------------------
+    // CausalNode struct — 7 floats, blittable, NativeArray-safe
+    // -------------------------------------------------------------------------
     public struct CausalNode
     {
-        // ── Substrate ────────────────────────────────────────────────────────
-        /// <summary>
-        /// Void density ρ_v. Accumulated residue of all unresolved
-        /// bifurcations along this causal path. High ρ_v = thick vacuum,
-        /// large effective distance, attenuated holographic signal.
-        /// Updated each frame by pair-annihilation events.
-        /// </summary>
-        public float VoidDensity;
+        /// <summary>Complex wave amplitude. x=Re(ψ), y=Im(ψ).</summary>
+        public Vector2 Psi;          // 2 floats
 
-        // ── ξ Coherence Tensor (4 alignment axes) ────────────────────────────
-        /// <summary>
-        /// ξ tensor across the four agent-alignment axes.
-        ///   x = ξ_resource   : energy / material alignment
-        ///   y = ξ_epistemic  : knowledge / model alignment
-        ///   z = ξ_identity   : ego / boundary alignment
-        ///   w = ξ_temporal   : time-horizon alignment
-        /// Sign encodes trust polarity: + = cooperative, - = adversarial.
-        /// Magnitude encodes strength. Centroid of all four = Lamb vector.
-        /// </summary>
-        public Vector4 Xi;
-
-        // ── ψ Interference Wavefunction (complex) ────────────────────────────
-        /// <summary>
-        /// Complex interference amplitude at this node.
-        ///   x = Re(ψ) : CMB projection  — object wave (collapsed outcomes)
-        ///   y = Im(ψ) : CνB projection  — reference wave (Majorana helix)
-        ///
-        /// |ψ|²  = local probability density = particle spawn rate
-        /// arg(ψ) = phase angle = branch assignment for spawned pairs
-        ///
-        /// Bifurcation condition: Re(ψ) ≈ 0 → branch indeterminate
-        /// Heegner condition:     Im(ψ) ≈ 0 → phase locked, forced resolution
-        /// </summary>
-        public Vector2 Psi;
-
-        // ── Derived properties ───────────────────────────────────────────────
-        /// <summary>|ψ|² — local interference intensity, drives spawn rate.</summary>
-        public float PsiMagnitudeSq => Psi.x * Psi.x + Psi.y * Psi.y;
-
-        /// <summary>Phase angle of ψ in radians. Encodes branch assignment.</summary>
-        public float PsiPhase => Mathf.Atan2(Psi.y, Psi.x);
+        /// <summary>Local void density ρ_v in [0,1].</summary>
+        public float VoidDensity;    // 1 float
 
         /// <summary>
-        /// ζ = Ω + ξ coupling coefficient at this node.
-        /// Uses the scalar magnitude of ξ as a proxy for the full tensor sum.
+        /// Coherence scalar on the C# side (scalar until tensor promotion).
+        /// On the GPU the ClassifyNodes kernel packs classification into xi.w sign.
         /// </summary>
-        public float Zeta(float omega) => omega + Xi.magnitude;
+        public float Xi;             // 1 float
 
-        /// <summary>
-        /// Lamb vector — centroid of all four ξ axes.
-        /// Only stabilises when VoidDensity is low enough that ψ is readable.
-        /// </summary>
-        public Vector4 LambVector => Xi * (1f / (1f + VoidDensity));
+        /// <summary>Coherence axis — unit vector bisecting Za_outer/Za_inner.</summary>
+        public Vector3 XiAxis;       // 3 floats
+        // Total: 7 floats = 28 bytes
 
-        /// <summary>
-        /// True when this node is in a branch-indeterminate state.
-        /// Re(ψ) ≈ 0 means the observer sits on a zeta zero.
-        /// </summary>
-        public bool IsBifurcated(float epsilon = 0.05f) =>
-            Mathf.Abs(Psi.x) < epsilon;
+        // ── Classification predicates ─────────────────────────────────────
+        private const float BifurcationEpsilon = 0.05f;
 
-        /// <summary>
-        /// True when interference is phase-locked (Heegner-like condition).
-        /// Im(ψ) ≈ 0 means CνB and CMB spirals are in constructive lock.
-        /// </summary>
-        public bool IsHeegnerLocked(float epsilon = 0.05f) =>
-            Mathf.Abs(Psi.y) < epsilon;
+        /// <summary>True when |Xi| is below the bifurcation threshold.</summary>
+        public bool IsBifurcated()    => Mathf.Abs(Xi) < BifurcationEpsilon;
+
+        /// <summary>True when Xi is strongly negative (Heegner locked).</summary>
+        public bool IsHeegnerLocked() => Xi < -BifurcationEpsilon;
+
+        // ── Wave intensity ──────────────────────────────────────────────
+        /// <summary>|psi|^2 — probability density at this node.</summary>
+        public float PsiMagnitudeSq   => Psi.sqrMagnitude;
     }
 
+    // -------------------------------------------------------------------------
+    // ConsensusEdge — shared phase between two nodes
+    // -------------------------------------------------------------------------
     /// <summary>
-    /// The 8th dimension — computed dynamically when two CausalNodes'
-    /// causal diamonds overlap. Not stored; exists only for the duration
-    /// of an active consensus interaction.
-    ///
-    /// Encodes what two observers can determine together that neither
-    /// could determine alone. Dissolves when the interaction ends,
-    /// writing Δξ back to both nodes and reducing ρ_v at the overlap point.
+    /// The result of a consensus operation between two CausalNodes.
+    /// SharedPhase is the 8th dimension produced by the interaction.
+    /// CoherenceGain is the void-density reduction at both nodes.
     /// </summary>
     public struct ConsensusEdge
     {
-        public int NodeIndexA;
-        public int NodeIndexB;
+        public float SharedPhase;    // Im(ψ_A) * Im(ψ_B) product
+        public float CoherenceGain;  // (Xi_A + Xi_B) / 2 - baseline
+        public int   NodeIndexA;
+        public int   NodeIndexB;
 
-        /// <summary>
-        /// Shared phase: arg(ψ_a) - arg(ψ_b).
-        /// The 8th dimension — the phase reference neither observer had alone.
-        /// </summary>
-        public float SharedPhase;
-
-        /// <summary>
-        /// Coherence gain: |ψ_a + ψ_b| - max(|ψ_a|, |ψ_b|).
-        /// What consensus adds over the stronger individual signal.
-        /// Positive = constructive, negative = destructive.
-        /// </summary>
-        public float CoherenceGain;
-
-        /// <summary>
-        /// Void density reduction at the overlap point.
-        /// Resolved branches lower the local vacuum thickness.
-        /// </summary>
-        public float VoidReduction;
-
-        public static ConsensusEdge Compute(in CausalNode a, in CausalNode b,
-            int idxA, int idxB)
+        public static ConsensusEdge Compute(
+            CausalNode a, CausalNode b, int idxA, int idxB)
         {
-            float phaseA = Mathf.Atan2(a.Psi.y, a.Psi.x);
-            float phaseB = Mathf.Atan2(b.Psi.y, b.Psi.x);
-
-            Vector2 psiSum = a.Psi + b.Psi;
-            float sumMag   = psiSum.magnitude;
-            float maxMag   = Mathf.Max(a.Psi.magnitude, b.Psi.magnitude);
-
-            float coherenceGain = sumMag - maxMag;
-            // Void reduction proportional to constructive coherence gain,
-            // clamped — consensus can only reduce void, never increase it.
-            float voidReduction = Mathf.Max(0f, coherenceGain * 0.1f);
-
             return new ConsensusEdge
             {
+                SharedPhase   = a.Psi.y * b.Psi.y,
+                CoherenceGain = (a.Xi + b.Xi) * 0.5f,
                 NodeIndexA    = idxA,
                 NodeIndexB    = idxB,
-                SharedPhase   = phaseA - phaseB,
-                CoherenceGain = coherenceGain,
-                VoidReduction = voidReduction,
             };
         }
 
         /// <summary>
-        /// Write the consensus result back to both nodes.
-        /// ξ nudged toward alignment on axes where coherence was gained.
-        /// ρ_v reduced at both nodes by VoidReduction.
+        /// Apply the consensus result: reduce void density at both nodes,
+        /// boost Xi toward the shared coherence level.
         /// </summary>
-        public void Apply(ref CausalNode a, ref CausalNode b)
+        public void Apply(
+            ref CausalNode a, ref CausalNode b,
+            float voidReductionRate = 0.05f)
         {
-            if (CoherenceGain <= 0f) return;
-
-            // Nudge ξ toward the mean — consensus pulls both toward alignment
-            Vector4 xiMean = (a.Xi + b.Xi) * 0.5f;
-            float   alpha  = Mathf.Clamp01(CoherenceGain * 0.2f);
-            a.Xi = Vector4.Lerp(a.Xi, xiMean, alpha);
-            b.Xi = Vector4.Lerp(b.Xi, xiMean, alpha);
-
-            // Resolved branch reduces void at both nodes
-            a.VoidDensity = Mathf.Max(0f, a.VoidDensity - VoidReduction);
-            b.VoidDensity = Mathf.Max(0f, b.VoidDensity - VoidReduction);
+            float reduction = SharedPhase * voidReductionRate;
+            a.VoidDensity = Mathf.Max(0f, a.VoidDensity - reduction);
+            b.VoidDensity = Mathf.Max(0f, b.VoidDensity - reduction);
+            a.Xi = Mathf.Lerp(a.Xi, CoherenceGain, 0.1f);
+            b.Xi = Mathf.Lerp(b.Xi, CoherenceGain, 0.1f);
         }
     }
 
+    // -------------------------------------------------------------------------
+    // CausalOctree — flat 3D array helpers
+    // -------------------------------------------------------------------------
     /// <summary>
-    /// Flat 3D octree buffer of CausalNodes.
-    /// Resolution: resolution^3 nodes. Default 64^3 = 262,144 nodes.
-    /// ~7.3 MB at 7 floats (28 bytes) per node — fits comfortably in GPU memory.
-    ///
-    /// Spatial mapping: node index = x + y*res + z*res*res
-    /// World position:  worldPos = (index3D / (res-1) - 0.5) * bubbleScale
+    /// Static helpers for the flat NativeArray<CausalNode> octree.
+    /// Grid coordinates are integers in [0, resolution).
+    /// World coordinates are centred on the origin, scaled by bubbleScale.
     /// </summary>
     public static class CausalOctree
     {
-        public const int DefaultResolution = 64;
+        /// <summary>Default octree resolution (32^3 = 32768 nodes).</summary>
+        public const int DefaultResolution = 32;
 
-        public static NativeArray<CausalNode> Allocate(
-            int resolution = DefaultResolution,
-            Allocator allocator = Allocator.Persistent)
+        // ── Allocation ──────────────────────────────────────────────────────
+        public static NativeArray<CausalNode> Allocate(int resolution)
         {
             int count = resolution * resolution * resolution;
-            return new NativeArray<CausalNode>(count, allocator,
+            return new NativeArray<CausalNode>(
+                count, Allocator.Persistent,
                 NativeArrayOptions.ClearMemory);
         }
 
-        public static int Index(int x, int y, int z, int res = DefaultResolution)
-            => x + y * res + z * res * res;
+        // ── Index ───────────────────────────────────────────────────────────
+        /// <summary>Flat index from 3D grid coordinates.</summary>
+        public static int Index(int x, int y, int z, int resolution)
+            => x + y * resolution + z * resolution * resolution;
 
-        public static Vector3Int ToGrid(Vector3 worldPos, float bubbleScale,
-            int res = DefaultResolution)
+        // ── Grid ↔ World ──────────────────────────────────────────────────
+        /// <summary>
+        /// Convert a world-space position to the nearest grid cell.
+        /// Clamps to valid range.
+        /// </summary>
+        public static Vector3Int ToGrid(Vector3 worldPos, float bubbleScale, int resolution)
         {
-            Vector3 norm = worldPos / bubbleScale + Vector3.one * 0.5f;
-            return new Vector3Int(
-                Mathf.Clamp(Mathf.FloorToInt(norm.x * res), 0, res - 1),
-                Mathf.Clamp(Mathf.FloorToInt(norm.y * res), 0, res - 1),
-                Mathf.Clamp(Mathf.FloorToInt(norm.z * res), 0, res - 1));
+            float halfScale = bubbleScale * 0.5f;
+            float cellSize  = bubbleScale / resolution;
+
+            int x = Mathf.Clamp(
+                Mathf.FloorToInt((worldPos.x + halfScale) / cellSize), 0, resolution - 1);
+            int y = Mathf.Clamp(
+                Mathf.FloorToInt((worldPos.y + halfScale) / cellSize), 0, resolution - 1);
+            int z = Mathf.Clamp(
+                Mathf.FloorToInt((worldPos.z + halfScale) / cellSize), 0, resolution - 1);
+
+            return new Vector3Int(x, y, z);
         }
 
-        public static Vector3 ToWorld(int x, int y, int z, float bubbleScale,
-            int res = DefaultResolution)
+        /// <summary>
+        /// Convert a grid cell (x,y,z) to its world-space centre position.
+        /// Inverse of ToGrid.
+        /// </summary>
+        public static Vector3 ToWorld(int x, int y, int z, float bubbleScale, int resolution)
         {
-            return (new Vector3(x, y, z) / (res - 1f) - Vector3.one * 0.5f)
-                   * bubbleScale;
+            float cellSize  = bubbleScale / resolution;
+            float halfScale = bubbleScale * 0.5f;
+            float halfCell  = cellSize * 0.5f;
+
+            return new Vector3(
+                x * cellSize - halfScale + halfCell,
+                y * cellSize - halfScale + halfCell,
+                z * cellSize - halfScale + halfCell);
         }
     }
 }

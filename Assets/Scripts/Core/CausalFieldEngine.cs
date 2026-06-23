@@ -18,7 +18,6 @@ using System.Collections.Generic;
 using Unity.Collections;
 using UnityEngine;
 using UnityEngine.Events;
-using InfiniteImprobability.Core;
 
 namespace InfiniteImprobability.Core
 {
@@ -47,6 +46,10 @@ namespace InfiniteImprobability.Core
         public UnityEvent<float> OnHeegnerCrossing;  // arg: Ω value — 9 moments
         public UnityEvent<float> OnCompositeCrossing;
 
+        // ── Public read-only accessors (used by CausalFieldBridge) ────────────────
+        public int   Resolution  => _resolution;
+        public float BubbleScale => _bubbleScale;
+
         // ── Private state ─────────────────────────────────────────────────────
         NativeArray<CausalNode> _nodes;
         ComputeBuffer           _nodeBuffer;
@@ -63,7 +66,7 @@ namespace InfiniteImprobability.Core
         static readonly HashSet<int> HeegnerNumbers =
             new HashSet<int> { 1, 2, 3, 7, 11, 19, 43, 67, 163 };
 
-        // ── Lifecycle ──────────────────────────────────────────────────────────
+        // ── Lifecycle ─────────────────────────────────────────────────────────
         void Awake()
         {
             _observer = GetComponent<ObserverBubble>();
@@ -100,7 +103,7 @@ namespace InfiniteImprobability.Core
             DispatchCompute();
         }
 
-        // ── Compute dispatch ───────────────────────────────────────────────────
+        // ── Compute dispatch ──────────────────────────────────────────────────
         void BindStaticUniforms()
         {
             foreach (int k in new[] { _kernelUpdatePsi, _kernelUpdateVoid, _kernelClassify })
@@ -136,7 +139,7 @@ namespace InfiniteImprobability.Core
             _computeShader.Dispatch(_kernelClassify,   groups, groups, groups);
         }
 
-        // ── Ω crossing classification ──────────────────────────────────────────
+        // ── Ω crossing classification ─────────────────────────────────────────
         float CurrentOmega()
         {
             float z = _observer != null ? _observer.Coordinate.RedshiftZ : 0f;
@@ -147,7 +150,6 @@ namespace InfiniteImprobability.Core
         {
             if (Mathf.Approximately(_lastOmega, newOmega)) return;
 
-            // Scale [0,1] Ω to [0,163] for Heegner/prime classification
             int omegaInt = Mathf.RoundToInt(newOmega * 163f);
 
             if (HeegnerNumbers.Contains(omegaInt))
@@ -166,21 +168,14 @@ namespace InfiniteImprobability.Core
             CheckOmegaCrossing(CurrentOmega());
         }
 
-        // Matches ObserverBubble.OnCoherenceChanged: Action<bool>
-        // true = coherent, false = destabilised
         void OnCoherenceChanged(bool isCoherent)
         {
             // Coherence state change propagates via XiObserver uniform
-            // each frame in DispatchCompute() — no extra work needed here.
-            // Downstream: VFX Graph reads xi.w classification flag from
-            // ClassifyNodes kernel output.
+            // each frame in DispatchCompute(). VFX Graph reads xi.w
+            // classification flag from ClassifyNodes kernel output.
         }
 
         // ── Public API ─────────────────────────────────────────────────────────
-        /// <summary>
-        /// Sample the causal field at a world-space position.
-        /// Returns the CausalNode for the nearest octree cell.
-        /// </summary>
         public CausalNode GetNode(Vector3 worldPos)
         {
             Vector3Int g = CausalOctree.ToGrid(worldPos, _bubbleScale, _resolution);
@@ -188,25 +183,15 @@ namespace InfiniteImprobability.Core
             return _nodes[idx];
         }
 
-        /// <summary>
-        /// Compute a ConsensusEdge between two world-space positions.
-        /// Returns the shared phase and coherence gain for that interaction.
-        /// </summary>
         public ConsensusEdge ResolveEdge(Vector3 posA, Vector3 posB)
         {
-            Vector3Int gA = CausalOctree.ToGrid(posA, _bubbleScale, _resolution);
-            Vector3Int gB = CausalOctree.ToGrid(posB, _bubbleScale, _resolution);
+            Vector3Int gA  = CausalOctree.ToGrid(posA, _bubbleScale, _resolution);
+            Vector3Int gB  = CausalOctree.ToGrid(posB, _bubbleScale, _resolution);
             int idxA = CausalOctree.Index(gA.x, gA.y, gA.z, _resolution);
             int idxB = CausalOctree.Index(gB.x, gB.y, gB.z, _resolution);
             return ConsensusEdge.Compute(_nodes[idxA], _nodes[idxB], idxA, idxB);
         }
 
-        /// <summary>
-        /// Observer resolves a bifurcation branch at their current position.
-        /// Selects the branch matching branchSign (+1 or -1), annihilates
-        /// the other, and reduces local void density.
-        /// Called by input handler when user resolves a choice window.
-        /// </summary>
         public void ResolveBranch(float branchSign)
         {
             Vector3Int g   = CausalOctree.ToGrid(Vector3.zero, _bubbleScale, _resolution);
@@ -220,7 +205,7 @@ namespace InfiniteImprobability.Core
             _nodes[idx] = node;
         }
 
-        // ── Utilities ──────────────────────────────────────────────────────────
+        // ── Utilities ─────────────────────────────────────────────────────────
         static bool IsPrime(int n)
         {
             if (n < 2)  return false;
