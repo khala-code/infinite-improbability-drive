@@ -9,14 +9,18 @@
 //   Composite Ω → bulk update, no event
 //   Prime Ω     → OnPrimeCrossing fired (bifurcated choice window)
 //   Heegner Ω   → OnHeegnerCrossing fired (overwhelming forced resolution)
+//
+// NOTE: OmegaZaTaCoordinate.Xi is currently a scalar float.
+// When Xi is promoted to Vector4 (4-axis tensor), replace the
+// scalar broadcast in DispatchCompute() with the full vector.
 
-using System;
 using System.Collections.Generic;
 using Unity.Collections;
 using UnityEngine;
 using UnityEngine.Events;
+using InfiniteImprobability.Core;
 
-namespace ObserverPrime
+namespace InfiniteImprobability.Core
 {
     [RequireComponent(typeof(ObserverBubble))]
     public class CausalFieldEngine : MonoBehaviour
@@ -25,8 +29,8 @@ namespace ObserverPrime
         [Header("Field")]
         [SerializeField] ComputeShader _computeShader;
         [SerializeField] Texture2D     _cmbTexture;
-        [SerializeField] int           _resolution    = CausalOctree.DefaultResolution;
-        [SerializeField] float         _bubbleScale   = 2f;
+        [SerializeField] int           _resolution  = CausalOctree.DefaultResolution;
+        [SerializeField] float         _bubbleScale = 2f;
 
         [Header("CνB Helix")]
         [SerializeField] Vector3 _spinVector = Vector3.up; // Majorana L-handed axis
@@ -39,8 +43,8 @@ namespace ObserverPrime
         [SerializeField] float _voidDecayRate      = 0.02f;
 
         [Header("Ω Events")]
-        public UnityEvent<float> OnPrimeCrossing;    // arg: Ω value
-        public UnityEvent<float> OnHeegnerCrossing; // arg: Ω value — 9 moments
+        public UnityEvent<float> OnPrimeCrossing;     // arg: Ω value
+        public UnityEvent<float> OnHeegnerCrossing;  // arg: Ω value — 9 moments
         public UnityEvent<float> OnCompositeCrossing;
 
         // ── Private state ─────────────────────────────────────────────────────
@@ -54,8 +58,8 @@ namespace ObserverPrime
 
         float _lastOmega = -1f;
 
-        // Heegner numbers — the 9 Ω boundaries where unique factorisation holds
-        // and constructive interference is complete.
+        // The 9 Ω boundaries where unique factorisation holds and
+        // constructive interference between CMB/CνB spirals is complete.
         static readonly HashSet<int> HeegnerNumbers =
             new HashSet<int> { 1, 2, 3, 7, 11, 19, 43, 67, 163 };
 
@@ -70,7 +74,6 @@ namespace ObserverPrime
             int count = _resolution * _resolution * _resolution;
 
             _nodes      = CausalOctree.Allocate(_resolution);
-            // GPU buffer: 7 floats per node, stride = sizeof(float)
             _nodeBuffer = new ComputeBuffer(count * 7, sizeof(float));
 
             _kernelUpdatePsi  = _computeShader.FindKernel("UpdatePsi");
@@ -100,7 +103,7 @@ namespace ObserverPrime
         // ── Compute dispatch ───────────────────────────────────────────────────
         void BindStaticUniforms()
         {
-            foreach (int k in new[]{ _kernelUpdatePsi, _kernelUpdateVoid, _kernelClassify })
+            foreach (int k in new[] { _kernelUpdatePsi, _kernelUpdateVoid, _kernelClassify })
             {
                 _computeShader.SetBuffer(k, "_Nodes", _nodeBuffer);
                 _computeShader.SetInt("_Resolution", _resolution);
@@ -118,11 +121,14 @@ namespace ObserverPrime
 
         void DispatchCompute()
         {
-            _computeShader.SetFloat("_DeltaTime",   Time.deltaTime);
-            _computeShader.SetFloat("_OmegaValue",  CurrentOmega());
+            // Xi is currently a scalar on OmegaZaTaCoordinate.
+            // Broadcast it uniformly across all 4 tensor axes.
+            // TODO: expand to Vector4 when Xi tensor promotion lands.
+            float xiScalar = _observer.Coordinate.Xi;
+            _computeShader.SetFloat("_DeltaTime",  Time.deltaTime);
+            _computeShader.SetFloat("_OmegaValue", CurrentOmega());
             _computeShader.SetFloats("_XiObserver",
-                _observer.Xi.x, _observer.Xi.y,
-                _observer.Xi.z, _observer.Xi.w);
+                xiScalar, xiScalar, xiScalar, xiScalar);
 
             int groups = Mathf.CeilToInt(_resolution / 8f);
             _computeShader.Dispatch(_kernelUpdatePsi,  groups, groups, groups);
@@ -133,9 +139,7 @@ namespace ObserverPrime
         // ── Ω crossing classification ──────────────────────────────────────────
         float CurrentOmega()
         {
-            // Ω derived from current redshift coordinate via log mapping.
-            // z=0 → Ω=0, z=1090 (CMB) → Ω=1.
-            float z = _observer != null ? _observer.CurrentRedshift : 0f;
+            float z = _observer != null ? _observer.Coordinate.RedshiftZ : 0f;
             return Mathf.Log(1f + z) / Mathf.Log(1f + 1090f);
         }
 
@@ -143,8 +147,8 @@ namespace ObserverPrime
         {
             if (Mathf.Approximately(_lastOmega, newOmega)) return;
 
-            // Map Ω to integer index for prime/Heegner classification
-            int omegaInt = Mathf.RoundToInt(newOmega * 163f); // scale to Heegner max
+            // Scale [0,1] Ω to [0,163] for Heegner/prime classification
+            int omegaInt = Mathf.RoundToInt(newOmega * 163f);
 
             if (HeegnerNumbers.Contains(omegaInt))
                 OnHeegnerCrossing?.Invoke(newOmega);
@@ -162,10 +166,14 @@ namespace ObserverPrime
             CheckOmegaCrossing(CurrentOmega());
         }
 
-        void OnCoherenceChanged(float xi)
+        // Matches ObserverBubble.OnCoherenceChanged: Action<bool>
+        // true = coherent, false = destabilised
+        void OnCoherenceChanged(bool isCoherent)
         {
-            // ξ change from the observer propagates into the field
-            // via the per-frame XiObserver uniform — no extra work needed here.
+            // Coherence state change propagates via XiObserver uniform
+            // each frame in DispatchCompute() — no extra work needed here.
+            // Downstream: VFX Graph reads xi.w classification flag from
+            // ClassifyNodes kernel output.
         }
 
         // ── Public API ─────────────────────────────────────────────────────────
@@ -201,16 +209,13 @@ namespace ObserverPrime
         /// </summary>
         public void ResolveBranch(float branchSign)
         {
-            Vector3Int g = CausalOctree.ToGrid(Vector3.zero, _bubbleScale, _resolution);
-            int idx = CausalOctree.Index(g.x, g.y, g.z, _resolution);
+            Vector3Int g   = CausalOctree.ToGrid(Vector3.zero, _bubbleScale, _resolution);
+            int        idx = CausalOctree.Index(g.x, g.y, g.z, _resolution);
             CausalNode node = _nodes[idx];
 
-            // Select branch: push Re(ψ) toward the chosen sign
             node.Psi = new Vector2(
                 branchSign * Mathf.Max(Mathf.Abs(node.Psi.x), _bifurcationEpsilon * 2f),
                 node.Psi.y);
-
-            // Resolved branch reduces local void
             node.VoidDensity = Mathf.Max(0f, node.VoidDensity - 0.1f);
             _nodes[idx] = node;
         }
@@ -218,7 +223,7 @@ namespace ObserverPrime
         // ── Utilities ──────────────────────────────────────────────────────────
         static bool IsPrime(int n)
         {
-            if (n < 2) return false;
+            if (n < 2)  return false;
             if (n == 2) return true;
             if (n % 2 == 0) return false;
             for (int i = 3; i * i <= n; i += 2)
