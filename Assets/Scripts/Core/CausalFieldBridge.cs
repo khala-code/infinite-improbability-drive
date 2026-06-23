@@ -8,6 +8,8 @@
 //      with stride 16 (float4) and capacity = resolution^3.
 //   4. Create three float exposed properties: _HeegnerIntensity,
 //      _BifurcationPulse, _CompositeFlow.
+//   5. Create two GPU Event Spawn contexts named "OnBifurcation" (200 particles)
+//      and "OnHeegner" (2000 particles). These are triggered by SendEvent below.
 //
 // Buffer layout per node (float4):
 //   x = |psi|^2       — wave intensity, drives particle spawn rate
@@ -16,9 +18,9 @@
 //   w = NodeClass     — 0=BULK, 1=BIFURCATED, 2=HEEGNER_LOCKED
 //
 // Colour convention (set in VFX Graph output node, driven by NodeClass):
-//   BULK          — deep blue,  HDR (0.1, 0.2, 0.8, 1)  dim ambient drift
-//   BIFURCATED    — amber,      HDR (1.0, 0.5, 0.0, 1)  pulsing choice window
-//   HEEGNER_LOCKED — white flare, HDR (2.0, 2.0, 2.0, 1)  overwhelm flash
+//   BULK           — deep blue,  HDR (0.1, 0.2, 0.8)  dim ambient drift
+//   BIFURCATED     — amber,      HDR (1.0, 0.5, 0.0)  pulsing choice window
+//   HEEGNER_LOCKED — white flare, HDR (2.0, 2.0, 2.0)  overwhelm flash
 
 using UnityEngine;
 using UnityEngine.VFX;
@@ -42,17 +44,21 @@ namespace InfiniteImprobability.Core
         [Tooltip("Seconds for Omega event intensities to decay back to baseline.")]
         [SerializeField] float _decayTime       = 2.0f;
 
-        // ── VFX Graph property name IDs ────────────────────────────────────────
+        // ── VFX Graph property + event name IDs ───────────────────────────────
         // Cached at startup — cheaper than hashing strings every frame.
         static readonly int ID_CausalNodes      = Shader.PropertyToID("_CausalNodes");
         static readonly int ID_HeegnerIntensity = Shader.PropertyToID("_HeegnerIntensity");
         static readonly int ID_BifurcationPulse = Shader.PropertyToID("_BifurcationPulse");
         static readonly int ID_CompositeFlow    = Shader.PropertyToID("_CompositeFlow");
 
+        // Event names must match the GPU Event Spawn context names in the VFX Graph.
+        static readonly int ID_OnBifurcation    = Shader.PropertyToID("OnBifurcation");
+        static readonly int ID_OnHeegner        = Shader.PropertyToID("OnHeegner");
+
         // ── Private state ─────────────────────────────────────────────────────
         CausalFieldEngine _engine;
-        GraphicsBuffer    _vfxBuffer;   // float4 per node, written CPU-side each frame
-        float[]           _bufferData;  // staging array — avoids per-frame allocation
+        GraphicsBuffer    _vfxBuffer;
+        float[]           _bufferData;
 
         int   _nodeCount;
         float _heegnerCurrent;
@@ -67,11 +73,9 @@ namespace InfiniteImprobability.Core
 
         void OnEnable()
         {
-            // Derive node count from the engine's resolution (cube)
-            int res  = _engine.Resolution;
+            int res    = _engine.Resolution;
             _nodeCount = res * res * res;
 
-            // float4 per node — 4 floats, stride 16 bytes
             _vfxBuffer  = new GraphicsBuffer(
                 GraphicsBuffer.Target.Structured,
                 _nodeCount,
@@ -79,11 +83,9 @@ namespace InfiniteImprobability.Core
 
             _bufferData = new float[_nodeCount * 4];
 
-            // Push buffer reference to VFX Graph once
             if (_vfx != null)
                 _vfx.SetGraphicsBuffer(ID_CausalNodes, _vfxBuffer);
 
-            // Subscribe to Omega crossing events
             _engine.OnHeegnerCrossing.AddListener(OnHeegner);
             _engine.OnPrimeCrossing.AddListener(OnPrime);
             _engine.OnCompositeCrossing.AddListener(OnComposite);
@@ -108,10 +110,6 @@ namespace InfiniteImprobability.Core
         }
 
         // ── Buffer write ──────────────────────────────────────────────────────
-        /// <summary>
-        /// Sample every node from the engine and pack into the staging array,
-        /// then upload to the GraphicsBuffer in one SetData call.
-        /// </summary>
         void WriteBuffer()
         {
             int res = _engine.Resolution;
@@ -123,43 +121,28 @@ namespace InfiniteImprobability.Core
                 Vector3    worldPos = CausalOctree.ToWorld(x, y, z,
                                         _engine.BubbleScale, res);
                 CausalNode node    = _engine.GetNode(worldPos);
-
                 int i = CausalOctree.Index(x, y, z, res) * 4;
 
-                // x: |psi|^2
                 _bufferData[i + 0] = node.Psi.sqrMagnitude;
-                // y: void density
                 _bufferData[i + 1] = node.VoidDensity;
-                // z: xi coherence (scalar until tensor promotion)
                 _bufferData[i + 2] = node.Xi;
-                // w: node class — encoded from xi.w sign convention
-                //    BULK=0, BIFURCATED=1, HEEGNER_LOCKED=2
                 _bufferData[i + 3] = EncodeClass(node);
             }
 
             _vfxBuffer.SetData(_bufferData);
         }
 
-        /// <summary>
-        /// Encode node classification as a float for VFX Graph sampling.
-        /// Matches the xi.w sign convention from ClassifyNodes kernel:
-        ///   xi.w > 0  → BULK (0)
-        ///   xi.w = 0  → BIFURCATED (1)
-        ///   xi.w < 0  → HEEGNER_LOCKED (2)
-        /// </summary>
         static float EncodeClass(CausalNode node)
         {
-            if (node.IsHeegnerLocked())  return 2f;
-            if (node.IsBifurcated())     return 1f;
+            if (node.IsHeegnerLocked()) return 2f;
+            if (node.IsBifurcated())    return 1f;
             return 0f;
         }
 
         // ── Omega intensity decay ─────────────────────────────────────────────
         void DecayIntensities()
         {
-            float dt   = Time.deltaTime;
-            float decay = dt / Mathf.Max(_decayTime, 0.001f);
-
+            float decay = Time.deltaTime / Mathf.Max(_decayTime, 0.001f);
             _heegnerCurrent     = Mathf.Max(0f, _heegnerCurrent     - _heegnerPeak     * decay);
             _bifurcationCurrent = Mathf.Max(0f, _bifurcationCurrent - _bifurcationPeak * decay);
             _compositeCurrent   = Mathf.Max(0f, _compositeCurrent   - _compositeFlow   * decay);
@@ -173,22 +156,27 @@ namespace InfiniteImprobability.Core
             _vfx.SetFloat(ID_CompositeFlow,    _compositeCurrent);
         }
 
-        // ── Omega event handlers ──────────────────────────────────────────────
+        // ── Omega event handlers ─────────────────────────────────────────────
         void OnHeegner(float omega)
         {
-            // Full peak — overwhelming constructive interference
             _heegnerCurrent = _heegnerPeak;
+            // Fire named event — triggers the 2000-particle GPU Event Spawn context.
+            // The event name in the VFX Graph must be "OnHeegner" (exact match).
+            _vfx?.SendEvent(ID_OnHeegner);
         }
 
         void OnPrime(float omega)
         {
-            // Bifurcation pulse — choice window opens
             _bifurcationCurrent = _bifurcationPeak;
+            // Fire named event — triggers the 200-particle GPU Event Spawn context.
+            // The event name in the VFX Graph must be "OnBifurcation" (exact match).
+            _vfx?.SendEvent(ID_OnBifurcation);
         }
 
         void OnComposite(float omega)
         {
-            // Soft ambient flow tick
+            // Composite crossings only update the continuous flow float —
+            // no burst event needed, the Constant Rate context handles ambient.
             _compositeCurrent = _compositeFlow;
         }
     }
