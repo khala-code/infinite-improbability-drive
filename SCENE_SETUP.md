@@ -78,11 +78,30 @@ Create a new VFX Graph asset: `Assets/VFX/CausalFieldGraph.vfx`
 | `_Resolution` | int | `32` |
 | `_BubbleScale` | float | `2.0` |
 
-### Spawn context
+### Spawn contexts
 
-- **Rate**: `_CompositeFlow * 500` particles/sec (base ambient)
-- **Burst on `_BifurcationPulse > 0.5`**: 200 particles
-- **Burst on `_HeegnerIntensity > 1.0`**: 2000 particles
+You need **three** spawn contexts total:
+
+#### 1. Constant Rate context (ambient)
+- **Type**: Constant Rate
+- **Rate**: `_CompositeFlow * 500` particles/sec
+- Drives the baseline ambient drift of BULK nodes.
+
+#### 2. GPU Event Spawn context — `OnBifurcation`
+- **Type**: GPU Event (Single Burst)
+- **Rename the context node header to exactly**: `OnBifurcation`
+- **Capacity**: 200 particles
+- Triggered by `CausalFieldBridge.cs` via `SendEvent("OnBifurcation")` on every
+  prime Ω crossing. In VFX Graph 17.x the context **name** is what `SendEvent()`
+  matches — do not rely on the Evt port / Blackboard Event binding; just rename
+  the context node directly.
+
+#### 3. GPU Event Spawn context — `OnHeegner`
+- **Type**: GPU Event (Single Burst)
+- **Rename the context node header to exactly**: `OnHeegner`
+- **Capacity**: 2000 particles
+- Triggered by `CausalFieldBridge.cs` via `SendEvent("OnHeegner")` on every
+  Heegner number Ω crossing.
 
 ### Initialize context — sample buffer
 
@@ -162,6 +181,7 @@ Well within Quest 2 limits.
 - [ ] `CausalFieldEngine.Update()` dispatching without errors (check Console)
 - [ ] `CausalFieldBridge._vfxBuffer` not null after OnEnable
 - [ ] VFX Graph emitting particles (even if positions look wrong initially)
+- [ ] `OnBifurcation` and `OnHeegner` GPU Event contexts firing (visible in VFX Graph debug panel)
 - [ ] `_HeegnerIntensity` spikes visible in VFX Graph debug when navigating to z=1090
 - [ ] Frame time < 11ms in Profiler at resolution=16 before upgrading to 32
 - [ ] No `NativeArray` leak warnings on exit (Dispose called in OnDisable)
