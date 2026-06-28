@@ -8,7 +8,10 @@
 //      with stride 16 (float4) and capacity = resolution^3.
 //   4. Create three float exposed properties: _HeegnerIntensity,
 //      _BifurcationPulse, _CompositeFlow.
-//   5. Create two GPU Event Spawn contexts named "OnBifurcation" (200 particles)
+//   5. Create an Int exposed property: _NodeOffset.
+//      Set to 0 on the first (Ambient) VFX asset.
+//      Set to the Ambient particle capacity (e.g. 128) on the second (Bifurcation) asset.
+//   6. Create two GPU Event Spawn contexts named "OnBifurcation" (200 particles)
 //      and "OnHeegner" (2000 particles). These are triggered by SendEvent below.
 //
 // Buffer layout per node (float4):
@@ -21,6 +24,24 @@
 //   BULK           — deep blue,  HDR (0.1, 0.2, 0.8)  dim ambient drift
 //   BIFURCATED     — amber,      HDR (1.0, 0.5, 0.0)  pulsing choice window
 //   HEEGNER_LOCKED — white flare, HDR (2.0, 2.0, 2.0)  overwhelm flash
+//
+// VFX Graph HLSL — Initialize context (both systems):
+//
+//   void CustomHLSL(
+//       inout VFXAttributes attributes,
+//       in StructuredBuffer<float4> _CausalNodes,
+//       in int   _Resolution,
+//       in float _BubbleScale,
+//       in int   _NodeOffset)          // <-- required
+//   {
+//       uint nodeCount = (uint)(_Resolution * _Resolution * _Resolution);
+//       uint id = ((uint)attributes.particleId + (uint)_NodeOffset) % nodeCount;
+//       float4 node = _CausalNodes[id];
+//       attributes.waveIntensity = node.x;
+//       attributes.voidDensity   = node.y;
+//       attributes.xiCoherence   = node.z;
+//       attributes.nodeClass     = node.w;
+//   }
 
 using UnityEngine;
 using UnityEngine.VFX;
@@ -33,6 +54,14 @@ namespace InfiniteImprobability.Core
         // ── Inspector ─────────────────────────────────────────────────────────
         [Header("VFX Target")]
         [SerializeField] VisualEffect _vfx;
+
+        [Header("Buffer Region")]
+        [Tooltip("Index into _CausalNodes at which this VFX system's particles begin. " +
+                 "Set to 0 for the first system (e.g. AmbientParticles). " +
+                 "Set to the previous system's particle capacity for each subsequent system " +
+                 "(e.g. 128 for BifurcationParticles if AmbientParticles has capacity 128). " +
+                 "Must be pushed as Int property '_NodeOffset' in the VFX Graph.")]
+        [SerializeField] int _nodeOffset = 0;
 
         [Header("Omega Event Intensities")]
         [Tooltip("Peak _HeegnerIntensity value pushed to VFX on Heegner crossing.")]
@@ -47,6 +76,9 @@ namespace InfiniteImprobability.Core
         // ── VFX Graph property + event name IDs ───────────────────────────────
         // Cached at startup — cheaper than hashing strings every frame.
         static readonly int ID_CausalNodes      = Shader.PropertyToID("_CausalNodes");
+        static readonly int ID_Resolution       = Shader.PropertyToID("_Resolution");
+        static readonly int ID_BubbleScale      = Shader.PropertyToID("_BubbleScale");
+        static readonly int ID_NodeOffset       = Shader.PropertyToID("_NodeOffset");
         static readonly int ID_HeegnerIntensity = Shader.PropertyToID("_HeegnerIntensity");
         static readonly int ID_BifurcationPulse = Shader.PropertyToID("_BifurcationPulse");
         static readonly int ID_CompositeFlow    = Shader.PropertyToID("_CompositeFlow");
@@ -54,6 +86,11 @@ namespace InfiniteImprobability.Core
         // Event names must match the GPU Event Spawn context names in the VFX Graph.
         static readonly int ID_OnBifurcation    = Shader.PropertyToID("OnBifurcation");
         static readonly int ID_OnHeegner        = Shader.PropertyToID("OnHeegner");
+
+        // ── Public accessors ──────────────────────────────────────────────────
+        /// <summary>Total node count in the shared _CausalNodes buffer (resolution^3).
+        /// Use this to compute _nodeOffset for the next VFX system in the chain.</summary>
+        public int NodeCount => _nodeCount;
 
         // ── Private state ─────────────────────────────────────────────────────
         CausalFieldEngine _engine;
@@ -86,8 +123,9 @@ namespace InfiniteImprobability.Core
             if (_vfx != null)
             {
                 _vfx.SetGraphicsBuffer(ID_CausalNodes, _vfxBuffer);
-                _vfx.SetInt(Shader.PropertyToID("_Resolution"), _engine.Resolution);
-                _vfx.SetFloat(Shader.PropertyToID("_BubbleScale"), _engine.BubbleScale);
+                _vfx.SetInt(ID_Resolution,  _engine.Resolution);
+                _vfx.SetFloat(ID_BubbleScale, _engine.BubbleScale);
+                _vfx.SetInt(ID_NodeOffset,  _nodeOffset);
             }
 
             _engine.OnHeegnerCrossing.AddListener(OnHeegner);
