@@ -2,7 +2,7 @@
   "dependencies": {
     "com.meta.xr.sdk.core": {
       "version": "203.0.0",
-      "depth": 0,
+      "depth": 1,
       "source": "registry",
       "dependencies": {
         "com.unity.xr.hands": "1.7.2",
@@ -125,6 +125,24 @@
         "com.unity.modules.jsonserialize": "1.0.0"
       }
     },
+    "com.unity.render-pipelines.universal": {
+      "version": "17.4.0",
+      "depth": 0,
+      "source": "builtin",
+      "dependencies": {
+        "com.unity.render-pipelines.core": "17.4.0",
+        "com.unity.shadergraph": "17.4.0",
+        "com.unity.render-pipelines.universal-config": "17.4.0"
+      }
+    },
+    "com.unity.render-pipelines.universal-config": {
+      "version": "17.4.0",
+      "depth": 1,
+      "source": "builtin",
+      "dependencies": {
+        "com.unity.render-pipelines.core": "17.4.0"
+      }
+    },
     "com.unity.searcher": {
       "version": "4.9.4",
       "depth": 2,
@@ -198,7 +216,7 @@
     },
     "com.unity.xr.hands": {
       "version": "1.7.3",
-      "depth": 1,
+      "depth": 2,
       "source": "registry",
       "dependencies": {
         "com.unity.modules.xr": "1.0.0",

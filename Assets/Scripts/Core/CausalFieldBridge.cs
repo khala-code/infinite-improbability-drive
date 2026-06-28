@@ -84,7 +84,11 @@ namespace InfiniteImprobability.Core
             _bufferData = new float[_nodeCount * 4];
 
             if (_vfx != null)
+            {
                 _vfx.SetGraphicsBuffer(ID_CausalNodes, _vfxBuffer);
+                _vfx.SetInt(Shader.PropertyToID("_Resolution"), _engine.Resolution);
+                _vfx.SetFloat(Shader.PropertyToID("_BubbleScale"), _engine.BubbleScale);
+            }
 
             _engine.OnHeegnerCrossing.AddListener(OnHeegner);
             _engine.OnPrimeCrossing.AddListener(OnPrime);

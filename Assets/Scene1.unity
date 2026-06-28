@@ -412,7 +412,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a3f7c2d1e8b04a5f9c6d3e2b1a7f0c4d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::InfiniteImprobability.Core.CausalFieldBridge
-  _vfx: {fileID: 0}
+  _vfx: {fileID: 1236258403}
   _heegnerPeak: 3
   _bifurcationPeak: 1.5
   _compositeFlow: 0.4
@@ -429,8 +429,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 554b93598807b714ebe5864bdaac9bbf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::InfiniteImprobability.Core.CausalFieldEngine
-  _computeShader: {fileID: 0}
-  _cmbTexture: {fileID: 0}
+  _computeShader: {fileID: 7200000, guid: 2b2230ce7080ceb4886048fc1edf9bc7, type: 3}
+  _cmbTexture: {fileID: 2800000, guid: ddadcbd303140924680ef6f2ea5a2464, type: 3}
   _resolution: 32
   _bubbleScale: 2
   _spinVector: {x: 0, y: 1, z: 0}
@@ -642,7 +642,7 @@ MonoBehaviour:
   _monoscopic: 0
   _sharpenType: 0
   _disableRecording: 0
-  _enableDynamicResolution: 0
+  _enableDynamicResolution: 1
   minDynamicResolutionScale: 1
   maxDynamicResolutionScale: 1
   quest2MinDynamicResolutionScale: 0.7
@@ -1024,7 +1024,7 @@ VisualEffect:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1236258400}
   m_Enabled: 1
-  m_Asset: {fileID: 0}
+  m_Asset: {fileID: 8926484042661614526, guid: 163299eeaaea2b74a9d2e3f5588118be, type: 3}
   m_InitialEventName: OnPlay
   m_InitialEventNameOverriden: 0
   m_StartSeed: 0
@@ -1033,7 +1033,10 @@ VisualEffect:
   m_ResourceVersion: 1
   m_PropertySheet:
     m_Float:
-      m_Array: []
+      m_Array:
+      - m_Value: 0
+        m_Name: _HeegnerIntensity
+        m_Overridden: 0
     m_Vector2f:
       m_Array: []
     m_Vector3f:
