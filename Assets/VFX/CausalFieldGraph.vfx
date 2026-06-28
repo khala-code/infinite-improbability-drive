@@ -109,7 +109,11 @@ MonoBehaviour:
   m_UICollapsed: 1
   m_UISuperCollapsed: 0
   m_UIInfos: {fileID: 114340500867371532}
-  m_CustomAttributes: []
+  m_CustomAttributes:
+  - {fileID: 8926484042661615322}
+  - {fileID: 8926484042661615323}
+  - {fileID: 8926484042661615324}
+  - {fileID: 8926484042661615325}
   m_ParameterInfo:
   - name: _CausalNodes
     path: 
@@ -137,7 +141,7 @@ MonoBehaviour:
       m_Type:
         m_SerializableType: System.Single, mscorlib, Version=4.0.0.0, Culture=neutral,
           PublicKeyToken=b77a5c561934e089
-      m_SerializableObject: 0
+      m_SerializableObject: 1
     min: -Infinity
     max: Infinity
     enumValues: []
@@ -153,7 +157,7 @@ MonoBehaviour:
       m_Type:
         m_SerializableType: System.Single, mscorlib, Version=4.0.0.0, Culture=neutral,
           PublicKeyToken=b77a5c561934e089
-      m_SerializableObject: 0
+      m_SerializableObject: 1
     min: -Infinity
     max: Infinity
     enumValues: []
@@ -169,7 +173,7 @@ MonoBehaviour:
       m_Type:
         m_SerializableType: System.Single, mscorlib, Version=4.0.0.0, Culture=neutral,
           PublicKeyToken=b77a5c561934e089
-      m_SerializableObject: 0
+      m_SerializableObject: 1
     min: -Infinity
     max: Infinity
     enumValues: []
@@ -185,7 +189,7 @@ MonoBehaviour:
       m_Type:
         m_SerializableType: System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral,
           PublicKeyToken=b77a5c561934e089
-      m_SerializableObject: 0
+      m_SerializableObject: 16
     min: -Infinity
     max: Infinity
     enumValues: []
@@ -201,7 +205,7 @@ MonoBehaviour:
       m_Type:
         m_SerializableType: System.Single, mscorlib, Version=4.0.0.0, Culture=neutral,
           PublicKeyToken=b77a5c561934e089
-      m_SerializableObject: 0
+      m_SerializableObject: 1
     min: -Infinity
     max: Infinity
     enumValues: []
@@ -1219,7 +1223,7 @@ MonoBehaviour:
   m_Parent: {fileID: 114350483966674976}
   m_Children: []
   m_UIPosition: {x: 0, y: 0}
-  m_UICollapsed: 0
+  m_UICollapsed: 1
   m_UISuperCollapsed: 0
   m_InputSlots: []
   m_OutputSlots:
@@ -1365,7 +1369,7 @@ MonoBehaviour:
       m_Type:
         m_SerializableType: System.Single, mscorlib, Version=4.0.0.0, Culture=neutral,
           PublicKeyToken=b77a5c561934e089
-      m_SerializableObject: 0
+      m_SerializableObject: 1
     m_Space: -1
   m_Property:
     name: o
@@ -1452,7 +1456,7 @@ MonoBehaviour:
       m_Type:
         m_SerializableType: System.Single, mscorlib, Version=4.0.0.0, Culture=neutral,
           PublicKeyToken=b77a5c561934e089
-      m_SerializableObject: 0
+      m_SerializableObject: 1
     m_Space: -1
   m_Property:
     name: o
@@ -1535,7 +1539,7 @@ MonoBehaviour:
       m_Type:
         m_SerializableType: System.Single, mscorlib, Version=4.0.0.0, Culture=neutral,
           PublicKeyToken=b77a5c561934e089
-      m_SerializableObject: 0
+      m_SerializableObject: 1
     m_Space: -1
   m_Property:
     name: o
@@ -1608,7 +1612,7 @@ MonoBehaviour:
       m_Type:
         m_SerializableType: System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral,
           PublicKeyToken=b77a5c561934e089
-      m_SerializableObject: 0
+      m_SerializableObject: 16
     m_Space: -1
   m_Property:
     name: o
@@ -1680,7 +1684,7 @@ MonoBehaviour:
       m_Type:
         m_SerializableType: System.Single, mscorlib, Version=4.0.0.0, Culture=neutral,
           PublicKeyToken=b77a5c561934e089
-      m_SerializableObject: 0
+      m_SerializableObject: 1
     m_Space: -1
   m_Property:
     name: o
@@ -1974,7 +1978,7 @@ MonoBehaviour:
   m_InputSlots:
   - {fileID: 8926484042661615067}
   m_OutputSlots: []
-  m_Label: Ambient Particles
+  m_Label: AmbientParticles
   m_Data: {fileID: 8926484042661615080}
   m_InputFlowSlot:
   - link:
@@ -3455,7 +3459,7 @@ MonoBehaviour:
   m_InputSlots:
   - {fileID: 8926484042661615082}
   m_OutputSlots: []
-  m_Label: Bifurcation Particles
+  m_Label: BifurcationParticles
   m_Data: {fileID: 8926484042661615095}
   m_InputFlowSlot:
   - link:
@@ -4936,7 +4940,7 @@ MonoBehaviour:
   m_InputSlots:
   - {fileID: 8926484042661615130}
   m_OutputSlots: []
-  m_Label: Heegner Particles
+  m_Label: HeegnerParticles
   m_Data: {fileID: 8926484042661615143}
   m_InputFlowSlot:
   - link:
@@ -6411,22 +6415,24 @@ MonoBehaviour:
   m_UICollapsed: 0
   m_UISuperCollapsed: 0
   m_InputSlots:
-  - {fileID: 8926484042661615308}
   - {fileID: 8926484042661615309}
   - {fileID: 8926484042661615310}
+  - {fileID: 8926484042661615328}
   m_OutputSlots: []
   m_Disabled: 0
   m_ActivationSlot: {fileID: 8926484042661615199}
   m_BlockName: Custom HLSL
-  m_HLSLCode: "void CustomHLSL(inout VFXAttributes attributes, \r\n               
-    in uint particleId,\r\n                in StructuredBuffer<float4> _CausalNodes,\r\n               
-    in int _Resolution)\r\n{\r\n    uint nodeIndex = particleId % (uint)(_Resolution
-    * _Resolution * _Resolution);\r\n    float4 nodeData = _CausalNodes[nodeIndex];\r\n\r\n   
-    float psiSq     = nodeData.x;\r\n    float voidD     = nodeData.y;\r\n    float
-    xi        = nodeData.z;\r\n    float nodeClass = nodeData.w;\r\n\r\n    attributes.lifetime
-    = lerp(0.5, 3.0, xi) * (1.0 - voidD * 0.5);\r\n    attributes.size     = lerp(0.002,
-    0.01, voidD);\r\n    attributes.velocity = normalize(attributes.position) * psiSq
-    * 0.3;\r\n}"
+  m_HLSLCode: "void CustomHLSL(\n    inout VFXAttributes          attributes,\n   
+    in  StructuredBuffer<float4> _CausalNodes,\n    in  int                     
+    _Resolution,\n    in  float                    _BubbleScale)\r\n{\r\n    uint
+    id = (uint)attributes.particleId % (uint)(_Resolution * _Resolution * _Resolution);\r\n   
+    float4 node = _CausalNodes[id];\r\n\r\n    float psiSq  = node.x;\r\n    float
+    voidD  = node.y;\r\n    float xi     = node.z;\r\n    float nClass = node.w;\r\n\r\n   
+    attributes.waveIntensity = psiSq;\r\n    attributes.voidDensity   = voidD;\r\n   
+    attributes.xiCoherence   = xi;\r\n    attributes.nodeClass     = nClass;\r\n\r\n   
+    // Heegner: large, slow, overwhelming \u2014 the 2000-particle moment\r\n   
+    attributes.size     = lerp(0.03f, 0.12f, saturate(psiSq * 3.0f));\r\n    attributes.lifetime
+    = lerp(1.0f, 2.5f, saturate(xi));\r\n    attributes.alpha    = 1.0f;\r\n}"
   m_ShaderFile: {fileID: 0}
   m_AvailableFunction:
     selection: CustomHLSL
@@ -6484,22 +6490,27 @@ MonoBehaviour:
   m_UICollapsed: 0
   m_UISuperCollapsed: 0
   m_InputSlots:
-  - {fileID: 8926484042661615302}
   - {fileID: 8926484042661615303}
   - {fileID: 8926484042661615304}
+  - {fileID: 8926484042661615326}
   m_OutputSlots: []
   m_Disabled: 0
   m_ActivationSlot: {fileID: 8926484042661615206}
   m_BlockName: Custom HLSL
-  m_HLSLCode: "void CustomHLSL(inout VFXAttributes attributes, \r\n               
-    in uint particleId,\r\n                in StructuredBuffer<float4> _CausalNodes,\r\n               
-    in int _Resolution)\r\n{\r\n    uint nodeIndex = particleId % (uint)(_Resolution
-    * _Resolution * _Resolution);\r\n    float4 nodeData = _CausalNodes[nodeIndex];\r\n\r\n   
-    float psiSq     = nodeData.x;\r\n    float voidD     = nodeData.y;\r\n    float
-    xi        = nodeData.z;\r\n    float nodeClass = nodeData.w;\r\n\r\n    attributes.lifetime
-    = lerp(0.5, 3.0, xi) * (1.0 - voidD * 0.5);\r\n    attributes.size     = lerp(0.002,
-    0.01, voidD);\r\n    attributes.velocity = normalize(attributes.position) * psiSq
-    * 0.3;\r\n}"
+  m_HLSLCode: "void CustomHLSL(\n    inout VFXAttributes          attributes,\n   
+    in  StructuredBuffer<float4> _CausalNodes,\n    in  int                     
+    _Resolution,\n    in  float                    _BubbleScale)\r\n{\r\n    uint
+    id = (uint)attributes.particleId % (uint)(_Resolution * _Resolution * _Resolution);\r\n   
+    float4 node = _CausalNodes[id];\r\n\r\n    // Unpack buffer channels\r\n    float
+    psiSq   = node.x;\r\n    float voidD   = node.y;\r\n    float xi      = node.z;\r\n   
+    float nClass  = node.w;\r\n\r\n    // Write custom attributes for the Render
+    Quad to read\r\n    attributes.waveIntensity = psiSq;\r\n    attributes.voidDensity  
+    = voidD;\r\n    attributes.xiCoherence   = xi;\r\n    attributes.nodeClass    
+    = nClass;\r\n\r\n    // Scale initial size by wave intensity \u2014 ambient particles
+    are small & scattered\r\n    attributes.size = lerp(0.002f, 0.012f, saturate(psiSq
+    * 0.5f));\r\n\r\n    // Lifetime: quieter nodes live longer (slow ambient drift)\r\n   
+    attributes.lifetime = lerp(3.0f, 1.0f, saturate(psiSq));\r\n\r\n    // Fade alpha
+    with void density\r\n    attributes.alpha = lerp(0.6f, 0.15f, saturate(voidD));\r\n}"
   m_ShaderFile: {fileID: 0}
   m_AvailableFunction:
     selection: CustomHLSL
@@ -6564,16 +6575,20 @@ MonoBehaviour:
   m_Disabled: 0
   m_ActivationSlot: {fileID: 8926484042661615213}
   m_BlockName: Custom HLSL
-  m_HLSLCode: "void CustomHLSL(inout VFXAttributes attributes,\r\n               
-    in float _BifurcationPulse,\r\n                in float _HeegnerIntensity,\r\n               
-    in float time)\r\n{\r\n    float nodeClass = attributes.color.w;\r\n\r\n    float3
-    bulkColor    = float3(0.1, 0.2, 0.8);\r\n    float3 bifurColor   = float3(1.0,
-    0.5, 0.0);\r\n    float3 heegnerColor = float3(2.0, 2.0, 2.0);\r\n\r\n    float3
-    col = bulkColor;\r\n    col = nodeClass > 0.5  ? bifurColor   : col;\r\n    col
-    = nodeClass > 1.5  ? heegnerColor : col;\r\n\r\n    col *= 1.0 + _BifurcationPulse
-    * sin(time * 8.0) * 0.5;\r\n    col *= 1.0 + _HeegnerIntensity;\r\n\r\n    float
-    psiSq = attributes.color.x;\r\n    attributes.color = float4(col, saturate(psiSq
-    * 2.0));\r\n}"
+  m_HLSLCode: "void CustomHLSL(\r\n    inout VFXAttributes attributes,\r\n    in   
+    float         _BifurcationPulse,\r\n    in    float         _HeegnerIntensity,\r\n   
+    in    float         time)\r\n{\r\n    float nClass  = attributes.nodeClass;\r\n   
+    float psiSq   = attributes.waveIntensity;\r\n\r\n    // Colour by node class
+    \u2014 BULK only for Ambient pipe\r\n    float3 bulkColor    = float3(0.1f, 0.2f,
+    0.8f);   // deep blue\r\n    float3 bifurColor   = float3(1.0f, 0.5f, 0.0f);  
+    // amber\r\n    float3 heegnerColor = float3(2.0f, 2.0f, 2.0f);   // white flare
+    (HDR)\r\n\r\n    float3 col = bulkColor;\r\n    col = (nClass > 0.5f) ? bifurColor  
+    : col;\r\n    col = (nClass > 1.5f) ? heegnerColor : col;\r\n\r\n    // Subtle
+    intensity pulse driven by wave amplitude\r\n    col *= 1.0f + 0.3f * sin(time
+    * 2.5f) * saturate(psiSq);\r\n\r\n    // Boost brightness when Omega events are
+    active\r\n    col *= 1.0f + _BifurcationPulse * 0.4f + _HeegnerIntensity * 0.6f;\r\n\n   
+    attributes.alpha = attributes.alpha * saturate(0.4f + psiSq * 0.8f);\r\n    attributes.color
+    = col;\r\n}"
   m_ShaderFile: {fileID: 0}
   m_AvailableFunction:
     selection: CustomHLSL
@@ -7455,16 +7470,20 @@ MonoBehaviour:
   m_Disabled: 0
   m_ActivationSlot: {fileID: 8926484042661615254}
   m_BlockName: Custom HLSL
-  m_HLSLCode: "void CustomHLSL(inout VFXAttributes attributes,\r\n               
-    in float _BifurcationPulse,\r\n                in float _HeegnerIntensity,\r\n               
-    in float time)\r\n{\r\n    float nodeClass = attributes.color.w;\r\n\r\n    float3
-    bulkColor    = float3(0.1, 0.2, 0.8);\r\n    float3 bifurColor   = float3(1.0,
-    0.5, 0.0);\r\n    float3 heegnerColor = float3(2.0, 2.0, 2.0);\r\n\r\n    float3
-    col = bulkColor;\r\n    col = nodeClass > 0.5  ? bifurColor   : col;\r\n    col
-    = nodeClass > 1.5  ? heegnerColor : col;\r\n\r\n    col *= 1.0 + _BifurcationPulse
-    * sin(time * 8.0) * 0.5;\r\n    col *= 1.0 + _HeegnerIntensity;\r\n\r\n    float
-    psiSq = attributes.color.x;\r\n    attributes.color = float4(col, saturate(psiSq
-    * 2.0));\r\n}"
+  m_HLSLCode: "void CustomHLSL(\r\n    inout VFXAttributes attributes,\r\n    in   
+    float         _BifurcationPulse,\r\n    in    float         _HeegnerIntensity,\r\n   
+    in    float         time)\r\n{\r\n    float nClass = attributes.nodeClass;\r\n   
+    float psiSq  = attributes.waveIntensity;\r\n    float xi     = attributes.xiCoherence;\r\n\r\n   
+    // Bifurcation pipe is amber \u2014 flare white when Heegner also active\r\n   
+    float3 baseColor    = float3(1.0f, 0.5f, 0.0f);   // amber\r\n    float3 heegnerColor
+    = float3(2.0f, 2.0f, 2.0f);   // white flare\r\n\r\n    float3 col = baseColor;\r\n   
+    col = lerp(col, heegnerColor, saturate(_HeegnerIntensity * 0.5f));\r\n\r\n   
+    // Pulse rate driven by xi coherence \u2014 higher coherence = faster flicker\r\n   
+    float pulse = 1.0f + 0.5f * sin(time * (4.0f + xi * 8.0f));\r\n    col *= pulse
+    * (1.0f + _BifurcationPulse);\r\n\r\n    // Age-based fade: particles burn bright
+    then die\r\n    float age01 = 1.0f - saturate(attributes.lifetime / max(attributes.lifetime,
+    0.001f));\r\n    attributes.alpha = saturate(1.0f - age01 * age01) * (0.7f +
+    psiSq * 0.3f);\r\n    attributes.color = col;\n}"
   m_ShaderFile: {fileID: 0}
   m_AvailableFunction:
     selection: CustomHLSL
@@ -7889,16 +7908,20 @@ MonoBehaviour:
   m_Disabled: 0
   m_ActivationSlot: {fileID: 8926484042661615279}
   m_BlockName: Custom HLSL
-  m_HLSLCode: "void CustomHLSL(inout VFXAttributes attributes,\r\n               
-    in float _BifurcationPulse,\r\n                in float _HeegnerIntensity,\r\n               
-    in float time)\r\n{\r\n    float nodeClass = attributes.color.w;\r\n\r\n    float3
-    bulkColor    = float3(0.1, 0.2, 0.8);\r\n    float3 bifurColor   = float3(1.0,
-    0.5, 0.0);\r\n    float3 heegnerColor = float3(2.0, 2.0, 2.0);\r\n\r\n    float3
-    col = bulkColor;\r\n    col = nodeClass > 0.5  ? bifurColor   : col;\r\n    col
-    = nodeClass > 1.5  ? heegnerColor : col;\r\n\r\n    col *= 1.0 + _BifurcationPulse
-    * sin(time * 8.0) * 0.5;\r\n    col *= 1.0 + _HeegnerIntensity;\r\n\r\n    float
-    psiSq = attributes.color.x;\r\n    attributes.color = float4(col, saturate(psiSq
-    * 2.0));\r\n}"
+  m_HLSLCode: "void CustomHLSL(\r\n    inout VFXAttributes attributes,\r\n    in   
+    float         _BifurcationPulse,\r\n    in    float         _HeegnerIntensity,\r\n   
+    in    float         time)\r\n{\r\n    float psiSq = attributes.waveIntensity;\r\n   
+    float xi    = attributes.xiCoherence;\r\n\r\n    // White flare HDR \u2014 driven
+    entirely by _HeegnerIntensity\r\n    float3 coreColor = float3(2.0f, 2.0f, 2.0f);\r\n   
+    float3 rimColor  = float3(0.8f, 0.9f, 1.0f);   // cool blue-white rim\r\n\r\n   
+    // Lerp core\u2192rim based on void density (hollow centre effect)\r\n    float3
+    col = lerp(coreColor, rimColor, saturate(attributes.voidDensity * 2.0f));\r\n\r\n   
+    // Scale brightness by _HeegnerIntensity \u2014 fades as the event decays\r\n   
+    float intensity = max(_HeegnerIntensity, 0.1f);\r\n    col *= intensity;\r\n\r\n   
+    // Slow, stately pulse \u2014 Heegner events are overwhelming not frantic\r\n   
+    col *= 1.0f + 0.15f * sin(time * 1.2f + xi * 3.14159f);\r\n\r\n    // Fade alpha
+    symmetrically with intensity so it dies cleanly\r\n    attributes.alpha = saturate(intensity
+    * 0.8f + psiSq * 0.2f);\r\n    attributes.color = col;\r\n}"
   m_ShaderFile: {fileID: 0}
   m_AvailableFunction:
     selection: CustomHLSL
@@ -8211,22 +8234,25 @@ MonoBehaviour:
   m_UICollapsed: 0
   m_UISuperCollapsed: 0
   m_InputSlots:
-  - {fileID: 8926484042661615305}
   - {fileID: 8926484042661615306}
   - {fileID: 8926484042661615307}
+  - {fileID: 8926484042661615327}
   m_OutputSlots: []
   m_Disabled: 0
   m_ActivationSlot: {fileID: 8926484042661615301}
   m_BlockName: Custom HLSL
-  m_HLSLCode: "void CustomHLSL(inout VFXAttributes attributes, \r\n               
-    in uint particleId,\r\n                in StructuredBuffer<float4> _CausalNodes,\r\n               
-    in int _Resolution)\r\n{\r\n    uint nodeIndex = particleId % (uint)(_Resolution
-    * _Resolution * _Resolution);\r\n    float4 nodeData = _CausalNodes[nodeIndex];\r\n\r\n   
-    float psiSq     = nodeData.x;\r\n    float voidD     = nodeData.y;\r\n    float
-    xi        = nodeData.z;\r\n    float nodeClass = nodeData.w;\r\n\r\n    attributes.lifetime
-    = lerp(0.5, 3.0, xi) * (1.0 - voidD * 0.5);\r\n    attributes.size     = lerp(0.002,
-    0.01, voidD);\r\n    attributes.velocity = normalize(attributes.position) * psiSq
-    * 0.3;\r\n}"
+  m_HLSLCode: "void CustomHLSL(\n    inout VFXAttributes          attributes,\n   
+    in  StructuredBuffer<float4> _CausalNodes,\n    in  int                     
+    _Resolution,\n    in  float                    _BubbleScale)\r\n{\r\n    uint
+    id = (uint)attributes.particleId % (uint)(_Resolution * _Resolution * _Resolution);\r\n   
+    float4 node = _CausalNodes[id];\r\n\r\n    float psiSq  = node.x;\r\n    float
+    voidD  = node.y;\r\n    float xi     = node.z;\r\n    float nClass = node.w;\r\n\r\n   
+    attributes.waveIntensity = psiSq;\r\n    attributes.voidDensity   = voidD;\r\n   
+    attributes.xiCoherence   = xi;\r\n    attributes.nodeClass     = nClass;\r\n\r\n   
+    // Bifurcation particles: mid-sized, short-lived burst behaviour\r\n    attributes.size    
+    = lerp(0.01f, 0.04f, saturate(psiSq * 2.0f));\r\n    attributes.lifetime = lerp(0.4f,
+    1.2f, saturate(xi));\r\n\r\n    // Born fully opaque \u2014 fade handled in Render
+    Quad via age\r\n    attributes.alpha = 1.0f;\r\n}"
   m_ShaderFile: {fileID: 0}
   m_AvailableFunction:
     selection: CustomHLSL
@@ -8262,40 +8288,6 @@ MonoBehaviour:
     name: _vfx_enabled
     m_serializedType:
       m_SerializableType: System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral,
-        PublicKeyToken=b77a5c561934e089
-  m_Direction: 0
-  m_LinkedSlots: []
---- !u!114 &8926484042661615302
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c52d920e7fff73b498050a6b3c4404ca, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Unity.VisualEffectGraph.Editor::UnityEditor.VFX.VFXSlotUint
-  m_UIIgnoredErrors: []
-  m_Parent: {fileID: 0}
-  m_Children: []
-  m_UIPosition: {x: 0, y: 0}
-  m_UICollapsed: 1
-  m_UISuperCollapsed: 0
-  m_MasterSlot: {fileID: 8926484042661615302}
-  m_MasterData:
-    m_Owner: {fileID: 8926484042661615200}
-    m_Value:
-      m_Type:
-        m_SerializableType: System.UInt32, mscorlib, Version=4.0.0.0, Culture=neutral,
-          PublicKeyToken=b77a5c561934e089
-      m_SerializableObject: 0
-    m_Space: -1
-  m_Property:
-    name: _particleId
-    m_serializedType:
-      m_SerializableType: System.UInt32, mscorlib, Version=4.0.0.0, Culture=neutral,
         PublicKeyToken=b77a5c561934e089
   m_Direction: 0
   m_LinkedSlots: []
@@ -8368,40 +8360,6 @@ MonoBehaviour:
         PublicKeyToken=b77a5c561934e089
   m_Direction: 0
   m_LinkedSlots: []
---- !u!114 &8926484042661615305
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c52d920e7fff73b498050a6b3c4404ca, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Unity.VisualEffectGraph.Editor::UnityEditor.VFX.VFXSlotUint
-  m_UIIgnoredErrors: []
-  m_Parent: {fileID: 0}
-  m_Children: []
-  m_UIPosition: {x: 0, y: 0}
-  m_UICollapsed: 1
-  m_UISuperCollapsed: 0
-  m_MasterSlot: {fileID: 8926484042661615305}
-  m_MasterData:
-    m_Owner: {fileID: 8926484042661615295}
-    m_Value:
-      m_Type:
-        m_SerializableType: System.UInt32, mscorlib, Version=4.0.0.0, Culture=neutral,
-          PublicKeyToken=b77a5c561934e089
-      m_SerializableObject: 0
-    m_Space: -1
-  m_Property:
-    name: _particleId
-    m_serializedType:
-      m_SerializableType: System.UInt32, mscorlib, Version=4.0.0.0, Culture=neutral,
-        PublicKeyToken=b77a5c561934e089
-  m_Direction: 0
-  m_LinkedSlots: []
 --- !u!114 &8926484042661615306
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8468,40 +8426,6 @@ MonoBehaviour:
     name: __Resolution
     m_serializedType:
       m_SerializableType: System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral,
-        PublicKeyToken=b77a5c561934e089
-  m_Direction: 0
-  m_LinkedSlots: []
---- !u!114 &8926484042661615308
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c52d920e7fff73b498050a6b3c4404ca, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Unity.VisualEffectGraph.Editor::UnityEditor.VFX.VFXSlotUint
-  m_UIIgnoredErrors: []
-  m_Parent: {fileID: 0}
-  m_Children: []
-  m_UIPosition: {x: 0, y: 0}
-  m_UICollapsed: 1
-  m_UISuperCollapsed: 0
-  m_MasterSlot: {fileID: 8926484042661615308}
-  m_MasterData:
-    m_Owner: {fileID: 8926484042661615193}
-    m_Value:
-      m_Type:
-        m_SerializableType: System.UInt32, mscorlib, Version=4.0.0.0, Culture=neutral,
-          PublicKeyToken=b77a5c561934e089
-      m_SerializableObject: 0
-    m_Space: -1
-  m_Property:
-    name: _particleId
-    m_serializedType:
-      m_SerializableType: System.UInt32, mscorlib, Version=4.0.0.0, Culture=neutral,
         PublicKeyToken=b77a5c561934e089
   m_Direction: 0
   m_LinkedSlots: []
@@ -8922,3 +8846,169 @@ MonoBehaviour:
   m_UIPosition: {x: 0, y: 0}
   m_UICollapsed: 1
   m_UISuperCollapsed: 0
+--- !u!114 &8926484042661615322
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e1fe1c3ae22b45dea22da94bb7969561, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.VisualEffectGraph.Editor::UnityEditor.VFX.VFXCustomAttributeDescriptor
+  m_Description: 
+  m_AttributeName: nodeClass
+  m_Type: 0
+  m_IsExpanded: 0
+--- !u!114 &8926484042661615323
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e1fe1c3ae22b45dea22da94bb7969561, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.VisualEffectGraph.Editor::UnityEditor.VFX.VFXCustomAttributeDescriptor
+  m_Description: 
+  m_AttributeName: waveIntensity
+  m_Type: 0
+  m_IsExpanded: 0
+--- !u!114 &8926484042661615324
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e1fe1c3ae22b45dea22da94bb7969561, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.VisualEffectGraph.Editor::UnityEditor.VFX.VFXCustomAttributeDescriptor
+  m_Description: 
+  m_AttributeName: voidDensity
+  m_Type: 0
+  m_IsExpanded: 0
+--- !u!114 &8926484042661615325
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e1fe1c3ae22b45dea22da94bb7969561, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.VisualEffectGraph.Editor::UnityEditor.VFX.VFXCustomAttributeDescriptor
+  m_Description: 
+  m_AttributeName: xiCoherence
+  m_Type: 0
+  m_IsExpanded: 0
+--- !u!114 &8926484042661615326
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f780aa281814f9842a7c076d436932e7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.VisualEffectGraph.Editor::UnityEditor.VFX.VFXSlotFloat
+  m_UIIgnoredErrors: []
+  m_Parent: {fileID: 0}
+  m_Children: []
+  m_UIPosition: {x: 0, y: 0}
+  m_UICollapsed: 1
+  m_UISuperCollapsed: 0
+  m_MasterSlot: {fileID: 8926484042661615326}
+  m_MasterData:
+    m_Owner: {fileID: 8926484042661615200}
+    m_Value:
+      m_Type:
+        m_SerializableType: System.Single, mscorlib, Version=4.0.0.0, Culture=neutral,
+          PublicKeyToken=b77a5c561934e089
+      m_SerializableObject: 0
+    m_Space: -1
+  m_Property:
+    name: __BubbleScale
+    m_serializedType:
+      m_SerializableType: System.Single, mscorlib, Version=4.0.0.0, Culture=neutral,
+        PublicKeyToken=b77a5c561934e089
+  m_Direction: 0
+  m_LinkedSlots: []
+--- !u!114 &8926484042661615327
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f780aa281814f9842a7c076d436932e7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.VisualEffectGraph.Editor::UnityEditor.VFX.VFXSlotFloat
+  m_UIIgnoredErrors: []
+  m_Parent: {fileID: 0}
+  m_Children: []
+  m_UIPosition: {x: 0, y: 0}
+  m_UICollapsed: 1
+  m_UISuperCollapsed: 0
+  m_MasterSlot: {fileID: 8926484042661615327}
+  m_MasterData:
+    m_Owner: {fileID: 8926484042661615295}
+    m_Value:
+      m_Type:
+        m_SerializableType: System.Single, mscorlib, Version=4.0.0.0, Culture=neutral,
+          PublicKeyToken=b77a5c561934e089
+      m_SerializableObject: 0
+    m_Space: -1
+  m_Property:
+    name: __BubbleScale
+    m_serializedType:
+      m_SerializableType: System.Single, mscorlib, Version=4.0.0.0, Culture=neutral,
+        PublicKeyToken=b77a5c561934e089
+  m_Direction: 0
+  m_LinkedSlots: []
+--- !u!114 &8926484042661615328
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f780aa281814f9842a7c076d436932e7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.VisualEffectGraph.Editor::UnityEditor.VFX.VFXSlotFloat
+  m_UIIgnoredErrors: []
+  m_Parent: {fileID: 0}
+  m_Children: []
+  m_UIPosition: {x: 0, y: 0}
+  m_UICollapsed: 1
+  m_UISuperCollapsed: 0
+  m_MasterSlot: {fileID: 8926484042661615328}
+  m_MasterData:
+    m_Owner: {fileID: 8926484042661615193}
+    m_Value:
+      m_Type:
+        m_SerializableType: System.Single, mscorlib, Version=4.0.0.0, Culture=neutral,
+          PublicKeyToken=b77a5c561934e089
+      m_SerializableObject: 0
+    m_Space: -1
+  m_Property:
+    name: __BubbleScale
+    m_serializedType:
+      m_SerializableType: System.Single, mscorlib, Version=4.0.0.0, Culture=neutral,
+        PublicKeyToken=b77a5c561934e089
+  m_Direction: 0
+  m_LinkedSlots: []
