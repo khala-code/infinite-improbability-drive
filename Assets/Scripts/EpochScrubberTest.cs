@@ -9,6 +9,17 @@
 //  XiPulseSpeed    -- how fast XiCoherence oscillates
 //  Paused          -- freeze epoch/xi at current values
 //  ManualEpoch     -- override epoch to a fixed value when Paused = true
+//  ManualXi        -- override xi to a fixed value when Paused = true
+//
+// Execution order note
+// --------------------
+// Values are pushed in LateUpdate so they are always written AFTER
+// HolographicParticleLayer.Update() has finished its Dispatch call.
+// This means the compute shader sees the scrubber's values on the
+// NEXT frame -- one frame of latency, acceptable for a test harness.
+// For production, EpochScrubber should be set earlier in Script
+// Execution Order (Project Settings > Script Execution Order) and
+// push values in Update, with HPL reading them in LateUpdate.
 
 using UnityEngine;
 
@@ -39,23 +50,28 @@ namespace InfiniteImprobability.CMB
         public float ManualXi = 0.5f;
 
         // Readout -- visible in Inspector during Play mode
-        [Header("Readout (read-only)")] 
+        [Header("Readout (read-only)")]
         [SerializeField] private float _currentEpoch;
         [SerializeField] private float _currentXi;
 
-        private void Reset()
+        private void Awake()
         {
-            // Auto-find sibling component on the same GameObject if not assigned
-            ParticleLayer = GetComponent<HolographicParticleLayer>();
+            // Resolve sibling reference at runtime rather than relying on
+            // Reset() which only fires once when the component is first added.
+            if (ParticleLayer == null)
+                ParticleLayer = GetComponent<HolographicParticleLayer>();
+
+            if (ParticleLayer == null)
+                Debug.LogError("[EpochScrubberTest] No HolographicParticleLayer found on this GameObject. "
+                             + "Assign it manually in the Inspector.");
         }
 
-        private void Update()
+        // LateUpdate: runs after all Update() calls in the same frame.
+        // HPL.Update() dispatches the compute shader in Update(), so writing
+        // here guarantees the GPU sees fresh values on the next Dispatch.
+        private void LateUpdate()
         {
-            if (ParticleLayer == null)
-            {
-                Debug.LogWarning("[EpochScrubberTest] ParticleLayer not assigned.");
-                return;
-            }
+            if (ParticleLayer == null) return;
 
             float epoch, xi;
 
@@ -80,8 +96,6 @@ namespace InfiniteImprobability.CMB
         }
 
 #if UNITY_EDITOR
-        // Draw a simple gizmo label in Scene view so you can see live values
-        // without keeping the Inspector open.
         private void OnDrawGizmosSelected()
         {
             UnityEditor.Handles.Label(
