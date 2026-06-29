@@ -104,7 +104,7 @@ namespace InfiniteImprobability.CMB
         private int           _anchorCount;       // 0 until anchor_positions.bin exists
         private int           _kernelUpdate;
         private FieldScalars  _fieldScalars;
-        private float         _lastEpoch;
+        private float         _lastEpoch = 1f;
 
         private static readonly float[] HeegnerOmegaThresholds = { 0.15f, 0.38f, 0.61f, 0.84f };
 
