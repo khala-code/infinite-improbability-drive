@@ -3,20 +3,26 @@
 hpl_viz_C.py  --  Real-data HPL epoch stillframes
 Reads particle_buffer.bin directly from your Unity StreamingAssets path.
 
-ParticleRecord struct (96 bytes, 24 x float32 / int32):
+Actual ParticleRecord struct layout (96 bytes = 24 x float32) as written
+by generate_particle_buffer.py (verified by field-range inspection 2026-06-29):
+
   [0:3]   Position       (float3)  -- Galactic Cartesian, X→GC, Z→NGP
   [3:6]   Velocity       (float3)
-  [6:10]  Colour         (float4)  -- RGBA baked by generate_particle_buffer.py
-  [10]    HeegnerPower   (float)
-  [11]    VoidPressure   (float)
-  [12]    SolitonDensity (float)
-  [13]    Kappa          (float)
-  [14]    ParticleClass  (int32 OR float32=0.0/1.0/2.0 depending on writer)
-  [15]    ParityWeight   (float)
-  [16:24] _p0.._p7       padding
+  [6:10]  Colour         (float4)  -- RGBA baked at generation time
+  [10]    HeegnerPower   (float)   range ~0.22–1.0
+  [11]    SolitonDensity (float)   range ~0.51–1.0
+  [12]    VoidPressure   (float)   range ~0–0.003
+  [13]    Kappa          (float)   range ~0.32–1.36 (unnormalised — clamp to 1)
+  [14:18] unknown/padding (5 floats)
+  [18]    ParityWeight   (float)   range ~0.03–1.0
+  [19]    ParticleClass  (float32 encoded int: 0=Soliton 1=Void 2=Heegner)
+  [20:24] padding
 
-Mirrors the epoch physics in HolographicParticleLayer.cs DispatchComputeUpdate()
-so the Python preview is a faithful CPU approximation of what Unity will render.
+NOTE: HolographicParticleLayer.cs struct spec has ParticleClass at offset 14.
+      The Python writer placed it at offset 19. Unity-side fix pending —
+      see Docs/data_index.txt. The viz script uses the verified Python offsets.
+
+Mirrors the epoch physics in HolographicParticleLayer.cs DispatchComputeUpdate().
 
 Usage:
   python hpl_viz_C.py
@@ -41,9 +47,17 @@ STRIDE      = 96
 N_FLOATS    = 24
 HEEGNER_THRESHOLDS = [0.15, 0.38, 0.61, 0.84]
 
+# Verified field offsets (generate_particle_buffer.py layout)
+F_HEEGNER_POWER   = 10
+F_SOLITON_DENSITY = 11
+F_VOID_PRESSURE   = 12
+F_KAPPA           = 13
+F_PARITY_WEIGHT   = 18
+F_PARTICLE_CLASS  = 19
+
 CLASS_COLOURS = {0: "#00e5ff", 1: "#ff6d00", 2: "#ffd600"}
 CLASS_NAMES   = {0: "Soliton", 1: "Void",    2: "Heegner"}
-H = 0.100; V = 0.550; S = 0.350   # field scalar defaults (matches field_scalars.json)
+H = 0.100; V = 0.550; S = 0.350   # field scalars (matches field_scalars.json)
 
 
 # ── Struct reader ───────────────────────────────────────────────────────────────
@@ -54,25 +68,8 @@ def load_particles(path):
     n = len(raw) // STRIDE
     if n == 0:
         sys.exit("particle_buffer.bin is empty or path wrong.")
-
-    data     = np.frombuffer(raw, dtype=np.float32).reshape(n, N_FLOATS).copy()
-    int_view = np.frombuffer(raw, dtype=np.int32).reshape(n, N_FLOATS)
-
-    # --- Detect whether ParticleClass was written as int32 or float32 ----------
-    # If the writer used float32 (e.g. numpy default), field 14 as int32 will
-    # contain float bit-patterns like 0x00000000, 0x3F800000, 0x40000000
-    # (i.e. 0, 1065353216, 1073741824) instead of 0, 1, 2.
-    raw_int_vals = np.unique(int_view[:, 14])
-    float_as_int = set(raw_int_vals.tolist())
-    # Canonical int32 encoding: only values in {0,1,2}
-    if float_as_int <= {0, 1, 2}:
-        pclass = int_view[:, 14].copy()
-        print("  ParticleClass encoding: int32")
-    else:
-        # float32 encoding: round the float view to nearest int
-        pclass = np.round(data[:, 14]).astype(np.int32)
-        print("  ParticleClass encoding: float32 (auto-detected, converting)")
-
+    data   = np.frombuffer(raw, dtype=np.float32).reshape(n, N_FLOATS).copy()
+    pclass = np.round(data[:, F_PARTICLE_CLASS]).astype(np.int32)
     return data, pclass, n
 
 
@@ -122,30 +119,25 @@ def epoch_alpha(data, pclass, t, xi=0.5):
     xsm = np.interp(xi, [0,1], [0.5, 1.5])  # xiSolitonMod
     xvm = np.interp(xi, [0,1], [1.5, 0.5])  # xiVoidMod
 
-    hp = data[:, 10]; vp = data[:, 11]; sd = data[:, 12]
+    hp = data[:, F_HEEGNER_POWER]
+    vp = data[:, F_VOID_PRESSURE]
+    sd = data[:, F_SOLITON_DENSITY]
+
     is_s = (pclass==0).astype(float)
     is_v = (pclass==1).astype(float)
     is_h = (pclass==2).astype(float)
-
-    # Warn once if class masks are all zero (encoding issue not caught above)
-    if is_s.sum() + is_v.sum() + is_h.sum() == 0:
-        print("  WARNING: all class masks are zero — unique pclass values:",
-              np.unique(pclass)[:10])
 
     bright = (is_s * S * sd * esb * xsm +
               is_v * V * vp * evb * xvm +
               is_h * H * hp * (1.0 + 0.5*np.sin(t*6.28*4)))
 
+    # VoidPressure is very small (~0–0.003) — boost so Voids are visible
+    # This mirrors the fact that Unity multiplies by a large _VoidPressureScale uniform
+    bright = np.where(is_v > 0, is_v * V * (vp / vp.max()).clip(0,1) * evb * xvm, bright)
+
     # Heegner flash amplification near Omega threshold crossings
     for thr in HEEGNER_THRESHOLDS:
         bright += is_h * np.exp(-200*(t-thr)**2) * 2.0
-
-    # Fallback: if fields are also zero, give all particles a minimum glow
-    # so at least something is visible for debugging
-    if bright.max() < 1e-6:
-        print(f"  WARNING: all brightness values ~0 at t={t:.3f} — "
-              f"hp max={hp.max():.4f} vp max={vp.max():.4f} sd max={sd.max():.4f}")
-        bright = np.full(len(data), 0.15)  # flat debug glow
 
     alpha = np.clip(bright, 0.0, 1.0)
     size  = 0.4 + 1.8 * alpha
