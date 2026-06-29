@@ -144,6 +144,18 @@ def lonlat_to_vec(lon_deg: float, lat_deg: float) -> np.ndarray:
     ], dtype=np.float64)
 
 
+def vec_to_pix(nside: int, v: np.ndarray) -> int:
+    """Convert a unit vector to a HEALPix pixel index (scalar int).
+
+    hp.vec2ang returns arrays even for a single vector; this helper
+    extracts the scalar theta/phi before calling ang2pix so the result
+    is always a plain Python int, not a 0-d array.
+    """
+    v = unit(v)
+    theta_arr, phi_arr = hp.vec2ang(v)
+    return int(hp.ang2pix(nside, float(theta_arr[0]), float(phi_arr[0])))
+
+
 # ---------------------------------------------------------------------------
 # Zenith interpolation
 # ---------------------------------------------------------------------------
@@ -285,10 +297,11 @@ def generate_heegner_particles(
         if ell == 2:
             flags |= CLASS_HEEGNER_L2_BLUESHIFTED
 
-        # Scatter particles in a von Mises-Fisher cap around the anchor
-        # Concentration kappa_vmf proportional to ell power
-        ell_pix  = hp.ang2pix(nside, *hp.vec2ang(anchor))
-        k_local  = float(np.abs(k_heegner[ell_pix]))
+        # Scatter particles in a von Mises-Fisher cap around the anchor.
+        # Use vec_to_pix to get a scalar pixel index (hp.vec2ang returns
+        # arrays even for a single vector -- vec_to_pix unwraps them).
+        ell_pix   = vec_to_pix(nside, anchor)
+        k_local   = float(np.abs(k_heegner[ell_pix]))
         kappa_vmf = float(np.clip(k_local * 50.0, 2.0, 80.0))
 
         for _ in range(n):
@@ -448,10 +461,17 @@ def generate(
     with open(fv_path, "r", encoding="utf-8") as f:
         fv = json.load(f)
 
-    # Void map: reconstruct from all non-heegner, non-soliton alm
-    # Approximate as full_alm minus heegner_alm minus soliton_alm
-    full_alm    = alm_data["full_alm"]
-    void_alm    = full_alm - heegner_alm - soliton_alm
+    # Void alm: prefer explicit void_alm key; fall back to full - heegner - soliton.
+    # If full_alm is also absent (older pipeline runs), void_alm is zeros and
+    # void particles will be uniformly distributed on the sphere.
+    if "void_alm" in alm_data:
+        void_alm = alm_data["void_alm"]
+    elif "full_alm" in alm_data:
+        void_alm = alm_data["full_alm"] - heegner_alm - soliton_alm
+        print("  (void_alm derived from full_alm - heegner - soliton)")
+    else:
+        void_alm = np.zeros_like(heegner_alm)
+        print("  WARNING: no void_alm or full_alm in npz -- void map is uniform")
 
     print("Reconstructing pixel maps ...")
     soliton_map = hp.alm2map(soliton_alm, nside=nside, lmax=lmax)
