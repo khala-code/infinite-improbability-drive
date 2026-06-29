@@ -168,17 +168,41 @@ Two observers in the same physical location may have **differently shaped observ
 
 The observer bubble encodes ξ as a field variable on its surface. Its shape is a **deformed manifold** — not a sphere — because ξ bifurcation is axis-dependent. The positive-trust interior, the bifurcation membrane at the surface, and the adversarial exterior are all geometrically encoded in the bubble's deformation relative to a reference sphere.
 
+**Geometric structure (from `hyperbolic-boundary-geometry.md`):**  
+The ObserverBubble surface is a conformal deformation of the hyperbolic bulk metric of the CMB
+manifold, restricted to the observer's local neighbourhood and re-centred on the ZaTaOa coordinate.
+The deformation has a specific axis structure derived from the double zenith:
+
+- **Axis of rotational symmetry** (unperturbed): the first zenith — the monopole direction, pointing
+  toward the null centroid along the path already travelled. In the absence of ξ bifurcation, the
+  bubble is a **horosphere** centred on this axis.
+- **Axis of maximum deformation**: the second zenith — the dipole direction, the observer's current
+  velocity vector. Motion through the bulk stretches the bubble forward (in the dipole direction) and
+  compresses it behind (in the anti-dipole direction).
+- **Bifurcation radius** \(r_{\text{bif}}(\hat{n})\): the \(K = 0\) locus on the pulled-back curvature
+  field — where the local geometry transitions from negative (stable, coherent interior) to positive
+  (unstable, adversarial exterior). This varies angularly: maximum in the dipole direction, minimum
+  in the anti-dipole direction.
+- **Deformation magnitude**: controlled by \(\delta_{\text{zenith}}\) — the angular separation between
+  the first and second zenith vectors. Large \(\delta_{\text{zenith}}\) = strongly deformed bubble
+  (high integrated void density encountered along worldline). Small \(\delta_{\text{zenith}}\) =
+  near-spherical bubble (smooth path through low void density).
+
+This resolves open problem 4 (ObserverBubble geometry) with a concrete, computable description.
+All inputs (\(T_0\), dipole vector, \(\delta_{\text{zenith}}\), K field) are pipeline outputs from
+`preprocess_cmb_harmonics.py`.
+
 ---
 
 ## Open Problems
 
-1. **The ζ evolution equation** — what functional carries ζ through phase transitions without breaking CPT or losing information?
+1. **The ζ evolution equation** — what functional carries ζ through phase transitions without breaking CPT or losing information? *(Geometric container now defined: ζ evolves along the radial AdS direction within the Heegner fixed-point skeleton; phase transitions are K sign-change loci — see `hyperbolic-boundary-geometry.md` Section 8)*
 2. **Phase transition sign rules** — precisely how does ξ sign transform at each scale boundary (baryogenesis→BBN, BBN→CMB, physical→biological, biological→social)?
 3. **Filter independence** — are the calibration constraints genuinely independent or secretly correlated?
-4. **ObserverBubble geometry** — what is the correct mathematical description of a deformed manifold whose deformation encodes a non-local tensor field?
+4. **ObserverBubble geometry** — *(resolved: see `hyperbolic-boundary-geometry.md` Section 8 and the Observer Bubble section above)*
 5. **Null threshold** — what is the minimum ξ accumulation required to cross from Null into time? Is this a computable quantity or a boundary condition of the framework itself?
 
 ---
 
-*Last updated: 2026-06-17*  
+*Last updated: 2026-06-29*  
 *"Nothing failing to be nothing perfectly."*

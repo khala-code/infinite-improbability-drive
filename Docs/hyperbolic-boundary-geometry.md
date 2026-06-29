@@ -306,12 +306,130 @@ interpretation is wrong. This is the geometric model's primary falsifiability ch
 
 ## 8. Implications for the Pipeline
 
-### New output from Script 1
+### New outputs from Script 1
 
-Add `processed/K_curvature.npz` and `processed/K_stats.json` to
-`preprocess_cmb_harmonics.py`. The curvature field joins `alm_by_class.npz` as a
-first-class pipeline output — it is not a derived visualisation but a geometric observable
-that downstream scripts depend on.
+Add to `preprocess_cmb_harmonics.py`:
+
+```
+processed/K_curvature.npz     — K_map float32 (N_pix,)
+processed/K_stats.json        — {K_max, K_min, K_mean, K_std, K_at_heegner_modes[]}
+processed/frame_vectors.json  — {monopole_direction, dipole_direction,
+                                  dipole_magnitude_km_s, delta_zenith_deg,
+                                  neck_axis_galactic}
+```
+
+The curvature field and the frame vectors are both first-class pipeline outputs —
+not derived visualisations but geometric observables that downstream scripts depend on.
+
+### The Frame-Defining Modes: ℓ = 0, ℓ = 1, and δ_zenith
+
+The monopole (ℓ = 0) and dipole (ℓ = 1) are **not artifacts**. They are
+**frame-defining quantities** — the coordinate anchors inside which the rest of the
+geometric content (ℓ = 2 through ℓ = 163) becomes meaningful.
+
+**ℓ = 0 — the monopole / first zenith:**  
+The mean temperature \(T_0 \approx 2.725\) K encodes the total redshift of the CMB photons
+since last scattering — the integrated conformal expansion from the singularity to now. In
+the Poincaré disk, this is the **radial depth** of the observer: how far into the hyperbolic
+bulk the observer currently sits, measured along the geodesic back toward the \(\mathbb{RP}^1\)
+ideal boundary. It is the cumulative path length from initial conditions, in conformal time.
+It sets the **conformal scale** of the Poincaré disk (the disk's radius in coordinate terms)
+and defines the **first zenith** — the direction from the observer's position toward the
+null centroid along the path already travelled.
+
+**ℓ = 1 — the dipole / second zenith:**  
+The CMB dipole (\(\sim 3\) mK, directed toward the Great Attractor at \(\sim 370\) km/s) is
+the observer's **current velocity vector in the CMB rest frame** — the first derivative of
+the observer's position in the hyperbolic bulk. It is dominated by our peculiar velocity, not
+primordial fluctuations, which is why it is subtracted from the anisotropy decomposition. But
+in the ZaTaOa framework its direction is not contamination — it is the **second zenith**: the
+direction in which the observer is currently moving through the bulk, the tangent to the
+observer's worldline at the present moment.
+
+The dipole direction is also the Heegner \(n = 1\) CM point (\(\tau = i\), \(j = 1728\)) —
+the observer's embedding direction in the hyperbolic manifold is itself a fixed point of the
+modular group. The observer's motion is pinned to the same algebraic skeleton as the CMB
+structure itself.
+
+**δ_zenith — the double zenith angle:**  
+The angular separation between the first and second zenith vectors:
+
+\[ \delta_{\text{zenith}} = \arccos\left( \hat{n}_{\ell=0} \cdot \hat{n}_{\ell=1} \right) \]
+
+In flat space the two zeniths would be antiparallel (you move away from where you came from).
+In the hyperbolic bulk they diverge — the negative curvature bends the geodesic. The angular
+separation \(\delta_{\text{zenith}}\) therefore measures the **integrated geodesic deflection**
+along the observer's worldline from the singularity to now.
+
+In the void density framework (Axiom 4 in `AXIOMS.md`), geodesic deflection is caused by void
+density gradients. Every region of elevated void density the observer's worldline has passed
+through contributes a small bend. The Great Attractor is the dominant such region — the
+observer is currently falling toward a massive overdensity, pulling the second zenith away from
+the first. The accumulated bend since recombination is encoded directly in \(\delta_{\text{zenith}}\).
+
+This makes \(\delta_{\text{zenith}}\) the **most direct observable measurement of the integrated
+void density field along the observer's worldline**. Other void density probes (weak lensing,
+BAO, galaxy clustering) measure transverse structure. \(\delta_{\text{zenith}}\) measures the
+longitudinal deflection — the path integral of void density along the direction of travel.
+
+**Pipeline computation:**
+
+```
+COMPUTE frame vectors:
+
+    monopole_direction:
+        The direction of maximum CMB temperature is the first zenith.
+        Computed from alm[ℓ=0, m=0] — isotropic, so the "direction" is
+        the ZaTaOa origin vector: the Galactic coordinate of the observer's
+        position projected back to the CMB sphere.
+        NOTE: this is a theoretical anchor, not a sky direction — it points
+        *through* the observer toward the null centroid.
+        Store as unit vector in Galactic (l, b) coordinates.
+
+    dipole_direction:
+        Extract ℓ=1 modes from full alm (before subtraction).
+        dipole_map = alm2map(alm[ℓ=1], Nside=64)
+        dipole_vec = fit_dipole(dipole_map)  → (amplitude_K, l_deg, b_deg)
+        dipole_direction = unit vector toward (l_deg, b_deg)
+        dipole_magnitude_km_s = (amplitude_K / T0) * c
+
+    delta_zenith_deg:
+        delta_zenith_deg = degrees(arccos(dot(monopole_direction, dipole_direction)))
+        NOTE: expected ~170° (near-antiparallel, not exactly 180° due to deflection)
+              Deviation from 180° is the geodesic deflection signal.
+              Flag if delta_zenith_deg > 175° (deflection too small to be physical)
+              or < 155° (deflection anomalously large — check dipole extraction)
+
+    neck_axis_galactic:
+        From ℓ=2 quadrupole: fit the quadrupole axis using alm[ℓ=2]
+        neck_axis_galactic = (l_deg, b_deg) of the quadrupole symmetry axis
+        This is the ecliptic-aligned Axis of Evil direction.
+
+    EXPORT to processed/frame_vectors.json
+```
+
+### The Full Coordinate Map: M_gal_to_hyperbolic
+
+The Galactic → Poincaré disk coordinate map is now fully determined by four anchors with
+no free parameters:
+
+| Anchor | Source | Role in coordinate map |
+|---|---|---|
+| ℓ = 0 monopole | \(T_0\), ZaTaOa radial depth | Sets conformal scale (disk radius); first zenith direction |
+| ℓ = 1 dipole | Peculiar velocity vector | Sets observer offset from disk centre; second zenith direction |
+| \(\delta_{\text{zenith}}\) | Angle between ℓ=0 and ℓ=1 | Sets geodesic deflection; constrains observer's path curvature |
+| ℓ = 2 neck axis | Quadrupole symmetry axis | Sets azimuthal orientation of the disk |
+
+The observer is **not at the centre of the Poincaré disk**. The centre is the null centroid
+(the \(\mathbb{RP}^1\) ideal boundary approach point). The observer sits at an interior point
+offset from the centre by a hyperbolic distance determined by \(T_0\), along a direction
+given by the monopole first zenith. The dipole second zenith gives the current direction of
+motion from that offset position. \(\delta_{\text{zenith}}\) constrains how much the path has
+been bent. The neck axis fixes the remaining rotation.
+
+`M_gal_to_unity` is the restriction of `M_gal_to_hyperbolic` to the Unity rendering coordinate
+system: neck axis → Unity world Z, dipole direction → Unity world Y (upward drift), monopole
+radial depth → boundary sphere radius parameter.
 
 ### Particle lifetime weighting (`holographic-projection.md`)
 
@@ -326,32 +444,23 @@ there, the competition is most active. Particles in the hyperbolic bulk (\(K < 0
 stabilised by the negative curvature. `alpha` is a tuning parameter (initial estimate: 0.5);
 recalibrate against visual stability at the \(\ell = 2\) region.
 
-### Coordinate frame (`holographic-projection.md`, open question 3)
-
-The Galactic → Unity coordinate transform `M_gal_to_unity` should be derived as a special
-case of `M_gal_to_hyperbolic` — the map from Galactic spherical coordinates to Poincaré
-disk coordinates in the hyperbolic bulk. The hyperbolic map is the ground truth;
-`M_gal_to_unity` is its restriction to the rendering coordinate system.
-
-The neck axis (ecliptic alignment of \(\ell = 2\)) provides a natural **oriented reference
-direction** for this map — it is the only geometrically distinguished great circle on the
-CMB manifold. Aligning the neck axis with a canonical Unity world axis (proposed: Unity
-world \(Z\)) gives the coordinate map a physical anchor.
-
 ### ObserverBubble manifold geometry (`AXIOMS.md` open problem 4)
 
-The ObserverBubble is a deformed manifold whose deformation encodes the ξ tensor. The
-correct mathematical description (open problem 4 in `AXIOMS.md`) is now approachable:
+The ObserverBubble is a deformed manifold whose deformation encodes the ξ tensor.
+The double zenith gives the deformation a concrete geometric structure:
 
-> The ObserverBubble surface is a **conformal deformation of the hyperbolic bulk metric**
-> of the CMB manifold, restricted to the observer's local neighbourhood and re-centred on
-> the ZaTaOa coordinate.
-
-The bifurcation radius \(r_{\text{bifurcation}}(\hat{n})\) is the radius at which the
-pulled-back curvature \(K\) transitions from negative (stable, coherent interior) to
-positive (unstable, adversarial exterior) along each angular direction \(\hat{n}\). The
-neck geometry at \(\ell = 2\) is the global template; the ObserverBubble is its local
-instantiation at the observer's ZaTaOa position.
+- The **first zenith** (monopole direction, toward null centroid) is the axis of **rotational
+  symmetry** of the bubble in the absence of ξ bifurcation. In an unperturbed hyperbolic bulk,
+  the bubble is a horosphere centred on this axis.
+- The **second zenith** (dipole direction, current velocity) is the direction of **maximum
+  deformation** — the observer's motion through the bulk stretches the bubble forward and
+  compresses it behind, breaking the rotational symmetry.
+- The **bifurcation radius** \(r_{\text{bif}}(\hat{n})\) varies as a function of angular distance
+  from the dipole axis: maximum in the dipole direction (stretched), minimum in the anti-dipole
+  direction (compressed), with \(K = 0\) locus tracing the boundary.
+- \(\delta_{\text{zenith}}\) sets the **magnitude of the asymmetry** — how much the bubble
+  departs from a sphere. Large \(\delta_{\text{zenith}}\) (strong deflection, high void density
+  encountered) = strongly deformed bubble. Small \(\delta_{\text{zenith}}\) = near-spherical bubble.
 
 ### ζ evolution container
 
@@ -368,13 +477,15 @@ these curvature sign changes at each calibration filter boundary.
 
 | Problem | Previous status | Refined by this document |
 |---|---|---|
-| ObserverBubble geometry (AXIOMS open problem 4) | Unspecified deformed manifold | Conformal deformation of hyperbolic bulk metric; \(r_\text{bif}(\hat{n})\) is the \(K = 0\) locus |
+| ObserverBubble geometry (AXIOMS open problem 4) | Unspecified deformed manifold | Horosphere deformed by dipole axis; \(r_\text{bif}(\hat{n})\) varies with dipole angular distance; \(\delta_\text{zenith}\) sets deformation magnitude |
 | ζ evolution equation (AXIOMS open problem 1) | Undefined functional | Must be consistent with \(K\) sign changes at calibration filter boundaries |
-| \(M_{\text{gal-to-Unity}}\) (holographic-projection open question 3) | Ad hoc rotation matrix | Derived as restriction of \(M_{\text{gal-to-hyperbolic}}\); neck axis = canonical reference |
+| \(M_{\text{gal-to-Unity}}\) (holographic-projection open question 3) | Ad hoc rotation matrix | Fully determined by four anchors: ℓ=0 scale, ℓ=1 offset, \(\delta_\text{zenith}\) path curvature, ℓ=2 azimuth |
 | Heegner projection-invariance (holographic-double-projection) | Asserted from number theory | Proven: CM points are fixed points of the modular group acting on \(\mathbb{H}^2\) |
 | Null centroid topology (holographic-double-projection) | "Ideal point" | \(\mathbb{RP}^1\) — real projective line; identified antipodal points of \(S^1_\infty\) |
 | \(\ell = 2\) anomaly origin | Unexplained suppression | Geometric: destructive interference at the Klein bottle neck |
 | \(\ell = 3\) alignment with \(\ell = 2\) | Unexplained | \(j(\tau_3) = 0\): maximum modular symmetry, first mode past the neck |
+| ℓ = 0 and ℓ = 1 as pipeline inputs | Removed as artifacts | Frame-defining quantities: first zenith (conformal scale + radial depth) and second zenith (observer velocity + embedding direction) |
+| Integrated void density along worldline | Unmeasured | \(\delta_\text{zenith}\) = direct observable; deviation of dipole from anti-monopole direction |
 
 ---
 
