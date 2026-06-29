@@ -27,6 +27,10 @@ Estimators
    Tests whether the Heegner multipoles cluster angularly.
    Naturally points toward the source region (no inversion needed).
 
+   Side-output: the per-ell axis vectors become HEEGNER_ANCHOR nodes
+   written to nodes.npz for use by generate_particle_buffer.py and
+   generate_boundary_heatmaps.py.
+
 3. PHASE_COHERENCE
    For each pixel, compute the mean resultant length of the Heegner
    alm phases projected onto the sphere via a simple phase map.
@@ -41,6 +45,12 @@ Updates frame_vectors.json in-place with:
   delta_zenith_deg            -- angle(HEEGNER_K_CENTROID_inverted, dipole)
   estimator_agreement_deg     -- max pairwise angle between the three estimates
   legacy_anti_dipole_delta_zenith_deg  -- old proxy retained for comparison
+
+Writes nodes.npz to the same Processed/ directory:
+  node_class   int8  (N,)    0 = HEEGNER_ANCHOR for all nodes in this file
+  directions   float32 (N,3) unit vectors (one per Heegner ell with power > 0)
+  ell          int32  (N,)   the Heegner ell number for each node
+  power        float32 (N,)  total ell power (weight used in alignment estimate)
 
 Usage
 -----
@@ -68,12 +78,16 @@ import numpy as np
 HEEGNER_NUMBERS: List[int] = sorted([1, 2, 3, 7, 11, 19, 43, 67, 163])
 EPSILON = 1e-12
 
+# Node class index -- must match generate_particle_buffer.py and
+# generate_boundary_heatmaps.py constants.
+NODE_CLASS_HEEGNER_ANCHOR: int = 0
+
 
 # ---------------------------------------------------------------------------
 # Path helpers
 # ---------------------------------------------------------------------------
 
-def default_paths() -> Tuple[Path, Path, Path]:
+def default_paths() -> Tuple[Path, Path, Path, Path]:
     script_dir = Path(__file__).resolve().parent
     repo_root = script_dir.parent
     processed = repo_root / "Assets" / "CMB" / "Processed"
@@ -81,6 +95,7 @@ def default_paths() -> Tuple[Path, Path, Path]:
         processed / "alm_by_class.npz",
         processed / "K_curvature.npz",
         processed / "frame_vectors.json",
+        processed / "nodes.npz",
     )
 
 
@@ -124,15 +139,6 @@ def vec_to_dict(v: np.ndarray) -> Dict[str, float]:
 
 # ---------------------------------------------------------------------------
 # Estimator 1 -- HEEGNER_K_CENTROID (inverted)
-#
-# Intensity-weighted centroid of the K_heegner curvature map, then
-# negated to recover the source pole rather than the accumulation pole.
-#
-# The centroid of |K_heegner| points toward the region where Heegner
-# curvature has accumulated -- the *destination* of the outward field.
-# The ZaTaOa first zenith is the antipodal *source* (the Null), so we
-# return -centroid.  This is the same convention as taking the anti-dipole
-# to find the direction we are moving away from.
 # ---------------------------------------------------------------------------
 
 def estimator_heegner_k_centroid(
@@ -143,12 +149,11 @@ def estimator_heegner_k_centroid(
     assert len(k_heegner) == npix, "k_heegner length must match nside"
 
     weights = np.abs(k_heegner).astype(np.float64)
-    weights = np.clip(weights, 0, np.percentile(weights, 99.5))  # remove outlier pixels
+    weights = np.clip(weights, 0, np.percentile(weights, 99.5))
     total = weights.sum()
     if total < EPSILON:
         raise ValueError("K_heegner is essentially zero -- curvature map may be degenerate")
 
-    # Pixel centres as unit vectors
     theta, phi = hp.pix2ang(nside, np.arange(npix))
     x = np.sin(theta) * np.cos(phi)
     y = np.sin(theta) * np.sin(phi)
@@ -159,34 +164,33 @@ def estimator_heegner_k_centroid(
     cz = float(np.dot(weights, z)) / total
 
     accumulation_pole = unit(np.array([cx, cy, cz], dtype=np.float64))
-
-    # Invert: source pole is antipodal to the accumulation pole.
-    # MULTIPOLE_ALIGNMENT and PHASE_COHERENCE both naturally point toward
-    # the source; this inversion aligns all three estimators.
-    source_pole = -accumulation_pole
-    return source_pole
+    return -accumulation_pole
 
 
 # ---------------------------------------------------------------------------
 # Estimator 2 -- MULTIPOLE_ALIGNMENT
-# For each Heegner ell, reconstruct the single-ell map and find the
-# direction of maximum absolute amplitude (the "axis" of that multipole).
-# Weighted mean over all 9 Heegner ells, weighted by total ell power.
+# Returns the weighted mean direction AND the per-ell node list for nodes.npz.
 # ---------------------------------------------------------------------------
 
 def estimator_multipole_alignment(
     heegner_alm: np.ndarray,
     lmax: int,
     nside: int,
-) -> np.ndarray:
+) -> Tuple[np.ndarray, List[Tuple[int, np.ndarray, float]]]:
+    """Return (mean_direction, per_ell_nodes).
+
+    per_ell_nodes is a list of (ell, unit_vec, ell_power) tuples --
+    one entry per Heegner ell that has non-zero power.  These become
+    the HEEGNER_ANCHOR rows in nodes.npz.
+    """
     axis_vecs: List[np.ndarray] = []
     weights: List[float] = []
+    per_ell_nodes: List[Tuple[int, np.ndarray, float]] = []
 
     for ell in HEEGNER_NUMBERS:
         if ell > lmax:
             continue
 
-        # Isolate this ell
         single_alm = np.zeros_like(heegner_alm)
         for m in range(ell + 1):
             idx = hp.Alm.getidx(lmax, ell, m)
@@ -197,7 +201,6 @@ def estimator_multipole_alignment(
         if ell_power < EPSILON:
             continue
 
-        # Axis = direction of maximum absolute value
         pix = int(np.argmax(np.abs(ell_map)))
         theta, phi = hp.pix2ang(nside, pix)
         vec = np.array([
@@ -206,7 +209,6 @@ def estimator_multipole_alignment(
             math.cos(theta),
         ], dtype=np.float64)
 
-        # Sign convention: project onto running mean; flip if anti-aligned
         if axis_vecs:
             running_mean = unit(sum(w * v for v, w in zip(axis_vecs, weights)))
             if np.dot(vec, running_mean) < 0:
@@ -214,27 +216,18 @@ def estimator_multipole_alignment(
 
         axis_vecs.append(vec)
         weights.append(ell_power)
+        per_ell_nodes.append((ell, vec, ell_power))
 
     if not axis_vecs:
         raise ValueError("No Heegner ells found within lmax -- increase lmax or check alm")
 
     total_w = sum(weights)
     mean_vec = sum(w * v for v, w in zip(axis_vecs, weights))
-    return unit(mean_vec / total_w)
+    return unit(mean_vec / total_w), per_ell_nodes
 
 
 # ---------------------------------------------------------------------------
 # Estimator 3 -- PHASE_COHERENCE
-# Build a pixel-space phase coherence map from the Heegner alm:
-# for each pixel p, project each (ell, m) Heegner mode onto p via
-# Y_lm(theta_p, phi_p) and accumulate the mean resultant length of
-# the resulting phase angles.  High MRL = coherent phase = origin region.
-# Then take the gradient direction of this MRL map.
-#
-# nside_coarse must satisfy lmax <= 4*nside_coarse (healpy Nyquist limit).
-# Default nside_coarse=64 gives lmax/nside = 4 for lmax=256.
-# If you change DEFAULT_LMAX, update nside_coarse accordingly:
-#   nside_coarse = max(32, next_power_of_two(lmax // 4))
 # ---------------------------------------------------------------------------
 
 def estimator_phase_coherence(
@@ -242,26 +235,15 @@ def estimator_phase_coherence(
     lmax: int,
     nside_coarse: int = 64,
 ) -> np.ndarray:
-    # Reconstruct Heegner map at coarse resolution
     coarse_map = hp.alm2map(heegner_alm, nside=nside_coarse, lmax=lmax)
-
-    # We approximate per-pixel phase coherence via the local gradient magnitude
-    # of the reconstructed map -- peaks in |grad T| correlate with phase fronts.
-    # True per-pixel MRL over Y_lm basis would require O(npix * lmax^2) ops;
-    # gradient proxy is O(npix) and sufficient for direction estimation.
     alm_coarse = hp.map2alm(coarse_map, lmax=lmax, pol=False, use_weights=False)
 
-    # Compute gradient magnitude map via spin-1 derivatives
-    # hp.alm2map_der1 returns (d/dtheta, 1/sin(theta) * d/dphi)
     try:
         dtheta, dphi = hp.alm2map_der1(alm_coarse, nside_coarse)
         grad_mag = np.sqrt(dtheta ** 2 + dphi ** 2)
     except Exception:
-        # Fallback: use abs(map) if derivative fails
         grad_mag = np.abs(coarse_map)
 
-    # First zenith = direction of maximum gradient magnitude
-    # (steepest phase front = origin of the coherence structure)
     pix = int(np.argmax(grad_mag))
     theta, phi = hp.pix2ang(nside_coarse, pix)
     vec = np.array([
@@ -273,13 +255,50 @@ def estimator_phase_coherence(
 
 
 # ---------------------------------------------------------------------------
-# Consensus: trimmed circular mean of the three estimators
+# Consensus
 # ---------------------------------------------------------------------------
 
 def consensus_direction(vecs: List[np.ndarray]) -> np.ndarray:
-    """Simple mean of unit vectors, re-normalised.  Works when spread < 90 deg."""
     mean = np.mean(np.stack(vecs, axis=0), axis=0)
     return unit(mean)
+
+
+# ---------------------------------------------------------------------------
+# nodes.npz writer
+# ---------------------------------------------------------------------------
+
+def write_nodes(
+    nodes_path: Path,
+    per_ell_nodes: List[Tuple[int, np.ndarray, float]],
+) -> None:
+    """Write HEEGNER_ANCHOR nodes to nodes.npz.
+
+    Arrays
+    ------
+    node_class  int8    (N,)   always NODE_CLASS_HEEGNER_ANCHOR (0)
+    directions  float32 (N,3)  unit vectors in galactic Cartesian coords
+    ell         int32   (N,)   Heegner ell number for each node
+    power       float32 (N,)   total ell map power (alignment weight)
+    """
+    n = len(per_ell_nodes)
+    node_class = np.full(n, NODE_CLASS_HEEGNER_ANCHOR, dtype=np.int8)
+    directions = np.array([v for _, v, _ in per_ell_nodes], dtype=np.float32)
+    ells       = np.array([e for e, _, _ in per_ell_nodes], dtype=np.int32)
+    powers     = np.array([p for _, _, p in per_ell_nodes], dtype=np.float32)
+
+    nodes_path.parent.mkdir(parents=True, exist_ok=True)
+    np.savez(
+        str(nodes_path),
+        node_class=node_class,
+        directions=directions,
+        ell=ells,
+        power=powers,
+    )
+    print(f"Written nodes.npz : {nodes_path}")
+    print(f"  {n} HEEGNER_ANCHOR nodes  (one per active Heegner ell)")
+    for ell, vec, pwr in per_ell_nodes:
+        lon, lat = vec_to_lonlat(vec)
+        print(f"    ell={ell:3d}  lon={lon:6.2f}  lat={lat:6.2f}  power={pwr:.4e}")
 
 
 # ---------------------------------------------------------------------------
@@ -290,6 +309,7 @@ def compute_zenith(
     alm_path: Path,
     k_path: Path,
     fv_path: Path,
+    nodes_path: Path,
 ) -> None:
     print(f"Loading alm from  {alm_path}")
     alm_data = np.load(alm_path)
@@ -312,33 +332,26 @@ def compute_zenith(
     ], dtype=np.float64)
     anti_dipole_vec = -dipole_vec
 
-    # -----------------------------------------------------------------------
-    # Derive nside_coarse for phase coherence: largest power-of-2 <= lmax/4
     nside_coarse = max(32, 1 << (lmax // 4).bit_length() - 1)
-    # Clamp to valid healpy nside (power of 2, max 512 for coarse use)
     nside_coarse = min(nside_coarse, 512)
 
     print("Running estimator 1: HEEGNER_K_CENTROID (inverted to source pole) ...")
     z1_k = estimator_heegner_k_centroid(k_heegner, nside)
 
     print("Running estimator 2: MULTIPOLE_ALIGNMENT ...")
-    z1_ma = estimator_multipole_alignment(heegner_alm, lmax, nside)
+    z1_ma, per_ell_nodes = estimator_multipole_alignment(heegner_alm, lmax, nside)
 
     print(f"Running estimator 3: PHASE_COHERENCE (nside_coarse={nside_coarse}) ...")
     z1_pc = estimator_phase_coherence(heegner_alm, lmax, nside_coarse=nside_coarse)
 
     z1_consensus = consensus_direction([z1_k, z1_ma, z1_pc])
 
-    # Pairwise agreement
     agreement_12 = angle_between_deg(z1_k, z1_ma)
     agreement_13 = angle_between_deg(z1_k, z1_pc)
     agreement_23 = angle_between_deg(z1_ma, z1_pc)
     max_pairwise = max(agreement_12, agreement_13, agreement_23)
 
-    # delta_zenith: inverted primary estimate vs dipole
     delta_zenith = angle_between_deg(z1_k, dipole_vec)
-
-    # Legacy proxy
     legacy_delta = angle_between_deg(anti_dipole_vec, dipole_vec)
 
     print(f"  HEEGNER_K_CENTROID (src) : lon={vec_to_lonlat(z1_k)[0]:.2f} lat={vec_to_lonlat(z1_k)[1]:.2f}")
@@ -348,6 +361,11 @@ def compute_zenith(
     print(f"  Max pairwise spread      : {max_pairwise:.2f} deg")
     print(f"  delta_zenith (K_src vs dipole) : {delta_zenith:.2f} deg")
     print(f"  Legacy anti-dipole delta_zenith: {legacy_delta:.2f} deg")
+
+    # -----------------------------------------------------------------------
+    # Write nodes.npz -- HEEGNER_ANCHOR directions from per-ell multipole axes
+    print()
+    write_nodes(nodes_path, per_ell_nodes)
 
     # -----------------------------------------------------------------------
     # Write back to frame_vectors.json
@@ -396,14 +414,17 @@ def compute_zenith(
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="ZaTaOa first-zenith estimator")
-    parser.add_argument("--alm", type=Path, default=None)
-    parser.add_argument("--k",   type=Path, default=None)
-    parser.add_argument("--fv",  type=Path, default=None)
+    parser.add_argument("--alm",   type=Path, default=None)
+    parser.add_argument("--k",     type=Path, default=None)
+    parser.add_argument("--fv",    type=Path, default=None)
+    parser.add_argument("--nodes", type=Path, default=None,
+                        help="Output path for nodes.npz (default: Processed/nodes.npz)")
     args = parser.parse_args()
 
-    default_alm, default_k, default_fv = default_paths()
+    default_alm, default_k, default_fv, default_nodes = default_paths()
     compute_zenith(
-        alm_path=args.alm or default_alm,
-        k_path=args.k   or default_k,
-        fv_path=args.fv or default_fv,
+        alm_path=args.alm   or default_alm,
+        k_path=args.k       or default_k,
+        fv_path=args.fv     or default_fv,
+        nodes_path=args.nodes or default_nodes,
     )
