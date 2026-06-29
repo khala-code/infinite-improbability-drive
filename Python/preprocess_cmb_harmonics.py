@@ -92,7 +92,7 @@ def alm_power_by_ell(alm: np.ndarray, lmax: int) -> np.ndarray:
 
 
 def reconstruct_map(alm: np.ndarray, nside: int, lmax: int) -> np.ndarray:
-    return hp.alm2map(alm, nside=nside, lmax=lmax, verbose=False)
+    return hp.alm2map(alm, nside=nside, lmax=lmax)
 
 
 def compute_sigma_and_curvature(
@@ -107,23 +107,50 @@ def compute_sigma_and_curvature(
         for m in range(ell + 1):
             idx = hp.Alm.getidx(lmax, ell, m)
             lap_alm[idx] *= factor
-    lap_sigma = hp.alm2map(lap_alm, nside=hp.get_nside(temp_map), lmax=lmax, verbose=False)
+    lap_sigma = hp.alm2map(lap_alm, nside=hp.get_nside(temp_map), lmax=lmax)
     k_map = -np.exp(-2.0 * sigma_map) * lap_sigma
     return sigma_map, lap_sigma, k_map
 
 
 def dipole_from_alm(full_alm: np.ndarray, lmax: int, nside: int = 32) -> Dict[str, float]:
+    """Extract dipole direction and amplitude from alm.
+
+    hp.fit_dipole return signature changed in healpy >= 1.15:
+      OLD (< 1.15): (amplitude_K, lon_deg, lat_deg)
+      NEW (>= 1.15): (monopole_K, dipole_vec)  where dipole_vec is shape (3,)
+
+    We handle both cases and always derive lon/lat from the unit vector.
+    """
     dipole_alm = alm_zero_like(lmax)
     for m in range(2):
         idx = hp.Alm.getidx(lmax, 1, m)
         dipole_alm[idx] = full_alm[idx]
-    dipole_map = hp.alm2map(dipole_alm, nside=nside, lmax=lmax, verbose=False)
-    amp, lon, lat = hp.fit_dipole(dipole_map, gal_cut=0)
-    direction = ang_to_vec(lon, lat)
+    dipole_map = hp.alm2map(dipole_alm, nside=nside, lmax=lmax)
+
+    result = hp.fit_dipole(dipole_map, gal_cut=0)
+
+    # Normalise return value across healpy versions
+    if len(result) == 2:
+        # New API: (monopole_scalar, dipole_vec_3d)
+        _monopole, dipole_vec = result
+        amp = float(np.linalg.norm(dipole_vec))
+        if amp > 1e-30:
+            direction = np.asarray(dipole_vec, dtype=np.float64) / amp
+        else:
+            direction = np.array([0.0, 0.0, 1.0], dtype=np.float64)
+        # Derive lon/lat from the unit vector (healpy convention: theta from N pole)
+        # direction = (x, y, z) in galactic Cartesian
+        lat = float(np.degrees(np.arcsin(np.clip(direction[2], -1.0, 1.0))))
+        lon = float(np.degrees(np.arctan2(direction[1], direction[0])) % 360.0)
+    else:
+        # Old API: (amplitude, lon_deg, lat_deg)
+        amp, lon, lat = float(result[0]), float(result[1]), float(result[2])
+        direction = ang_to_vec(lon, lat)
+
     return {
-        "amplitude_K": float(amp),
-        "lon_deg": float(lon),
-        "lat_deg": float(lat),
+        "amplitude_K": amp,
+        "lon_deg": lon,
+        "lat_deg": lat,
         "x": float(direction[0]),
         "y": float(direction[1]),
         "z": float(direction[2]),
@@ -136,7 +163,7 @@ def quadrupole_axis_from_map(full_alm: np.ndarray, lmax: int, nside: int = 64) -
     for m in range(ell + 1):
         idx = hp.Alm.getidx(lmax, ell, m)
         quad_alm[idx] = full_alm[idx]
-    quad_map = hp.alm2map(quad_alm, nside=nside, lmax=lmax, verbose=False)
+    quad_map = hp.alm2map(quad_alm, nside=nside, lmax=lmax)
     pix = int(np.argmax(np.abs(quad_map)))
     theta, phi = hp.pix2ang(nside, pix)
     lon = math.degrees(phi)
@@ -203,7 +230,7 @@ def main() -> None:
     nside_recon = int(os.environ.get("IID_NSIDE_RECON", DEFAULT_NSIDE_RECON))
 
     print(f"Loading temperature map from {fits_path}")
-    raw_map = hp.read_map(str(fits_path), field=0, dtype=np.float64, verbose=False)
+    raw_map = hp.read_map(str(fits_path), field=0, dtype=np.float64)
     nside_in = hp.get_nside(raw_map)
     t0 = float(np.mean(raw_map))
     print(f"Input nside={nside_in}  lmax={lmax}  t0={t0:.9f} K")
