@@ -11,7 +11,7 @@ ParticleRecord struct (96 bytes, 24 x float32 / int32):
   [11]    VoidPressure   (float)
   [12]    SolitonDensity (float)
   [13]    Kappa          (float)
-  [14]    ParticleClass  (int32)   -- 0=Soliton  1=Void  2=Heegner
+  [14]    ParticleClass  (int32 OR float32=0.0/1.0/2.0 depending on writer)
   [15]    ParityWeight   (float)
   [16:24] _p0.._p7       padding
 
@@ -54,9 +54,25 @@ def load_particles(path):
     n = len(raw) // STRIDE
     if n == 0:
         sys.exit("particle_buffer.bin is empty or path wrong.")
-    data       = np.frombuffer(raw, dtype=np.float32).reshape(n, N_FLOATS).copy()
-    int_view   = np.frombuffer(raw, dtype=np.int32).reshape(n, N_FLOATS)
-    pclass     = int_view[:, 14].copy()   # ParticleClass field reinterpreted as int32
+
+    data     = np.frombuffer(raw, dtype=np.float32).reshape(n, N_FLOATS).copy()
+    int_view = np.frombuffer(raw, dtype=np.int32).reshape(n, N_FLOATS)
+
+    # --- Detect whether ParticleClass was written as int32 or float32 ----------
+    # If the writer used float32 (e.g. numpy default), field 14 as int32 will
+    # contain float bit-patterns like 0x00000000, 0x3F800000, 0x40000000
+    # (i.e. 0, 1065353216, 1073741824) instead of 0, 1, 2.
+    raw_int_vals = np.unique(int_view[:, 14])
+    float_as_int = set(raw_int_vals.tolist())
+    # Canonical int32 encoding: only values in {0,1,2}
+    if float_as_int <= {0, 1, 2}:
+        pclass = int_view[:, 14].copy()
+        print("  ParticleClass encoding: int32")
+    else:
+        # float32 encoding: round the float view to nearest int
+        pclass = np.round(data[:, 14]).astype(np.int32)
+        print("  ParticleClass encoding: float32 (auto-detected, converting)")
+
     return data, pclass, n
 
 
@@ -111,6 +127,11 @@ def epoch_alpha(data, pclass, t, xi=0.5):
     is_v = (pclass==1).astype(float)
     is_h = (pclass==2).astype(float)
 
+    # Warn once if class masks are all zero (encoding issue not caught above)
+    if is_s.sum() + is_v.sum() + is_h.sum() == 0:
+        print("  WARNING: all class masks are zero — unique pclass values:",
+              np.unique(pclass)[:10])
+
     bright = (is_s * S * sd * esb * xsm +
               is_v * V * vp * evb * xvm +
               is_h * H * hp * (1.0 + 0.5*np.sin(t*6.28*4)))
@@ -118,6 +139,13 @@ def epoch_alpha(data, pclass, t, xi=0.5):
     # Heegner flash amplification near Omega threshold crossings
     for thr in HEEGNER_THRESHOLDS:
         bright += is_h * np.exp(-200*(t-thr)**2) * 2.0
+
+    # Fallback: if fields are also zero, give all particles a minimum glow
+    # so at least something is visible for debugging
+    if bright.max() < 1e-6:
+        print(f"  WARNING: all brightness values ~0 at t={t:.3f} — "
+              f"hp max={hp.max():.4f} vp max={vp.max():.4f} sd max={sd.max():.4f}")
+        bright = np.full(len(data), 0.15)  # flat debug glow
 
     alpha = np.clip(bright, 0.0, 1.0)
     size  = 0.4 + 1.8 * alpha
