@@ -12,8 +12,11 @@
 *.apk
 *.aab
 *.unitypackage
+Assets/_Recovery
+Assets/_Recovery.meta
 
 # Large CMB data files (download separately from Planck archive)
+Assets/CMB/**/*.txt
 Assets/CMB/**/*.fits
 Assets/CMB/**/*.fits.meta
 Assets/CMB/**/*.fits.gz
