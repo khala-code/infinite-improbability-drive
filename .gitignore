@@ -17,6 +17,7 @@ Assets/_Recovery.meta
 
 # Large CMB data files (download separately from Planck archive)
 Assets/CMB/**/*.txt
+Assets/CMB/**/*.txt.meta
 Assets/CMB/**/*.fits
 Assets/CMB/**/*.fits.meta
 Assets/CMB/**/*.fits.gz
@@ -24,6 +25,8 @@ Assets/CMB/**/*.fits.gz.meta
 Assets/CMB/**/*.psv.gz
 Assets/CMB/**/*.psv.gz.meta
 Assets/CMB/Data/Lensing.meta
+Assets/CMB/Processed
+Assets/CMB/Processed.meta
 Assets/CMB/**/*.hdf5
 
 # CMB pipeline outputs (reproducible from FITS via Python pipeline)
