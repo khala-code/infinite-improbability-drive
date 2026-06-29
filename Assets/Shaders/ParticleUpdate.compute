@@ -1,0 +1,90 @@
+// ParticleUpdate.compute
+// Stub -- compiles and dispatches cleanly, does not yet move particles.
+// Sufficient to confirm the C# pipeline (HolographicParticleLayer.cs) is
+// wired correctly before writing the full update kernel.
+//
+// Kernel: UpdateParticles
+// Threadgroup: [64, 1, 1]  (matches CeilToInt(particleCount / 64f) dispatch)
+//
+// Full kernel will implement:
+//   - Soliton drift toward nearest HEEGNER_ANCHOR node (weighted by Kappa)
+//   - Void drift away from HEEGNER_ANCHOR (weighted by VoidPressure)
+//   - Epoch modulation of visibility (alpha)
+//   - Xi coherence brightness modulation per class
+//   - Parity asymmetry global desaturation
+
+#pragma kernel UpdateParticles
+
+// -----------------------------------------------------------------------
+// ParticleRecord layout -- must match HolographicParticleLayer.cs exactly
+// 96 bytes, 24 floats per record
+// -----------------------------------------------------------------------
+struct ParticleRecord
+{
+    float3 Position;        // 12
+    float3 Velocity;        // 12
+    float4 Colour;          // 16
+    float  HeegnerPower;    //  4
+    float  VoidPressure;    //  4
+    float  SolitonDensity;  //  4
+    float  Kappa;           //  4
+    int    ParticleClass;   //  4  (0=Heegner, 1=Soliton, 2=Void, 3=Transition)
+    float  ParityWeight;    //  4
+    float  _p0, _p1, _p2, _p3, _p4, _p5, _p6, _p7;  // padding to 96
+};
+
+RWStructuredBuffer<ParticleRecord> _ParticleBuffer;
+
+// -----------------------------------------------------------------------
+// Uniforms (set by HolographicParticleLayer.cs each frame)
+// -----------------------------------------------------------------------
+int    _ParticleCount;
+float  _DeltaTime;
+float  _NormEpoch;           // 0 = high-z, 1 = present
+float  _XiCoherence;         // 0 = void dominant, 1 = soliton dominant
+float4x4 _GalToUnity;        // Galactic Cartesian -> Unity world
+float  _ParticleSize;
+float  _SolitonBrightness;
+float  _VoidBrightness;
+float  _HeegnerBrightness;
+float  _ParityAsymmetry;
+float  _EpochVoidBoost;
+float  _EpochSolitonBoost;
+float  _XiSolitonMod;
+float  _XiVoidMod;
+
+// -----------------------------------------------------------------------
+// Stub kernel -- passes through, no movement
+// Replace this body with the full update once buffer is verified.
+// -----------------------------------------------------------------------
+[numthreads(64, 1, 1)]
+void UpdateParticles(uint3 id : SV_DispatchThreadID)
+{
+    uint i = id.x;
+    if ((int)i >= _ParticleCount) return;
+
+    // --- STUB: no position update ---
+    // Brightness modulation is cheap to validate visually even in stub form.
+
+    ParticleRecord p = _ParticleBuffer[i];
+
+    float brightness = 1.0;
+
+    if (p.ParticleClass == 0)  // Heegner
+        brightness = _HeegnerBrightness;
+    else if (p.ParticleClass == 1)  // Soliton
+        brightness = _SolitonBrightness * _EpochSolitonBoost * _XiSolitonMod;
+    else if (p.ParticleClass == 2)  // Void
+        brightness = _VoidBrightness * _EpochVoidBoost * _XiVoidMod;
+    // Transition (3): no modulation
+
+    p.Colour.rgb *= brightness;
+
+    // Parity desaturation: when void is dominant (asymmetry > 1),
+    // push all colours toward grey.
+    float grey = dot(p.Colour.rgb, float3(0.299, 0.587, 0.114));
+    float desat = saturate(_ParityAsymmetry - 1.0);  // 0 when balanced, >0 when void wins
+    p.Colour.rgb = lerp(p.Colour.rgb, float3(grey, grey, grey), desat * 0.4);
+
+    _ParticleBuffer[i] = p;
+}
