@@ -1,61 +1,113 @@
 // ParticleUpdate.compute
-// Stub -- compiles and dispatches cleanly, does not yet move particles.
-// Sufficient to confirm the C# pipeline (HolographicParticleLayer.cs) is
-// wired correctly before writing the full update kernel.
+// Full motion kernel for the CMB holographic particle layer.
 //
-// Kernel: UpdateParticles
-// Threadgroup: [64, 1, 1]  (matches CeilToInt(particleCount / 64f) dispatch)
+// Particle classes
+// ----------------
+//   0  HEEGNER     -- locked to sky position, never drifts, brightness pulses
+//   1  SOLITON     -- drifts toward nearest Heegner anchor (weighted by Kappa)
+//   2  VOID        -- drifts away from nearest Heegner anchor (weighted by VoidPressure)
+//   3  TRANSITION  -- interpolates between soliton and void behaviour by XiCoherence
 //
-// Full kernel will implement:
-//   - Soliton drift toward nearest HEEGNER_ANCHOR node (weighted by Kappa)
-//   - Void drift away from HEEGNER_ANCHOR (weighted by VoidPressure)
-//   - Epoch modulation of visibility (alpha)
-//   - Xi coherence brightness modulation per class
-//   - Parity asymmetry global desaturation
+// All positions live on the unit sphere surface.  After each integration
+// step the position is renormalised so particles never leave the boundary.
+//
+// Coordinate space
+// ----------------
+// Positions are stored in Galactic Cartesian (unit sphere, right-handed,
+// X toward GC, Z toward NGP).  _GalToUnity transforms them in the vertex
+// shader; all motion here stays in Galactic space.
 
 #pragma kernel UpdateParticles
 
 // -----------------------------------------------------------------------
-// ParticleRecord layout -- must match HolographicParticleLayer.cs exactly
-// 96 bytes, 24 floats per record
+// ParticleRecord -- must match HolographicParticleLayer.cs exactly (96 B)
 // -----------------------------------------------------------------------
 struct ParticleRecord
 {
-    float3 Position;        // 12
-    float3 Velocity;        // 12
-    float4 Colour;          // 16
-    float  HeegnerPower;    //  4
-    float  VoidPressure;    //  4
-    float  SolitonDensity;  //  4
-    float  Kappa;           //  4
-    int    ParticleClass;   //  4  (0=Heegner, 1=Soliton, 2=Void, 3=Transition)
-    float  ParityWeight;    //  4
-    float  _p0, _p1, _p2, _p3, _p4, _p5, _p6, _p7;  // padding to 96
+    float3 Position;
+    float3 Velocity;
+    float4 Colour;
+    float  HeegnerPower;
+    float  VoidPressure;
+    float  SolitonDensity;
+    float  Kappa;
+    int    ParticleClass;
+    float  ParityWeight;
+    float  _p0, _p1, _p2, _p3, _p4, _p5, _p6, _p7;
 };
 
 RWStructuredBuffer<ParticleRecord> _ParticleBuffer;
 
-// -----------------------------------------------------------------------
-// Uniforms (set by HolographicParticleLayer.cs each frame)
-// -----------------------------------------------------------------------
-int    _ParticleCount;
-float  _DeltaTime;
-float  _NormEpoch;           // 0 = high-z, 1 = present
-float  _XiCoherence;         // 0 = void dominant, 1 = soliton dominant
-float4x4 _GalToUnity;        // Galactic Cartesian -> Unity world
-float  _ParticleSize;
-float  _SolitonBrightness;
-float  _VoidBrightness;
-float  _HeegnerBrightness;
-float  _ParityAsymmetry;
-float  _EpochVoidBoost;
-float  _EpochSolitonBoost;
-float  _XiSolitonMod;
-float  _XiVoidMod;
+// Heegner anchor positions (unit sphere, Galactic Cartesian).
+// Populated from the node list written by generate_particle_buffer.py.
+// _HeegnerAnchorCount = 0 until the anchor buffer is wired up;
+// NearestAnchor() falls back to the north galactic pole in that case,
+// which is visually identifiable and confirms the kernel fires correctly.
+// TODO: populate via ComputeBuffer set in HolographicParticleLayer.Awake()
+//       once generate_particle_buffer.py emits anchor_positions.bin.
+#define MAX_HEEGNER_ANCHORS 512
+StructuredBuffer<float3> _HeegnerAnchors;
+int _HeegnerAnchorCount;
 
 // -----------------------------------------------------------------------
-// Stub kernel -- passes through, no movement
-// Replace this body with the full update once buffer is verified.
+// Uniforms set by HolographicParticleLayer.cs each frame
+// -----------------------------------------------------------------------
+int      _ParticleCount;
+float    _DeltaTime;
+float    _NormEpoch;           // 0 = high-z, 1 = present day
+float    _XiCoherence;         // 0 = void dominant, 1 = soliton dominant
+float4x4 _GalToUnity;
+float    _ParticleSize;
+float    _SolitonBrightness;
+float    _VoidBrightness;
+float    _HeegnerBrightness;
+float    _ParityAsymmetry;
+float    _EpochVoidBoost;
+float    _EpochSolitonBoost;
+float    _XiSolitonMod;
+float    _XiVoidMod;
+
+// -----------------------------------------------------------------------
+// Helpers
+// -----------------------------------------------------------------------
+
+// Nearest Heegner anchor by dot-product (arc-distance proxy, no sqrt).
+// Returns north galactic pole float3(0,0,1) when no anchors are loaded.
+float3 NearestAnchor(float3 pos)
+{
+    if (_HeegnerAnchorCount <= 0)
+        return float3(0.0, 0.0, 1.0);
+
+    float  bestDot    = -2.0;
+    float3 bestAnchor = _HeegnerAnchors[0];
+    for (int j = 0; j < _HeegnerAnchorCount; j++)
+    {
+        float d = dot(pos, _HeegnerAnchors[j]);
+        if (d > bestDot) { bestDot = d; bestAnchor = _HeegnerAnchors[j]; }
+    }
+    return bestAnchor;
+}
+
+// Remove radial component so velocity stays tangent to the unit sphere.
+float3 TangentProject(float3 pos, float3 dir)
+{
+    return dir - dot(dir, pos) * pos;
+}
+
+// Fast integer hash -> [0,1).  Used for per-particle noise without a texture.
+uint WangHash(uint n)
+{
+    n = (n ^ 61u) ^ (n >> 16u);
+    n = n + (n << 3u);
+    n = n ^ (n >> 4u);
+    n = n * 0x27d4eb2du;
+    n = n ^ (n >> 15u);
+    return n;
+}
+float Hash01(uint n) { return float(WangHash(n)) * (1.0 / 4294967296.0); }
+
+// -----------------------------------------------------------------------
+// Main kernel
 // -----------------------------------------------------------------------
 [numthreads(64, 1, 1)]
 void UpdateParticles(uint3 id : SV_DispatchThreadID)
@@ -63,28 +115,105 @@ void UpdateParticles(uint3 id : SV_DispatchThreadID)
     uint i = id.x;
     if ((int)i >= _ParticleCount) return;
 
-    // --- STUB: no position update ---
-    // Brightness modulation is cheap to validate visually even in stub form.
-
     ParticleRecord p = _ParticleBuffer[i];
+
+    // ----------------------------------------------------------------
+    // 1. Motion
+    // ----------------------------------------------------------------
+
+    float3 anchor   = NearestAnchor(p.Position);
+    // Safe direction vectors -- epsilon prevents degenerate normalise at coincident points
+    float3 toAnchor   = normalize(anchor   - p.Position + float3(1e-6, 0, 0));
+    float3 fromAnchor = -toAnchor;
+
+    // Per-particle tangent-space noise (breaks up large uniform regions)
+    float3 noise = float3(
+        Hash01(i * 1973u + 7u)  - 0.5,
+        Hash01(i * 3571u + 13u) - 0.5,
+        Hash01(i * 6791u + 31u) - 0.5) * 0.0003;
+    noise = TangentProject(p.Position, noise);
+
+    float3 drift = float3(0, 0, 0);
+
+    if (p.ParticleClass == 0)
+    {
+        // HEEGNER: stationary, micro-jitter keeps them visually alive
+        drift = noise * 0.4;
+    }
+    else if (p.ParticleClass == 1)
+    {
+        // SOLITON: attracted to anchor, strength = kappa * epoch * xi
+        float strength = p.Kappa * _EpochSolitonBoost * _XiSolitonMod * 0.012;
+        drift = TangentProject(p.Position, toAnchor) * strength + noise;
+    }
+    else if (p.ParticleClass == 2)
+    {
+        // VOID: repelled from anchor, strength = voidPressure * epoch * xi
+        float strength = p.VoidPressure * _EpochVoidBoost * _XiVoidMod * 0.009;
+        drift = TangentProject(p.Position, fromAnchor) * strength + noise;
+    }
+    else
+    {
+        // TRANSITION: blend soliton and void by XiCoherence
+        float sSt = p.SolitonDensity * _EpochSolitonBoost * _XiSolitonMod * 0.012;
+        float vSt = p.VoidPressure   * _EpochVoidBoost   * _XiVoidMod   * 0.009;
+        float3 sDrift = TangentProject(p.Position, toAnchor)   * sSt;
+        float3 vDrift = TangentProject(p.Position, fromAnchor) * vSt;
+        drift = lerp(vDrift, sDrift, _XiCoherence) + noise;
+    }
+
+    // Euler integration with velocity damping
+    p.Velocity  = p.Velocity * 0.92 + drift;
+
+    // Speed clamp -- prevents runaway at large DeltaTime spikes
+    float speed = length(p.Velocity);
+    if (speed > 0.005)
+        p.Velocity *= (0.005 / speed);
+
+    // Normalise DeltaTime to 60fps so speed tuning is frame-rate independent
+    p.Position += p.Velocity * _DeltaTime * 60.0;
+
+    // Renormalise to unit sphere -- particles must stay on the boundary
+    p.Position = normalize(p.Position);
+
+    // ----------------------------------------------------------------
+    // 2. Colour / brightness modulation
+    // ----------------------------------------------------------------
 
     float brightness = 1.0;
 
-    if (p.ParticleClass == 0)  // Heegner
-        brightness = _HeegnerBrightness;
-    else if (p.ParticleClass == 1)  // Soliton
+    if (p.ParticleClass == 0)
+    {
+        // Heegner: slow pulse keyed to epoch phase, offset per particle
+        float pulse = 0.85 + 0.15 * sin(_NormEpoch * 6.2832 * 4.0 + float(i) * 0.001);
+        brightness  = _HeegnerBrightness * pulse;
+    }
+    else if (p.ParticleClass == 1)
+    {
         brightness = _SolitonBrightness * _EpochSolitonBoost * _XiSolitonMod;
-    else if (p.ParticleClass == 2)  // Void
+    }
+    else if (p.ParticleClass == 2)
+    {
         brightness = _VoidBrightness * _EpochVoidBoost * _XiVoidMod;
-    // Transition (3): no modulation
+    }
+    // class 3: base colour, no extra modulation
 
     p.Colour.rgb *= brightness;
 
-    // Parity desaturation: when void is dominant (asymmetry > 1),
-    // push all colours toward grey.
-    float grey = dot(p.Colour.rgb, float3(0.299, 0.587, 0.114));
-    float desat = saturate(_ParityAsymmetry - 1.0);  // 0 when balanced, >0 when void wins
-    p.Colour.rgb = lerp(p.Colour.rgb, float3(grey, grey, grey), desat * 0.4);
+    // ----------------------------------------------------------------
+    // 3. Parity desaturation
+    // ----------------------------------------------------------------
+    // When void is dominant (parity_asymmetry > 1), the field desaturates
+    // toward grey -- competition ratio is legible at a glance.
+    float grey  = dot(p.Colour.rgb, float3(0.299, 0.587, 0.114));
+    float desat = saturate(_ParityAsymmetry - 1.0) * 0.4;
+    p.Colour.rgb = lerp(p.Colour.rgb, float3(grey, grey, grey), desat);
+
+    // ----------------------------------------------------------------
+    // 4. Void alpha: fade out at low redshift (solitons win at present day)
+    // ----------------------------------------------------------------
+    if (p.ParticleClass == 2)
+        p.Colour.a *= lerp(1.0, 0.25, _NormEpoch);
 
     _ParticleBuffer[i] = p;
 }
