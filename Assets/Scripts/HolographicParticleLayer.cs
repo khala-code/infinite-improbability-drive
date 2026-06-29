@@ -45,34 +45,23 @@ namespace InfiniteImprobability.CMB
     // -----------------------------------------------------------------------
     // ParticleRecord: must match the struct layout in generate_particle_buffer.py
     // 96 bytes, 16-byte aligned for GPU.
+    // Stored as a flat float[] in memory; we use Buffer.BlockCopy to transfer
+    // from the raw .bin bytes without requiring an unsafe context.
     // -----------------------------------------------------------------------
     [StructLayout(LayoutKind.Sequential, Pack = 4)]
     public struct ParticleRecord
     {
-        // Position in Galactic Cartesian coords (unit sphere surface at t=0)
         public Vector3 Position;          // 12 bytes
-        // Velocity seed -- direction of drift at t=0
         public Vector3 Velocity;          // 12 bytes
-        // Base colour (RGBA, linear)
         public Vector4 Colour;            // 16 bytes
-        // Scalar field values at this particle's sky position
-        public float HeegnerPower;        // 4  -- HEEGNER_LOCKED alm power
-        public float VoidPressure;        // 4  -- VOID_PRIME alm power
-        public float SolitonDensity;      // 4  -- SOLITON alm power
-        public float Kappa;               // 4  -- lensing convergence
-        // Classification
-        public int   ParticleClass;       // 4  (0=Heegner,1=Soliton,2=Void,3=Transition)
-        public float ParityWeight;        // 4  -- local contribution to parity asymmetry
-        // Padding to 96 bytes
-        public float _pad0;               // 4
-        public float _pad1;               // 4
-        public float _pad2;               // 4
-        public float _pad3;               // 4
-        // Total: 12+12+16+4+4+4+4+4+4+4+4+4+4 = 80... pad to 96
-        public float _pad4;               // 4
-        public float _pad5;               // 4
-        public float _pad6;               // 4
-        public float _pad7;               // 4
+        public float   HeegnerPower;      //  4
+        public float   VoidPressure;      //  4
+        public float   SolitonDensity;    //  4
+        public float   Kappa;             //  4
+        public int     ParticleClass;     //  4  (0=Heegner,1=Soliton,2=Void,3=Transition)
+        public float   ParityWeight;      //  4
+        // Padding to 96 bytes (total fields above = 64 bytes; 8 x float = 32)
+        public float _p0, _p1, _p2, _p3, _p4, _p5, _p6, _p7;
     }
 
     // -----------------------------------------------------------------------
@@ -81,11 +70,11 @@ namespace InfiniteImprobability.CMB
     [Serializable]
     public class FieldScalars
     {
-        public float parity_asymmetry;    // void_power / soliton_power
-        public float heegner_fraction;    // fraction of total power in Heegner modes
+        public float parity_asymmetry;
+        public float heegner_fraction;
         public float void_fraction;
         public float soliton_fraction;
-        public float xi_baseline;         // observer coherence baseline from epoch
+        public float xi_baseline;
     }
 
     // -----------------------------------------------------------------------
@@ -124,17 +113,11 @@ namespace InfiniteImprobability.CMB
         [Range(0.001f, 0.05f)]
         public float ParticleSize = 0.008f;
 
-        [Range(0f, 2f)]
-        public float SolitonBrightness = 1f;
-
-        [Range(0f, 2f)]
-        public float VoidBrightness = 0.4f;
-
-        [Range(0f, 2f)]
-        public float HeegnerBrightness = 1.8f;
+        [Range(0f, 2f)] public float SolitonBrightness  = 1f;
+        [Range(0f, 2f)] public float VoidBrightness     = 0.4f;
+        [Range(0f, 2f)] public float HeegnerBrightness  = 1.8f;
 
         [Header("Events")]
-        [Tooltip("Fired when epoch crosses a Heegner Omega threshold.")]
         public UnityEngine.Events.UnityEvent HeegnerFlash;
 
         // ----------------------------------------------------------------
@@ -143,18 +126,14 @@ namespace InfiniteImprobability.CMB
 
         private ComputeBuffer _particleBuffer;
         private ComputeBuffer _argsBuffer;
-        private int _particleCount;
-        private int _kernelUpdate;
+        private int           _particleCount;
+        private int           _kernelUpdate;
+        private FieldScalars  _fieldScalars;
+        private float         _lastEpoch;
 
-        private FieldScalars _fieldScalars;
-        private float _lastEpoch;
-
-        // Heegner Omega crossings -- epoch values where the field competition
-        // tips.  Values derived from field_scalars parity history; hardcoded
-        // defaults here, overridden at runtime if epoch_frame.json supplies them.
         private static readonly float[] HeegnerOmegaThresholds = { 0.15f, 0.38f, 0.61f, 0.84f };
 
-        // Shader property IDs -- cached to avoid string lookups per frame
+        // Cached shader property IDs
         private static readonly int ID_ParticleBuffer     = Shader.PropertyToID("_ParticleBuffer");
         private static readonly int ID_ParticleCount      = Shader.PropertyToID("_ParticleCount");
         private static readonly int ID_DeltaTime          = Shader.PropertyToID("_DeltaTime");
@@ -169,6 +148,10 @@ namespace InfiniteImprobability.CMB
         private static readonly int ID_HeegnerFraction    = Shader.PropertyToID("_HeegnerFraction");
         private static readonly int ID_VoidFraction       = Shader.PropertyToID("_VoidFraction");
         private static readonly int ID_SolitonFraction    = Shader.PropertyToID("_SolitonFraction");
+        private static readonly int ID_EpochVoidBoost     = Shader.PropertyToID("_EpochVoidBoost");
+        private static readonly int ID_EpochSolitonBoost  = Shader.PropertyToID("_EpochSolitonBoost");
+        private static readonly int ID_XiSolitonMod       = Shader.PropertyToID("_XiSolitonMod");
+        private static readonly int ID_XiVoidMod          = Shader.PropertyToID("_XiVoidMod");
 
         // ----------------------------------------------------------------
         // Unity lifecycle
@@ -205,60 +188,54 @@ namespace InfiniteImprobability.CMB
             string path = Path.Combine(Application.streamingAssetsPath, "CMB", ParticleBufferFilename);
 
 #if UNITY_ANDROID && !UNITY_EDITOR
-            // On Quest 2, StreamingAssets are inside a .apk and must be read
-            // via UnityWebRequest.  For now, copy to persistentDataPath on
-            // first launch.  TODO: implement async copy on first boot.
+            // Quest 2: StreamingAssets are inside the .apk archive.
+            // Requires an async UnityWebRequest copy to persistentDataPath on first boot.
+            // TODO: implement StreamingAssetsBootstrap.cs before Quest build.
             path = Path.Combine(Application.persistentDataPath, "CMB", ParticleBufferFilename);
 #endif
 
             if (!File.Exists(path))
             {
-                Debug.LogError($"[HolographicParticleLayer] particle_buffer.bin not found at {path}. "
+                Debug.LogError($"[HPL] particle_buffer.bin not found at: {path}\n"
                              + "Run generate_particle_buffer.py and copy output to StreamingAssets/CMB/.");
                 return;
             }
 
-            byte[] bytes = File.ReadAllBytes(path);
-            int stride   = Marshal.SizeOf<ParticleRecord>();    // must be 96
-            _particleCount = bytes.Length / stride;
+            byte[] raw    = File.ReadAllBytes(path);
+            int    stride = Marshal.SizeOf<ParticleRecord>();   // expect 96
+            _particleCount = raw.Length / stride;
 
             if (_particleCount == 0)
             {
-                Debug.LogError("[HolographicParticleLayer] particle_buffer.bin is empty.");
+                Debug.LogError("[HPL] particle_buffer.bin is empty.");
                 return;
             }
 
-            Debug.Log($"[HolographicParticleLayer] Loaded {_particleCount} particles "
-                    + $"({bytes.Length / 1024f / 1024f:F1} MB)  stride={stride}B");
+            // Validate stride matches expectation
+            if (stride != 96)
+                Debug.LogWarning($"[HPL] ParticleRecord stride is {stride}, expected 96. "
+                               + "Check struct padding matches Python output.");
 
+            Debug.Log($"[HPL] Loading {_particleCount} particles "
+                    + $"({raw.Length / 1024f / 1024f:F1} MB)  stride={stride}B");
+
+            // ---- Safe copy: raw bytes -> float[] via Buffer.BlockCopy ----
+            // ParticleRecord is a blittable struct of floats/ints.
+            // Reinterpreting as float[] lets us use Buffer.BlockCopy which
+            // is a safe, non-unsafe memmove equivalent in managed C#.
+            int floatsPerRecord = stride / sizeof(float);  // 24 floats per record
+            float[] floatData   = new float[_particleCount * floatsPerRecord];
+            Buffer.BlockCopy(raw, 0, floatData, 0, raw.Length);
+
+            // Upload to GPU
             _particleBuffer = new ComputeBuffer(_particleCount, stride, ComputeBufferType.Structured);
-
-            // Pin managed array and bulk-copy into GPU buffer
-            ParticleRecord[] records = new ParticleRecord[_particleCount];
-            GCHandle pin = GCHandle.Alloc(bytes, GCHandleType.Pinned);
-            try
-            {
-                IntPtr src = pin.AddrOfPinnedObject();
-                GCHandle dstPin = GCHandle.Alloc(records, GCHandleType.Pinned);
-                try
-                {
-                    Buffer.MemoryCopy(
-                        (void*)src,
-                        (void*)dstPin.AddrOfPinnedObject(),
-                        (long)(records.Length * stride),
-                        (long)bytes.Length);
-                }
-                finally { dstPin.Free(); }
-            }
-            finally { pin.Free(); }
-
-            _particleBuffer.SetData(records);
+            _particleBuffer.SetData(floatData);
         }
 
         private void InitArgsBuffer()
         {
-            // DrawProceduralIndirect args: vertexCount, instanceCount, startVertex, startInstance
-            // We draw 1 vertex per particle and expand to a quad in the geometry/vertex shader.
+            // DrawProceduralIndirect: vertexCount=1 per particle,
+            // quad expansion happens in the vertex shader via SV_VertexID.
             uint[] args = new uint[4] { 1u, (uint)_particleCount, 0u, 0u };
             _argsBuffer = new ComputeBuffer(4, sizeof(uint), ComputeBufferType.IndirectArguments);
             _argsBuffer.SetData(args);
@@ -268,7 +245,7 @@ namespace InfiniteImprobability.CMB
         {
             if (ParticleUpdateShader == null)
             {
-                Debug.LogWarning("[HolographicParticleLayer] No ComputeShader assigned.");
+                Debug.LogWarning("[HPL] No ComputeShader assigned.");
                 return;
             }
             _kernelUpdate = ParticleUpdateShader.FindKernel("UpdateParticles");
@@ -279,29 +256,30 @@ namespace InfiniteImprobability.CMB
             string path = Path.Combine(Application.streamingAssetsPath, "CMB", "field_scalars.json");
             if (!File.Exists(path))
             {
-                Debug.LogWarning("[HolographicParticleLayer] field_scalars.json not found; using defaults.");
+                Debug.LogWarning("[HPL] field_scalars.json not found; using defaults.");
                 _fieldScalars = new FieldScalars
                 {
                     parity_asymmetry = 1f, heegner_fraction = 0.1f,
-                    void_fraction = 0.55f, soliton_fraction = 0.35f,
-                    xi_baseline = 0.5f
+                    void_fraction    = 0.55f, soliton_fraction = 0.35f,
+                    xi_baseline      = 0.5f
                 };
-                return;
             }
-            string json = File.ReadAllText(path);
-            _fieldScalars = JsonUtility.FromJson<FieldScalars>(json);
+            else
+            {
+                _fieldScalars = JsonUtility.FromJson<FieldScalars>(File.ReadAllText(path));
+            }
 
-            // Push to global shader scope so boundary shaders read the same values
+            // Push to global scope -- boundary shaders (LensingBoundary, MilkyWayBoundary)
+            // read these without any additional wiring.
             Shader.SetGlobalFloat(ID_ParityAsymmetry, _fieldScalars.parity_asymmetry);
             Shader.SetGlobalFloat(ID_HeegnerFraction, _fieldScalars.heegner_fraction);
             Shader.SetGlobalFloat(ID_VoidFraction,    _fieldScalars.void_fraction);
             Shader.SetGlobalFloat(ID_SolitonFraction, _fieldScalars.soliton_fraction);
 
-            Debug.Log($"[HolographicParticleLayer] FieldScalars loaded: "
-                    + $"parity={_fieldScalars.parity_asymmetry:F3} "
-                    + $"heegner={_fieldScalars.heegner_fraction:F3} "
-                    + $"void={_fieldScalars.void_fraction:F3} "
-                    + $"soliton={_fieldScalars.soliton_fraction:F3}");
+            Debug.Log($"[HPL] FieldScalars: parity={_fieldScalars.parity_asymmetry:F3} "
+                    + $"h={_fieldScalars.heegner_fraction:F3} "
+                    + $"v={_fieldScalars.void_fraction:F3} "
+                    + $"s={_fieldScalars.soliton_fraction:F3}");
         }
 
         // ----------------------------------------------------------------
@@ -312,33 +290,27 @@ namespace InfiniteImprobability.CMB
         {
             if (ParticleUpdateShader == null || _particleBuffer == null) return;
 
-            ParticleUpdateShader.SetBuffer(_kernelUpdate, ID_ParticleBuffer, _particleBuffer);
-            ParticleUpdateShader.SetInt(   ID_ParticleCount,     _particleCount);
-            ParticleUpdateShader.SetFloat( ID_DeltaTime,         Time.deltaTime);
-            ParticleUpdateShader.SetFloat( ID_NormEpoch,         NormalisedEpoch);
-            ParticleUpdateShader.SetFloat( ID_XiCoherence,       XiCoherence);
-            ParticleUpdateShader.SetMatrix(ID_GalToUnity,        GalToUnity);
-            ParticleUpdateShader.SetFloat( ID_ParticleSize,      ParticleSize);
-            ParticleUpdateShader.SetFloat( ID_SolitonBrightness, SolitonBrightness);
-            ParticleUpdateShader.SetFloat( ID_VoidBrightness,    VoidBrightness);
-            ParticleUpdateShader.SetFloat( ID_HeegnerBrightness, HeegnerBrightness);
-            ParticleUpdateShader.SetFloat( ID_ParityAsymmetry,   _fieldScalars.parity_asymmetry);
-
-            // Epoch modulations:
-            // - High redshift (low NormEpoch): void visibility boosted, soliton muted
-            // - Low redshift (high NormEpoch): soliton dominant, void recedes
             float epochVoidBoost    = Mathf.Lerp(1.8f, 1.0f, NormalisedEpoch);
             float epochSolitonBoost = Mathf.Lerp(0.3f, 1.0f, NormalisedEpoch);
-            ParticleUpdateShader.SetFloat(Shader.PropertyToID("_EpochVoidBoost"),    epochVoidBoost);
-            ParticleUpdateShader.SetFloat(Shader.PropertyToID("_EpochSolitonBoost"), epochSolitonBoost);
+            float xiSolitonMod      = Mathf.Lerp(0.5f, 1.5f, XiCoherence);
+            float xiVoidMod         = Mathf.Lerp(1.5f, 0.5f, XiCoherence);
 
-            // Xi modulation: high coherence = soliton brightens, void dims
-            float xiSolitonMod = Mathf.Lerp(0.5f, 1.5f, XiCoherence);
-            float xiVoidMod    = Mathf.Lerp(1.5f, 0.5f, XiCoherence);
-            ParticleUpdateShader.SetFloat(Shader.PropertyToID("_XiSolitonMod"), xiSolitonMod);
-            ParticleUpdateShader.SetFloat(Shader.PropertyToID("_XiVoidMod"),    xiVoidMod);
+            ParticleUpdateShader.SetBuffer(_kernelUpdate, ID_ParticleBuffer,    _particleBuffer);
+            ParticleUpdateShader.SetInt(   ID_ParticleCount,                    _particleCount);
+            ParticleUpdateShader.SetFloat( ID_DeltaTime,                        Time.deltaTime);
+            ParticleUpdateShader.SetFloat( ID_NormEpoch,                        NormalisedEpoch);
+            ParticleUpdateShader.SetFloat( ID_XiCoherence,                      XiCoherence);
+            ParticleUpdateShader.SetMatrix(ID_GalToUnity,                       GalToUnity);
+            ParticleUpdateShader.SetFloat( ID_ParticleSize,                     ParticleSize);
+            ParticleUpdateShader.SetFloat( ID_SolitonBrightness,                SolitonBrightness);
+            ParticleUpdateShader.SetFloat( ID_VoidBrightness,                   VoidBrightness);
+            ParticleUpdateShader.SetFloat( ID_HeegnerBrightness,                HeegnerBrightness);
+            ParticleUpdateShader.SetFloat( ID_ParityAsymmetry,                  _fieldScalars.parity_asymmetry);
+            ParticleUpdateShader.SetFloat( ID_EpochVoidBoost,                   epochVoidBoost);
+            ParticleUpdateShader.SetFloat( ID_EpochSolitonBoost,                epochSolitonBoost);
+            ParticleUpdateShader.SetFloat( ID_XiSolitonMod,                     xiSolitonMod);
+            ParticleUpdateShader.SetFloat( ID_XiVoidMod,                        xiVoidMod);
 
-            // Dispatch: threadgroup size 64 (matches [numthreads(64,1,1)] in compute shader)
             int groups = Mathf.CeilToInt(_particleCount / 64f);
             ParticleUpdateShader.Dispatch(_kernelUpdate, groups, 1, 1);
         }
@@ -351,63 +323,42 @@ namespace InfiniteImprobability.CMB
             ParticleMaterial.SetMatrix(ID_GalToUnity,     GalToUnity);
             ParticleMaterial.SetFloat( ID_ParticleSize,   ParticleSize);
 
-            // Render into a bounds large enough to cover the boundary sphere
-            // (radius ~1000 Unity units for a skybox-scale scene)
+            // Bounds large enough to cover the boundary sphere (~1000 Unity units)
             Bounds bounds = new Bounds(Vector3.zero, Vector3.one * 2200f);
-
             Graphics.DrawProceduralIndirect(
                 ParticleMaterial,
                 bounds,
                 MeshTopology.Points,
-                _argsBuffer,
-                camera: null   // renders to all cameras; restrict if needed
-            );
+                _argsBuffer);
         }
 
         private void CheckHeegnerCrossings()
         {
             foreach (float threshold in HeegnerOmegaThresholds)
             {
-                bool wasBefore = _lastEpoch < threshold;
-                bool isAfter   = NormalisedEpoch >= threshold;
-                if (wasBefore && isAfter)
+                if (_lastEpoch < threshold && NormalisedEpoch >= threshold)
                 {
-                    Debug.Log($"[HolographicParticleLayer] HeegnerFlash @ epoch={NormalisedEpoch:F3} threshold={threshold}");
+                    Debug.Log($"[HPL] HeegnerFlash @ epoch={NormalisedEpoch:F3} threshold={threshold}");
                     HeegnerFlash?.Invoke();
                 }
             }
         }
 
         // ----------------------------------------------------------------
-        // Public API for coupling components
+        // Public API
         // ----------------------------------------------------------------
 
-        /// <summary>Called by EpochScrubber to advance the simulation epoch.</summary>
-        public void SetEpoch(float normalisedEpoch)
-        {
-            NormalisedEpoch = Mathf.Clamp01(normalisedEpoch);
-        }
+        /// <summary>Called by EpochScrubber.</summary>
+        public void SetEpoch(float normalisedEpoch)     => NormalisedEpoch = Mathf.Clamp01(normalisedEpoch);
 
-        /// <summary>Called by ObserverBubbleRenderer to update xi coherence.</summary>
-        public void SetXiCoherence(float xi)
-        {
-            XiCoherence = Mathf.Clamp01(xi);
-        }
+        /// <summary>Called by ObserverBubbleRenderer.</summary>
+        public void SetXiCoherence(float xi)            => XiCoherence = Mathf.Clamp01(xi);
 
-        /// <summary>
-        /// Set the Galactic-to-Unity rotation matrix from epoch_frame.json.
-        /// Call this once on scene load after reading the ZaTaOa frame.
-        /// </summary>
-        public void SetGalToUnity(Matrix4x4 m)
-        {
-            GalToUnity = m;
-        }
+        /// <summary>Set Galactic-to-Unity rotation from epoch_frame.json. Call once on scene load.</summary>
+        public void SetGalToUnity(Matrix4x4 m)          => GalToUnity = m;
 
-        /// <summary>Reload field_scalars.json and re-push globals (call after hot-reload in editor).</summary>
-        public void RefreshFieldScalars()
-        {
-            LoadFieldScalars();
-        }
+        /// <summary>Re-read field_scalars.json and push globals (editor hot-reload).</summary>
+        public void RefreshFieldScalars()               => LoadFieldScalars();
 
 #if UNITY_EDITOR
         [ContextMenu("Reload Field Scalars")]
@@ -417,7 +368,7 @@ namespace InfiniteImprobability.CMB
         private void EditorLogBufferStats()
         {
             if (_particleBuffer == null) { Debug.Log("Buffer not loaded."); return; }
-            Debug.Log($"ParticleBuffer: {_particleCount} particles, "
+            Debug.Log($"[HPL] Buffer: {_particleCount} particles, "
                     + $"{_particleCount * Marshal.SizeOf<ParticleRecord>() / 1024f / 1024f:F2} MB GPU");
         }
 #endif
