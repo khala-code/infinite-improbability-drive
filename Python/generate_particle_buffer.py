@@ -251,7 +251,12 @@ def nearest_anchor(pos: np.ndarray,
 #   float3 vel; float speed; float4 colour;
 #   float kappa; float parity_weight; uint flags; uint ell;
 #   float3 anchor_dir; float anchor_dist; float4 pad; }
-_FMT = "<3ff3ff4ff2I3ff4f"   # 24 floats + 2 uints = 96 bytes
+#
+# Explicit per-field specifiers (no repeat prefixes) so struct.pack item
+# count matches exactly: 20 floats + 2 uints + 4 pad floats = 26 values.
+# Each 'f' or 'I' is one slot; struct validates slot count against values.
+_FMT = "<" + "ffff" + "ffff" + "ffff" + "ff" + "II" + "ffff" + "ffff"
+#             pos+r     vel+s    colour   k+pw   flags  anc+d    pad
 
 def pack_record(pos: np.ndarray, radius: float,
                 vel: np.ndarray, speed: float,
@@ -261,14 +266,21 @@ def pack_record(pos: np.ndarray, radius: float,
                 anchor_dir: np.ndarray, anchor_dist: float) -> bytes:
     return struct.pack(
         _FMT,
+        # pos (3) + radius (1)
         float(pos[0]), float(pos[1]), float(pos[2]), float(radius),
+        # vel (3) + speed (1)
         float(vel[0]), float(vel[1]), float(vel[2]), float(speed),
+        # colour rgba (4)
         float(colour[0]), float(colour[1]), float(colour[2]), float(colour[3]),
+        # kappa + parity_weight (2)
         float(kappa), float(parity_weight),
+        # flags + ell (2 uints)
         int(flags), int(ell),
+        # anchor_dir (3) + anchor_dist (1)
         float(anchor_dir[0]), float(anchor_dir[1]), float(anchor_dir[2]),
         float(anchor_dist),
-        0.0, 0.0, 0.0, 0.0,   # _pad
+        # _pad (4)
+        0.0, 0.0, 0.0, 0.0,
     )
 
 
