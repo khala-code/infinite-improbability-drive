@@ -278,7 +278,7 @@ def generate_heatmap(
     anchor splashes push above 1.0 (intentional HDR for anchor visibility).
     """
     print(f"  Reconstructing {label} pixel map  (Nside={nside}) ...")
-    pixel_map = hp.alm2map(alm, nside=nside, lmax=lmax, verbose=False)
+    pixel_map = hp.alm2map(alm, nside=nside, lmax=lmax)
     pixel_map = np.abs(pixel_map).astype(np.float64)
 
     print(f"  Normalising {label} (p1/p99) ...")
