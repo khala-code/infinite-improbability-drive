@@ -8,9 +8,16 @@ independent geometric estimates of the ZaTaOa origin direction.
 Estimators
 ----------
 1. HEEGNER_K_CENTROID
-   Intensity-weighted centroid of the K_heegner curvature map.
-   Heegner modes are the algebraic origin anchors; their curvature
-   field is expected to peak in the direction of the ZaTaOa origin.
+   Antipodal direction of the intensity-weighted centroid of the
+   K_heegner curvature map.
+
+   The curvature centroid points toward the field *accumulation* pole --
+   the direction the Heegner field has propagated and piled up outward
+   from the source.  The ZaTaOa first zenith is the *source* pole: the
+   Null, the point of emergence.  This is the same source/destination
+   asymmetry as the CMB dipole (which points toward our motion
+   destination, not origin).  Returning -centroid corrects for this.
+
    This is the primary estimator.
 
 2. MULTIPOLE_ALIGNMENT
@@ -18,18 +25,20 @@ Estimators
    (argmax of the reconstructed single-ell map).  Compute the
    intensity-weighted mean unit vector over all 9 Heegner ells.
    Tests whether the Heegner multipoles cluster angularly.
+   Naturally points toward the source region (no inversion needed).
 
 3. PHASE_COHERENCE
    For each pixel, compute the mean resultant length of the Heegner
    alm phases projected onto the sphere via a simple phase map.
    The gradient of this coherence field points toward the origin.
    Robust to amplitude outliers that HEEGNER_K_CENTROID is sensitive to.
+   Naturally points toward the source region (no inversion needed).
 
 Outputs
 -------
 Updates frame_vectors.json in-place with:
   zatao_first_zenith          -- dict with all three estimates + consensus
-  delta_zenith_deg            -- angle(HEEGNER_K_CENTROID, dipole)
+  delta_zenith_deg            -- angle(HEEGNER_K_CENTROID_inverted, dipole)
   estimator_agreement_deg     -- max pairwise angle between the three estimates
   legacy_anti_dipole_delta_zenith_deg  -- old proxy retained for comparison
 
@@ -114,10 +123,16 @@ def vec_to_dict(v: np.ndarray) -> Dict[str, float]:
 
 
 # ---------------------------------------------------------------------------
-# Estimator 1 -- HEEGNER_K_CENTROID
-# Intensity-weighted centroid of the K_heegner curvature map.
-# We take abs(K_heegner) as weight -- origin direction is where curvature
-# is concentrated, regardless of sign.
+# Estimator 1 -- HEEGNER_K_CENTROID (inverted)
+#
+# Intensity-weighted centroid of the K_heegner curvature map, then
+# negated to recover the source pole rather than the accumulation pole.
+#
+# The centroid of |K_heegner| points toward the region where Heegner
+# curvature has accumulated -- the *destination* of the outward field.
+# The ZaTaOa first zenith is the antipodal *source* (the Null), so we
+# return -centroid.  This is the same convention as taking the anti-dipole
+# to find the direction we are moving away from.
 # ---------------------------------------------------------------------------
 
 def estimator_heegner_k_centroid(
@@ -143,8 +158,13 @@ def estimator_heegner_k_centroid(
     cy = float(np.dot(weights, y)) / total
     cz = float(np.dot(weights, z)) / total
 
-    centroid = unit(np.array([cx, cy, cz], dtype=np.float64))
-    return centroid
+    accumulation_pole = unit(np.array([cx, cy, cz], dtype=np.float64))
+
+    # Invert: source pole is antipodal to the accumulation pole.
+    # MULTIPOLE_ALIGNMENT and PHASE_COHERENCE both naturally point toward
+    # the source; this inversion aligns all three estimators.
+    source_pole = -accumulation_pole
+    return source_pole
 
 
 # ---------------------------------------------------------------------------
@@ -298,7 +318,7 @@ def compute_zenith(
     # Clamp to valid healpy nside (power of 2, max 512 for coarse use)
     nside_coarse = min(nside_coarse, 512)
 
-    print("Running estimator 1: HEEGNER_K_CENTROID ...")
+    print("Running estimator 1: HEEGNER_K_CENTROID (inverted to source pole) ...")
     z1_k = estimator_heegner_k_centroid(k_heegner, nside)
 
     print("Running estimator 2: MULTIPOLE_ALIGNMENT ...")
@@ -315,19 +335,19 @@ def compute_zenith(
     agreement_23 = angle_between_deg(z1_ma, z1_pc)
     max_pairwise = max(agreement_12, agreement_13, agreement_23)
 
-    # delta_zenith: primary estimate vs dipole second-zenith
+    # delta_zenith: inverted primary estimate vs dipole
     delta_zenith = angle_between_deg(z1_k, dipole_vec)
 
     # Legacy proxy
     legacy_delta = angle_between_deg(anti_dipole_vec, dipole_vec)
 
-    print(f"  HEEGNER_K_CENTROID  : lon={vec_to_lonlat(z1_k)[0]:.2f} lat={vec_to_lonlat(z1_k)[1]:.2f}")
-    print(f"  MULTIPOLE_ALIGNMENT : lon={vec_to_lonlat(z1_ma)[0]:.2f} lat={vec_to_lonlat(z1_ma)[1]:.2f}")
-    print(f"  PHASE_COHERENCE     : lon={vec_to_lonlat(z1_pc)[0]:.2f} lat={vec_to_lonlat(z1_pc)[1]:.2f}")
-    print(f"  Consensus           : lon={vec_to_lonlat(z1_consensus)[0]:.2f} lat={vec_to_lonlat(z1_consensus)[1]:.2f}")
-    print(f"  Max pairwise spread : {max_pairwise:.2f} deg")
-    print(f"  delta_zenith (K_centroid vs dipole) : {delta_zenith:.2f} deg")
-    print(f"  Legacy anti-dipole delta_zenith     : {legacy_delta:.2f} deg")
+    print(f"  HEEGNER_K_CENTROID (src) : lon={vec_to_lonlat(z1_k)[0]:.2f} lat={vec_to_lonlat(z1_k)[1]:.2f}")
+    print(f"  MULTIPOLE_ALIGNMENT      : lon={vec_to_lonlat(z1_ma)[0]:.2f} lat={vec_to_lonlat(z1_ma)[1]:.2f}")
+    print(f"  PHASE_COHERENCE          : lon={vec_to_lonlat(z1_pc)[0]:.2f} lat={vec_to_lonlat(z1_pc)[1]:.2f}")
+    print(f"  Consensus                : lon={vec_to_lonlat(z1_consensus)[0]:.2f} lat={vec_to_lonlat(z1_consensus)[1]:.2f}")
+    print(f"  Max pairwise spread      : {max_pairwise:.2f} deg")
+    print(f"  delta_zenith (K_src vs dipole) : {delta_zenith:.2f} deg")
+    print(f"  Legacy anti-dipole delta_zenith: {legacy_delta:.2f} deg")
 
     # -----------------------------------------------------------------------
     # Write back to frame_vectors.json
@@ -337,14 +357,18 @@ def compute_zenith(
         "PHASE_COHERENCE": vec_to_dict(z1_pc),
         "consensus": vec_to_dict(z1_consensus),
         "estimator_notes": {
-            "HEEGNER_K_CENTROID": "Primary. Intensity-weighted centroid of K_heegner map (clipped at 99.5th percentile).",
-            "MULTIPOLE_ALIGNMENT": "Power-weighted mean of per-ell Heegner multipole axes. Tests angular clustering.",
-            "PHASE_COHERENCE": "Gradient of Heegner phase coherence map (grad-magnitude proxy). Robust to amplitude outliers.",
+            "HEEGNER_K_CENTROID": (
+                "Primary. Antipodal direction of intensity-weighted centroid of K_heegner map "
+                "(clipped at 99.5th percentile). Inverted because centroid points to the "
+                "accumulation pole; source pole (ZaTaOa Null) is antipodal."
+            ),
+            "MULTIPOLE_ALIGNMENT": "Power-weighted mean of per-ell Heegner multipole axes. Tests angular clustering. Naturally points to source.",
+            "PHASE_COHERENCE": "Gradient of Heegner phase coherence map (grad-magnitude proxy). Robust to amplitude outliers. Naturally points to source.",
             "consensus": "Trimmed circular mean of the three estimators. Use when max_pairwise_spread_deg < 30.",
         },
     }
     fv["delta_zenith_deg"] = delta_zenith
-    fv["delta_zenith_estimator"] = "HEEGNER_K_CENTROID_vs_dipole"
+    fv["delta_zenith_estimator"] = "HEEGNER_K_CENTROID_inverted_vs_dipole"
     fv["estimator_agreement_deg"] = {
         "K_CENTROID_vs_MULTIPOLE": agreement_12,
         "K_CENTROID_vs_PHASE": agreement_13,
@@ -359,6 +383,8 @@ def compute_zenith(
     fv["legacy_anti_dipole_delta_zenith_deg"] = legacy_delta
     fv["notes"]["monopole_definition"] = (
         "ZaTaOa first zenith estimated via three independent Heegner-mode estimators. "
+        "HEEGNER_K_CENTROID is inverted (antipodal) to recover the source pole from the "
+        "accumulation pole -- same source/destination asymmetry as the CMB dipole. "
         "See zatao_first_zenith for details. Legacy anti-dipole proxy retained for comparison."
     )
 
