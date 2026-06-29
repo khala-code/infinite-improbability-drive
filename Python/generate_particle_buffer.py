@@ -43,6 +43,35 @@ Outputs
 -------
 Assets/StreamingAssets/CMB/particle_buffer.bin  -- raw struct array
 Assets/StreamingAssets/CMB/epoch_frame.json     -- zenith vectors + matrix
+                                                    + observer_frame block
+
+observer_frame block
+--------------------
+Encodes the full ZaTaOa azimuth volume so the headset knows which way is
+"forward" without parsing galactic coordinates at runtime.
+
+  forward   = CMB dipole apex unit vector (lon≈264°, lat≈48°)
+              This is ΔA=0 in observer-relative azimuth.
+              Blueshift direction: incoming futures, soliton-dominant side.
+
+  east      = cross(zenith, forward) -- completes right-hand triad with
+              zenith as +Y.  Azimuth increases eastward (ΔA grows +X).
+
+  quadrants -- four named 90° sectors around the zenith pole:
+    Gamma (ΔA 0–90°)    forward-east   dipole apex → NGP side
+                         observer's position; soliton-dense
+    Delta (ΔA 90–180°)  back-east      CMB cold spot region; void-onset
+    Beta  (ΔA 180–270°) back-west      dipole antapex; max void pressure
+    Alpha (ΔA 270–360°) forward-west   Virgo / Local Sheet; Heegner anchor cluster
+
+  tridents  -- three bearing unit vectors per quadrant at the centre
+               azimuth ± 30°.  Used as debug rays in the shader to
+               triangulate position within a quadrant visually in-headset.
+
+  handedness_check -- expected galactic lon/lat of the dipole apex.
+               At runtime: project the dipole unit vec through _GalToUnity
+               and verify it appears near ΔA=0, E≈+48° in the headset.
+               If it appears near ΔA≈180° the handedness is flipped.
 
 Usage
 -----
@@ -88,6 +117,12 @@ COLOUR_HEEGNER    = (0.85, 0.92, 1.00, 1.0)   # cold white-blue
 COLOUR_HEEGNER_L2 = (0.55, 0.70, 1.00, 1.0)   # stronger blue-shift for ell=2
 COLOUR_SOLITON    = (0.72, 0.88, 0.78, 0.8)   # pale soliton green
 COLOUR_VOID       = (0.18, 0.12, 0.22, 0.4)   # deep void purple
+
+# CMB dipole apex: direction of maximum blueshift (observer motion apex).
+# Galactic coordinates: lon=264.021°, lat=+48.253° (Planck 2018 PR3).
+# This is ΔA=0 -- the observer's "forward" in the azimuth volume frame.
+DIPOLE_APEX_LON_DEG: float = 264.021
+DIPOLE_APEX_LAT_DEG: float = 48.253
 
 
 # ---------------------------------------------------------------------------
@@ -200,6 +235,102 @@ def build_gal_to_unity(zenith: np.ndarray) -> np.ndarray:
         [0.0,      0.0,      0.0,      1.0],
     ], dtype=np.float32)
     return R
+
+
+# ---------------------------------------------------------------------------
+# Observer frame (azimuth volume)
+# ---------------------------------------------------------------------------
+
+def _azimuth_vec(forward: np.ndarray, east: np.ndarray,
+                 zenith: np.ndarray, delta_a_deg: float) -> np.ndarray:
+    """Return unit vector at azimuth delta_a_deg from forward, in the
+    equatorial plane of the zenith pole (elevation = 0)."""
+    a = math.radians(delta_a_deg)
+    return unit(math.cos(a) * forward + math.sin(a) * east)
+
+
+def build_observer_frame(zenith: np.ndarray) -> Dict:
+    """Build the full observer-frame block for epoch_frame.json.
+
+    Encodes the ZaTaOa azimuth volume: forward direction (ΔA=0),
+    east direction, four named quadrants, per-quadrant trident bearings,
+    and a runtime handedness check value.
+
+    Trident bearings
+    ----------------
+    Each quadrant has a centre azimuth.  Three bearing vectors are placed
+    at centre-30°, centre, and centre+30° -- the trident -- for use as
+    debug rays in the headset shader to triangulate position within the
+    quadrant visually.
+
+    Quadrant map
+    ------------
+    Gamma  ΔA   0– 90°   forward-east   dipole apex → NGP     soliton-dense
+    Delta  ΔA  90–180°   back-east      CMB cold spot          void-onset
+    Beta   ΔA 180–270°   back-west      dipole antapex         max void pressure
+    Alpha  ΔA 270–360°   forward-west   Virgo / Local Sheet    Heegner anchor cluster
+    """
+    # Dipole apex is the canonical forward (ΔA=0)
+    forward = lonlat_to_vec(DIPOLE_APEX_LON_DEG, DIPOLE_APEX_LAT_DEG)
+
+    # East = cross(zenith, forward); completes right-hand triad (zenith=+Y)
+    east_raw = np.cross(zenith, forward)
+    if np.linalg.norm(east_raw) < EPSILON:
+        # Degenerate: zenith parallel to forward; use fallback
+        east_raw = np.cross(zenith, np.array([0.0, 0.0, 1.0]))
+    east = unit(east_raw)
+
+    quadrant_defs = [
+        ("gamma", 0.0,   90.0,  "forward-east",  "Dipole apex → NGP side; soliton-dense; observer position"),
+        ("delta", 90.0,  180.0, "back-east",      "CMB cold spot region; void-onset"),
+        ("beta",  180.0, 270.0, "back-west",      "Dipole antapex; max void pressure; redshift dominated"),
+        ("alpha", 270.0, 360.0, "forward-west",   "Virgo / Local Sheet; Heegner anchor cluster"),
+    ]
+
+    quadrants: Dict = {}
+    for name, lo, hi, orientation, description in quadrant_defs:
+        centre = (lo + hi) / 2.0
+        trident = {
+            "left":   vec_to_dict(_azimuth_vec(forward, east, zenith, centre - 30.0)),
+            "centre": vec_to_dict(_azimuth_vec(forward, east, zenith, centre)),
+            "right":  vec_to_dict(_azimuth_vec(forward, east, zenith, centre + 30.0)),
+        }
+        quadrants[name] = {
+            "delta_a_min_deg": lo,
+            "delta_a_max_deg": hi,
+            "centre_deg":      centre,
+            "orientation":     orientation,
+            "description":     description,
+            "trident":         trident,
+        }
+
+    # Dipole antapex is Beta quadrant centre -- max void pressure direction
+    antapex = unit(-forward)
+
+    return {
+        "note": (
+            "All vectors are in galactic unit-sphere coordinates. "
+            "Apply M_gal_to_unity at runtime to get Unity world-space directions. "
+            "forward is ΔA=0 (CMB dipole apex, blueshift / incoming futures). "
+            "Azimuth increases eastward. Zenith is +Y pole."
+        ),
+        "forward":  vec_to_dict(forward),
+        "east":     vec_to_dict(east),
+        "antapex":  vec_to_dict(antapex),
+        "quadrants": quadrants,
+        "handedness_check": {
+            "description": (
+                "At runtime: project forward through _GalToUnity. "
+                "In headset the dipole apex must appear at ΔA≈0°, E≈+48°. "
+                "If it appears at ΔA≈180° the _GalToUnity matrix has a handedness flip."
+            ),
+            "expected_forward_gal_lon_deg": DIPOLE_APEX_LON_DEG,
+            "expected_forward_gal_lat_deg": DIPOLE_APEX_LAT_DEG,
+            "expected_delta_a_deg":         0.0,
+            "expected_elevation_deg":       DIPOLE_APEX_LAT_DEG,
+            "tolerance_deg":                5.0,
+        },
+    }
 
 
 # ---------------------------------------------------------------------------
@@ -519,6 +650,12 @@ def generate(
     anchors = compute_anchor_directions(heegner_alm, lmax, nside)
     print(f"  {len(anchors)} anchors: ells {sorted(anchors.keys())}")
 
+    # Build observer frame (azimuth volume)
+    observer_frame = build_observer_frame(z_epoch)
+    fwd = observer_frame["forward"]
+    print(f"Observer forward    : ΔA=0  lon={fwd['lon_deg']:.2f}°  lat={fwd['lat_deg']:.2f}°  "
+          f"(dipole apex, blueshift direction)")
+
     # Generate particles
     print(f"Generating {N_HEEGNER} Heegner particles ...")
     h_records = generate_heegner_particles(
@@ -552,6 +689,7 @@ def generate(
         "consensus_zenith": vec_to_dict(z1),
         "zenith_at_T":      vec_to_dict(z_epoch),
         "M_gal_to_unity":   M.flatten().tolist(),
+        "observer_frame":   observer_frame,
         "class_flags": {
             "HEEGNER_ANCHOR":       CLASS_HEEGNER_ANCHOR,
             "HEEGNER_L2_BLUESHIFTED": CLASS_HEEGNER_L2_BLUESHIFTED,
