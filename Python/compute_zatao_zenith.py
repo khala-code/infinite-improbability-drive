@@ -172,7 +172,7 @@ def estimator_multipole_alignment(
             idx = hp.Alm.getidx(lmax, ell, m)
             single_alm[idx] = heegner_alm[idx]
 
-        ell_map = hp.alm2map(single_alm, nside=nside, lmax=lmax, verbose=False)
+        ell_map = hp.alm2map(single_alm, nside=nside, lmax=lmax)
         ell_power = float(np.sum(ell_map ** 2))
         if ell_power < EPSILON:
             continue
@@ -211,21 +211,20 @@ def estimator_multipole_alignment(
 # the resulting phase angles.  High MRL = coherent phase = origin region.
 # Then take the gradient direction of this MRL map.
 #
-# Implementation uses a low-nside approximation for speed (nside=32);
-# the gradient direction is stable to nside choice.
+# nside_coarse must satisfy lmax <= 4*nside_coarse (healpy Nyquist limit).
+# Default nside_coarse=64 gives lmax/nside = 4 for lmax=256.
+# If you change DEFAULT_LMAX, update nside_coarse accordingly:
+#   nside_coarse = max(32, next_power_of_two(lmax // 4))
 # ---------------------------------------------------------------------------
 
 def estimator_phase_coherence(
     heegner_alm: np.ndarray,
     lmax: int,
-    nside_coarse: int = 32,
+    nside_coarse: int = 64,
 ) -> np.ndarray:
-    npix = hp.nside2npix(nside_coarse)
-
     # Reconstruct Heegner map at coarse resolution
-    coarse_map = hp.alm2map(heegner_alm, nside=nside_coarse, lmax=lmax, verbose=False)
+    coarse_map = hp.alm2map(heegner_alm, nside=nside_coarse, lmax=lmax)
 
-    # Phase map: angle of complex alm2map evaluated per pixel
     # We approximate per-pixel phase coherence via the local gradient magnitude
     # of the reconstructed map -- peaks in |grad T| correlate with phase fronts.
     # True per-pixel MRL over Y_lm basis would require O(npix * lmax^2) ops;
@@ -294,14 +293,19 @@ def compute_zenith(
     anti_dipole_vec = -dipole_vec
 
     # -----------------------------------------------------------------------
+    # Derive nside_coarse for phase coherence: largest power-of-2 <= lmax/4
+    nside_coarse = max(32, 1 << (lmax // 4).bit_length() - 1)
+    # Clamp to valid healpy nside (power of 2, max 512 for coarse use)
+    nside_coarse = min(nside_coarse, 512)
+
     print("Running estimator 1: HEEGNER_K_CENTROID ...")
     z1_k = estimator_heegner_k_centroid(k_heegner, nside)
 
     print("Running estimator 2: MULTIPOLE_ALIGNMENT ...")
     z1_ma = estimator_multipole_alignment(heegner_alm, lmax, nside)
 
-    print("Running estimator 3: PHASE_COHERENCE ...")
-    z1_pc = estimator_phase_coherence(heegner_alm, lmax)
+    print(f"Running estimator 3: PHASE_COHERENCE (nside_coarse={nside_coarse}) ...")
+    z1_pc = estimator_phase_coherence(heegner_alm, lmax, nside_coarse=nside_coarse)
 
     z1_consensus = consensus_direction([z1_k, z1_ma, z1_pc])
 

@@ -26,6 +26,13 @@ Assets/CMB/**/*.psv.gz.meta
 Assets/CMB/Data/Lensing.meta
 Assets/CMB/**/*.hdf5
 
+# CMB pipeline outputs (reproducible from FITS via Python pipeline)
+# Already-committed files: run `git rm -r --cached Assets/CMB/Processed/`
+# then commit to stop tracking them.
+Assets/CMB/Processed/*.npz
+Assets/CMB/Processed/*.json
+Assets/CMB/Processed/*.npy
+
 # Large pre-baked textures (generated locally by Python pipeline)
 Assets/CMB/Textures/*.exr
 
