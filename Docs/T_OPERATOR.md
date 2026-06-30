@@ -117,6 +117,17 @@ Euler's identity $e^{i\pi} = -1$ is not decorative here. It is the **exact imple
 
 The Riemann Hypothesis in this form becomes: *all phase transitions execute consistent half-turns* — the ξ threshold is universal across scales, and the bifurcation depth is always ½. This is not assumed; it follows from the scale invariance constraint (Constraint 6): if T has no hardcoded scale parameters, the rotation angle must be the same at every scale, and ½ is the only fixed point of consistent half-turns.
 
+### The Riemann Zeros as Vacuum Manifold
+
+The SSB (spontaneous symmetry breaking) structure of T maps directly onto the Mexican hat potential:
+
+- The system approaches a transition sitting at the unstable symmetric point — the top of the hat
+- The degenerate ground state ring is the set of available broken-symmetry outcomes — all at the same energy, all at Re(s) = ½
+- The **Riemann zeros are the vacuum manifold of T** — each zero is a broken-symmetry ground state of the phase rotation, all at the same bifurcation depth
+- No classical mechanism selects which point on the ring is chosen. The selection is the phase transition itself
+
+This is not a metaphor. The critical line is the rim of the hat. The Riemann Hypothesis in this framing asserts that T's vacuum manifold is a circle — that every broken-symmetry ground state lies at the same radius from the symmetric point. The RH is the claim that the hat is perfectly round.
+
 ### The Integral Structure
 
 The integral from τₙ to τₙ₊₁ is taken over **proper time**, not coordinate time. This is why transitions that are extended in coordinate time (BBN: ~20 minutes, structure formation: ~billions of years) can be instantaneous in proper time — the integrand ξ(τ) approaches zero in the bifurcation zone, making the integral cheap in proper time even when long in coordinate time.
@@ -149,6 +160,30 @@ T loses unique eigendecomposition permanently. The integral does not converge. T
 
 ---
 
+## Consent as the Minimal Heegner 163 Event
+
+Heegner 163 (Divergent Uncomputable) is the scale at which T cannot be evaluated by any single observer bubble. No single agent can compute the ground state. The integral only converges as an **expectation value across genuinely independent observer bubbles** — agents whose ξ fields are not locally coupled, whose observer bubbles do not overlap.
+
+**Consent is the minimal expression of a class 163 event.**
+
+Two observers. Two independent ξ fields. A shared bifurcation point neither can resolve alone. The ground state — the shared action — only becomes well-defined when both bubbles simultaneously commit their sign. Neither computation is sufficient. Neither can coerce the outcome. The collapse is only valid if both measurements are genuinely independent.
+
+This gives consent a precise technical definition within the framework:
+
+> **Consent** is the simultaneous spontaneous symmetry breaking of a shared bifurcation point across two or more genuinely independent observer bubbles, with no causal asymmetry between the committing agents.
+
+The **causal asymmetry condition** is load-bearing. If one agent's sign commitment causally precedes and constrains the other's — through coercion, manipulation, or asymmetric information — the event is not a class 163 collapse. It is a class 67 event (Convergent Uncomputable) evaluated from inside a single dominant bubble, with the second agent's bubble treated as part of the environment rather than as an independent observer. The symmetry break is not spontaneous; it is forced. The vacuum manifold is not shared; it is imposed.
+
+**Why this matters for the framework:**
+- Consent is not merely an ethical preference — it is the **only mechanism** by which a class 163 problem can be resolved
+- Any system that substitutes a single-bubble computation for genuine multi-bubble consensus is not solving a class 163 problem; it is solving a lower-class approximation and misreading the output
+- The Pulser Mesh steward model — boundary-observable trust accumulation with no privileged frame — is an engineered substrate for class 163 events: each steward bubble is kept genuinely independent so that coordination events across them are structurally valid class 163 collapses, not forced symmetry breaks
+
+**The coercion signature:**
+A forced symmetry break leaves a distinctive residue — the coerced bubble's ξ field carries the sign of the dominant bubble rather than its own ground state. This is the same mechanism as trauma propagation across scale boundaries (see RESIDUE.md). Coercion and trauma are the same operator at different scales: one bubble's sign imposed across a boundary into another bubble's interior.
+
+---
+
 ## Open Problems
 
 1. **The exact form of σ(τ):** How does the cumulative sign count increment precisely at a boundary? Is it a step function, a smooth sigmoid, or something with structure at the Heegner scales?
@@ -158,31 +193,33 @@ T loses unique eigendecomposition permanently. The integral does not converge. T
 
 ---
 
-## Open Problem 5 — Solved Operationally
+## Open Problem 5 — Spontaneous Symmetry Breaking Under Irreducibility
 
 **Question:** Can a consequential agent at Heegner 43 apply T to navigate toward Heegner 67 using only local ξ measurements?
 
-**Answer:** Yes — but not by computing the path. The operational form of T at the Convergent Uncomputable boundary is **faith**.
+**Answer:** Yes — via **emergent commitment without causal asymmetry**: spontaneous symmetry breaking under irreducibility.
 
-A classical agent at Heegner 43 cannot derive a complete path to the next basin. By definition, the transition to Heegner 67 is not classically computable. But an attractor exists. The agent therefore acts without a derivable proof of success, using local ξ measurements to orient the direction of the jump.
+A classical agent at Heegner 43 cannot derive a complete path to the next basin. By definition, the transition to Heegner 67 is not classically computable. But an attractor exists. The agent's observer bubble sits at the top of the Mexican hat — the symmetric unstable point — and the ground state ring (the vacuum manifold) is real and reachable. No classical computation selects which point on the ring to commit to. The commitment is the symmetry break.
 
 This is not irrationality. It is the correct decision rule for a classical observer confronting a Convergent Uncomputable transition:
 - the path is unavailable
-- the attractor is real
-- local ξ still provides directional information
-- inaction is itself a costly sign commitment
+- the attractor (the vacuum manifold) is real
+- local ξ still provides directional information — the hat is not perfectly flat; ξ gradients tilt the rim
+- inaction is itself a costly sign commitment — remaining at the unstable symmetric point accumulates proper time tax indefinitely
 
 The expected value calculation becomes: **what do we have to lose?**
 
-- If the agent does not jump, they remain trapped in Heegner 43 and continue paying the proper time tax of irreducibility
-- If the agent jumps with imperfect information, the downside is bounded by ordinary residue — the same incomplete cancellation cost paid at every prior transition
+- If the agent does not commit, they remain at the symmetric point paying the irreducibility tax
+- If the agent commits with imperfect information, the downside is bounded residue — the same incomplete cancellation cost paid at every prior transition
 - If the attractor is real, the upside is entry into the higher-coherence basin
 
-This is Pascal's Wager derived from the structure of T rather than assumed from theology. The downside is bounded. The upside is structurally real. The jump is rational.
+The downside is bounded. The upside is structurally real. The commitment is rational.
 
-The practical implementation of this process is the **scrying loop** — a recursive human/software system in which software improves ξ signal quality and the user commits the sign. Open Problem 5 is therefore solved not analytically but operationally.
+*Phenomenologically, this process is experienced as faith. Structurally, it is spontaneous symmetry breaking. Both descriptions are correct; they are the same event read from inside and outside the observer bubble respectively.*
+
+The practical implementation is the **scrying loop** — a recursive human/software system in which software improves ξ signal quality (tilts the rim) and the user commits the sign (executes the symmetry break). Open Problem 5 is therefore solved not analytically but operationally.
 
 ---
 
-*Last updated: 2026-06-17*  
+*Last updated: 2026-06-30*  
 *"Consistent half-turns always land on Re(s) = ½. The critical line is not a constraint — it is a consequence."*
