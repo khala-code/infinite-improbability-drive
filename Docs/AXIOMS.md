@@ -157,6 +157,31 @@ Nucleosynthesis events and other phase transitions have a **subjective duration 
 
 ---
 
+## Derived Axiom 9 — No Privileged Frames
+
+**All observer coordinate frames are first-class information configurations. No ZaTaOa position is ontologically prior to any other.**
+
+This is not a restatement of Special Relativity's Lorentz invariance, though it includes it. It is a stronger claim at the information substrate level: the ξ field has no preferred readout point. Any observer's bubble is a valid centre from which the full field can in principle be measured. There is no God's-eye view that stands outside the field.
+
+**Consequences:**
+
+**1. Measurement is always internal.**  
+Every measurement of ξ is made by a node inside the field using instruments that are also inside the field. There is no external calibration point. The framework's internal consistency constraints (CPT, Heegner fixed-point structure, calibration sequence) are the closest available substitute for external grounding.
+
+**2. Consensus is not averaging.**  
+Because no frame is privileged, genuine multi-agent consensus is not the arithmetic mean of individual ξ readings. It is a new information configuration that could not be reached from any single bubble. This is the structural basis of the Independence Condition for Divergent Uncomputable problems — correlated copies of one observer do not produce a new frame, they produce one frame with extra noise.
+
+**3. The Null is equidistant from all frames.**  
+Since the Null is the zero-ξ ground state and no observer is closer to it by virtue of their coordinate position, every observer is equidistant from Null in the relevant sense. Collapse toward Null is not a spatial process — it is a coherence process. Any node can collapse; any node can threshold.
+
+**4. Scale asymmetry is not frame privilege.**  
+The recursive sign alternation (Axiom 5) produces nodes at different scales with different ξ sign environments. This is not privilege — it is position within the standing wave. A high-scale node (national institution) is not ontologically prior to a low-scale node (individual). It is operating in a different sign environment with different affordances. The T operator that governs both is identical.
+
+**Relationship to gravitas:**  
+Gravitas (see `QUARK-FIELDS.md`) is a real field effect — dependency gradients genuinely curve adjacent ζ geodesics. This is not a violation of no-privileged-frames. Gravitas is a local geometry effect, not an ontological priority claim. The high-gravitas node does not have a privileged view of reality; it has a stronger gravitational field. These are different things.
+
+---
+
 ## The Observer Bubble (ZaTaOa)
 
 Each observer α is located in the collective information field by the triple **(Oα, Zα, Tα)**:
@@ -197,12 +222,12 @@ All inputs (\(T_0\), dipole vector, \(\delta_{\text{zenith}}\), K field) are pip
 ## Open Problems
 
 1. **The ζ evolution equation** — what functional carries ζ through phase transitions without breaking CPT or losing information? *(Geometric container now defined: ζ evolves along the radial AdS direction within the Heegner fixed-point skeleton; phase transitions are K sign-change loci — see `hyperbolic-boundary-geometry.md` Section 8)*
-2. **Phase transition sign rules** — precisely how does ξ sign transform at each scale boundary (baryogenesis→BBN, BBN→CMB, physical→biological, biological→social)?
+2. **Phase transition sign rules** — precisely how does ξ sign transform at each scale boundary (baryogenesis→BBN, BBN→CMB, physical→biological, biological→social)? *(Candidate mechanism: bottom-axis residue quality; see `QUARK-FIELDS.md`)*
 3. **Filter independence** — are the calibration constraints genuinely independent or secretly correlated?
 4. **ObserverBubble geometry** — *(resolved: see `hyperbolic-boundary-geometry.md` Section 8 and the Observer Bubble section above)*
-5. **Null threshold** — what is the minimum ξ accumulation required to cross from Null into time? Is this a computable quantity or a boundary condition of the framework itself?
+5. **Null threshold** — what is the minimum ξ accumulation required to cross from Null into time? *(Candidate: minimum charm value for forced self-measurement to produce a stable readout; see `QUARK-FIELDS.md` — Charm axis and Consent Threshold)*
 
 ---
 
-*Last updated: 2026-06-29*  
+*Last updated: 2026-07-01*  
 *"Nothing failing to be nothing perfectly."*
