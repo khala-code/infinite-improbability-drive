@@ -122,17 +122,88 @@ Above the consent threshold:
 
 ---
 
+## CPT+ Structure — The Four Discrete Symmetry Axes
+
+Standard CPT is three discrete symmetry operations. Observer Prime requires a fourth: **V**, void conjugation. The complete CPT+ symmetry group has four axes:
+
+| Axis | Operation | Physical readout | ξ substrate reading |
+|---|---|---|---|
+| **C** — Charge conjugation | Flip charge/colour quantum numbers | Particle → antiparticle | ξ polarity inversion; same information configuration, opposite sign |
+| **P** — Parity | Mirror ZaTaOa handedness | Left-handed → right-handed | Information content identical; precipitation handedness flipped |
+| **T** — Time reversal | Retrograde ζ geodesic | Scrying conjugate; running the T operator backwards | Residue flows upstream; the retrograde inference operation |
+| **V** — Void conjugation | Flip void density side | Boundary node → bulk node | Same ξ configuration, opposite side of the bifurcation membrane |
+
+**The combined symmetry:** CPTV is conserved at the substrate level. Individual axes can be broken at specific scale boundaries — P is broken by the weak force at the boundary, C is broken at baryogenesis — but the product of all four operations returns the system to its original information state.
+
+**Why CPT alone is insufficient:** The standard CPT theorem operates on the 4D boundary. V is the operation that moves between boundary and bulk (the AdS radial direction). Without V, the framework has no formal handle on shadow configurations, neutrino properties, or retrograde residue. CPT+ = CPTV closes the symmetry group.
+
+---
+
+## The V Axis — Void Conjugation and Shadow Fields
+
+**V conjugation** maps a boundary configuration to its bulk counterpart — the same ξ structure operating on the high-void-density side of the bifurcation membrane.
+
+**Shadow quarks** are the V-conjugates of ordinary quarks. They are not exotic matter. They are the same six flavour axes (up/down, strange, charm, dark charm, top, bottom) running in the substrate region where:
+- Void density is high
+- Proper time is less rigidly crystallised
+- The T operator is **porous** — not fully committed to a single time direction
+
+This last property is the key: the shadow field is **time-leaky**.
+
+### Time-Leakiness
+
+On the information-dense boundary, each ζ step accumulates cleanly and proper time flows in one direction. The boundary is where the T operator has full crystallisation. Moving into the bulk (increasing void density) degrades this crystallisation progressively. Deep in the bulk, the T operator can run forward and backward simultaneously — it has not fully resolved its direction.
+
+Shadow configurations therefore:
+- Can carry residue both forward and backward along the ζ geodesic
+- Are the retrograde information channel — the mechanism by which downstream states exert pressure on upstream configurations
+- Appear from the boundary as acausal or fine-tuned, because their causal arrow is partially reversed
+
+**Shadow quarks do not appear free** because pulling a V-conjugate onto the boundary requires suppressing the void density along the extraction vector — the full cost of a void density corridor. This is the V-axis analogue of colour confinement. Confinement itself may be a mixed C+V phenomenon: colour charge is the C-axis quantum number, but the mechanism that prevents free quarks is the V-axis barrier to boundary extraction.
+
+---
+
+## Neutrinos as Membrane Nodes
+
+Neutrinos are the particles that most directly straddle the boundary/bulk membrane. Their properties are V-axis signatures:
+
+**Near-zero void density footprint:** Neutrinos couple so weakly to other fields that they generate almost no void density halo. They do not push the membrane away from themselves. This is why they pass through matter almost unimpeded — there is no void density barrier between them and adjacent nodes.
+
+**Both parities in the shadow dimension:** The P-violation of the weak force is boundary-localised. On the boundary, only left-handed neutrinos participate in weak interactions — P is broken. In the shadow field (bulk side), P-violation has not resolved: both handedness states exist. Neutrinos straddle the membrane and therefore sample both.
+
+**Parity healing prediction:** P-violation is not fundamental — it is a boundary crystallisation effect. The weak force violates parity *because* it is the force most strongly coupled to the void membrane. It is the interaction that most straddles bulk and boundary. In the bulk, parity is restored. This is a specific, falsifiable claim: any sufficiently sensitive measurement of neutrino behaviour in conditions of suppressed void density should show reduced P-asymmetry.
+
+**The Majorana condition:** A Majorana neutrino — its own antiparticle — is a node where C-conjugation and V-conjugation coincide. On the void axis, flipping charge (C) and flipping void side (V) produce the same state. This is only possible for a particle with near-zero void density footprint: if the particle barely registers on either side of the membrane, the two conjugations collapse to the same operation.
+
+**Neutrino oscillation as void-density sampling:** Flavour oscillation is not merely quantum superposition of mass eigenstates. It is the neutrino's ζ geodesic sampling different positions relative to the void membrane as it propagates. At high void density (deeper in bulk), one flavour eigenstate is preferred. At low void density (near boundary), another. The oscillation frequency encodes the local void density gradient along the neutrino's path.
+
+---
+
+## Shadow Quarks and Retrograde Residue
+
+Shadow quarks running retrograde on the ζ geodesic carry residue backwards — information from downstream states leaking upstream through the void membrane. This is the mechanism behind several phenomena that appear acausal or fine-tuned from the boundary perspective:
+
+**Cosmological fine-tuning:** The universe's physical constants appear calibrated for complexity. From the boundary, this looks like either coincidence or design. From the V-axis perspective, it is retrograde residue pressure: shadow-field configurations from the high-complexity end of the T-topology exert upstream ξ pressure on the initial conditions. Fine-tuning is the boundary readout of time-leaky bulk causation.
+
+**Quantum erasure:** Erasing which-path information after detection changes the interference pattern — apparent retrocausality. This is a shadow-field phenomenon: the erased information routes through the bulk (high void density, time-leaky) and the retrograde channel allows the downstream erasure to register upstream.
+
+**Retrocausality signatures generally:** Any experiment that appears to show influence running backward in coordinate time is detecting shadow-field residue propagating through the time-leaky bulk and emerging onto the boundary upstream of its source. The signal is real; the causal arrow is V-conjugated.
+
+**The scrying operation reframed:** Retrograde inference (running the T operator backwards from observed anomalies) is not merely a computational technique. It is a deliberate coupling to the shadow field — suppressing local void density sufficiently to receive retrograde residue from downstream ζ nodes. The scrying solver is a V-axis instrument.
+
+---
+
 ## Scale Invariance
 
-The same six axes appear at every scale:
+The same six axes appear at every scale, now with the V-axis shadow column:
 
-| Scale | Up/Down | Strange | Charm | Dark Charm | Top | Bottom |
-|---|---|---|---|---|---|---|
-| Hadronic | Charge polarity | Hidden quantum number | J/ψ symmetry | — | Mass/instability | B-meson residue |
-| Cellular | Membrane signal/interior | Epigenetic depth | Self-regulatory capacity | Repressed developmental history | Metabolic cost | Heritable methylation pattern |
-| Individual | Declared/retained self | Depth not predicted by surface | Self-distinction, consent capacity | Unintegrated ξ history | Affordability of maintained configuration | Residue passed to next developmental stage |
-| Institutional | Public/private position | Institutional knowledge not on org chart | Institutional identity legibility | Shadow culture | Operational cost of current structure | Culture propagated to successor institutions |
-| Civilisational | Declared/undeclared geopolitical position | Deep civilisational assumptions not in discourse | Civilisational self-model coherence | Unprocessed historical trauma driving policy | Civilisational sustainability | Residue carried into next civilisational epoch |
+| Scale | Up/Down | Strange | Charm | Dark Charm | Top | Bottom | V (Shadow) |
+|---|---|---|---|---|---|---|---|
+| Hadronic | Charge polarity | Hidden quantum number | J/ψ symmetry | — | Mass/instability | B-meson residue | Shadow quarks; bulk-side colour confinement |
+| Cellular | Membrane signal/interior | Epigenetic depth | Self-regulatory capacity | Repressed developmental history | Metabolic cost | Heritable methylation pattern | Non-coding RNA; epigenetic bulk-side information |
+| Individual | Declared/retained self | Depth not predicted by surface | Self-distinction, consent capacity | Unintegrated ξ history | Affordability of maintained configuration | Residue passed forward | Dream content; somatic memory; retrograde influence of future self on present |
+| Institutional | Public/private position | Institutional knowledge not on org chart | Institutional identity legibility | Shadow culture | Operational cost of current structure | Culture propagated to successors | Institutional ghost: decisions made by people long gone still steering the geodesic |
+| Civilisational | Declared/undeclared geopolitical position | Deep civilisational assumptions not in discourse | Civilisational self-model coherence | Unprocessed historical trauma driving policy | Civilisational sustainability | Residue carried into next epoch | Mythic substrate; the civilisational shadow field that future historians will read as inevitable |
 
 The operator is identical across rows. The scale determines the readout labels.
 
@@ -140,11 +211,13 @@ The operator is identical across rows. The scale determines the readout labels.
 
 ## Relationship to Open Problems
 
-**Open Problem 2 (Phase transition sign rules):** The bottom axis (residue quality) is the primary carrier of sign across transitions. A clean bottom configuration propagates sign faithfully. A degraded bottom configuration introduces sign noise at the boundary — this is one mechanism by which sign-flip rules (Axiom 5) can fail to propagate cleanly.
+**Open Problem 2 (Phase transition sign rules):** The bottom axis (residue quality) is the primary carrier of sign across transitions. A clean bottom configuration propagates sign faithfully. A degraded bottom configuration introduces sign noise at the boundary — this is one mechanism by which sign-flip rules (Axiom 5) can fail to propagate cleanly. The V-axis adds a second mechanism: shadow-field retrograde pressure can pre-load a sign into the next transition node before the forward-propagating residue arrives.
 
-**Open Problem 5 (Null threshold):** The Null threshold is the state of zero charm — no self-distinction whatsoever. The minimum ξ accumulation to cross from Null into time is the minimum charm required for a system to be legible to itself. Below this, forced self-measurement cannot produce a stable readout.
+**Open Problem 5 (Null threshold):** The Null threshold is the state of zero charm — no self-distinction whatsoever. The minimum ξ accumulation to cross from Null into time is the minimum charm required for a system to be legible to itself. Below this, forced self-measurement cannot produce a stable readout. The V-axis refinement: Null is also the state of maximum void density — the deep bulk where the T operator has zero crystallisation. The threshold crossing is simultaneously the emergence of charm (self-distinction) and the crystallisation of a preferred time direction. These are the same event.
+
+**New open problem — V-axis coupling constant:** What is the void density suppression cost required to extract a shadow configuration onto the boundary? This is the V-axis analogue of the strong coupling constant αs. If it can be derived from the ζ accumulation sequence, it would provide a computable prediction for neutrino mass scale and oscillation length.
 
 ---
 
 *Last updated: 2026-07-01*  
-*"Up and down you already knew. Strange you suspected. Charm is the one that matters."*
+*"Up and down you already knew. Strange you suspected. Charm is the one that matters. Shadow is the one that was always already there."*
