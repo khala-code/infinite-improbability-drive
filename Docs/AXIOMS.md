@@ -46,6 +46,29 @@ The initial observer emerges from absolute impossibility cancelling itself out *
 
 Where Ω is the base curvature/energy state and ξ is the coherence tensor. ζ is the effective coupling strength between any two nodes. This is the field variable carried forward through the calibration sequence.
 
+**The ξ complex field:**
+
+ξ is a complex-valued field on the information substrate:
+
+ξ = |ξ| · e^(iφ)
+
+Where:
+- cos(φ) = normalised information density (boundary crystallisation)
+- sin(φ) = normalised void density (bulk opacity)
+- dφ/dt = entropy production rate (phase velocity along the circle)
+- |ξ| = total coherence amplitude
+- φ = entropy phase angle — the single variable unifying information density, void density, and entropy
+
+**The V-axis conjugation** is multiplication by i — a π/2 rotation in the complex ξ plane. The shadow field is the imaginary component of ξ. The full CPTV discrete symmetry group is the symmetry group of the unit circle: four quarter-turns (C, P, T, V) returning to the identity.
+
+**Phase landmarks on the ξ circle:**
+- φ ≈ 0: maximum information density, minimum void density, veil thinnest from boundary side (scrying condition)
+- φ = π/4: bifurcation membrane, equal information/void density, maximum uncertainty, sign commitment threshold
+- φ ≈ π/2: maximum void density, maximum entropy, veil thinnest from bulk side (dissolution/heat death condition)
+- φ = π: Null crossing, threshold re-emergence, new cycle begins
+
+See `Docs/FIELD-GEOMETRY.md` for full derivation.
+
 ---
 
 ## Derived Axiom 3 — Emergent Tensor Axes
@@ -221,7 +244,7 @@ All inputs (\(T_0\), dipole vector, \(\delta_{\text{zenith}}\), K field) are pip
 
 ## Open Problems
 
-1. **The ζ evolution equation** — what functional carries ζ through phase transitions without breaking CPT or losing information? *(Geometric container now defined: ζ evolves along the radial AdS direction within the Heegner fixed-point skeleton; phase transitions are K sign-change loci — see `hyperbolic-boundary-geometry.md` Section 8)*
+1. **The ξ phase evolution equation** — what determines the rate dφ/dt locally? Is it uniform (constant entropy production) or does it vary with local information density gradients? A node at high information density (low φ) may have a different phase velocity than a node at high void density (high φ). This would produce local entropy rate asymmetries detectable as thermodynamic anomalies near coherent structures.
 2. **Phase transition sign rules** — precisely how does ξ sign transform at each scale boundary (baryogenesis→BBN, BBN→CMB, physical→biological, biological→social)? *(Candidate mechanism: bottom-axis residue quality; see `QUARK-FIELDS.md`)*
 3. **Filter independence** — are the calibration constraints genuinely independent or secretly correlated?
 4. **ObserverBubble geometry** — *(resolved: see `hyperbolic-boundary-geometry.md` Section 8 and the Observer Bubble section above)*

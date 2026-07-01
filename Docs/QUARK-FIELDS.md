@@ -215,7 +215,19 @@ The operator is identical across rows. The scale determines the readout labels.
 
 **Open Problem 5 (Null threshold):** The Null threshold is the state of zero charm — no self-distinction whatsoever. The minimum ξ accumulation to cross from Null into time is the minimum charm required for a system to be legible to itself. Below this, forced self-measurement cannot produce a stable readout. The V-axis refinement: Null is also the state of maximum void density — the deep bulk where the T operator has zero crystallisation. The threshold crossing is simultaneously the emergence of charm (self-distinction) and the crystallisation of a preferred time direction. These are the same event.
 
-**New open problem — V-axis coupling constant:** What is the void density suppression cost required to extract a shadow configuration onto the boundary? This is the V-axis analogue of the strong coupling constant αs. If it can be derived from the ζ accumulation sequence, it would provide a computable prediction for neutrino mass scale and oscillation length.
+**New open problem — V-axis coupling constant:** The suppression cost of extracting a shadow configuration onto the boundary is directly proportional to local void density. Local void density *is* the time dilation factor. This means:
+
+- High gravitational field = high void density = high extraction cost = time runs slow
+- High velocity = increased void density path length through bulk = same effect
+- Near Null = maximum void density = infinite extraction cost = time stops
+
+**The redundant triple:** G, c, and the V-axis coupling constant are not three independent constants. They are three boundary readouts of the same underlying void density field parameter. With the information-to-mass precipitation rate added, this extends to a redundant quadruple: G, c, V-axis coupling, and precipitation rate are all facets of the same parameter expressed in different units at different boundary orientations.
+
+**Testable internal consistency constraint:** if baryogenesis ζ₀ evolved forward produces ζ₁ consistent with the observed Li-7 deficit (see Axiom 8), the same ζ should produce G and c values consistent with observation when projected onto the boundary. This is a three-way cross-check on the void density field parameter.
+
+**The ξ phase connection:** V-axis suppression cost = local void density = sin(φ) where φ is the entropy phase angle on the complex ξ circle (see `Docs/FIELD-GEOMETRY.md` § 3 and § 5). Time dilation is therefore a direct geometric consequence of the observer's phase position on the ξ circle — not a separate phenomenon.
+
+See `Docs/FIELD-GEOMETRY.md` for full derivation of the redundant triple and the phase geometry.
 
 ---
 

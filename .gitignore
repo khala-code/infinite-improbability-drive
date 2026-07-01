@@ -28,6 +28,8 @@ Assets/CMB/Data/Lensing.meta
 Assets/CMB/Processed
 Assets/CMB/Processed.meta
 Assets/CMB/**/*.hdf5
+frames/*
+frames/**/*
 
 # CMB pipeline outputs (reproducible from FITS via Python pipeline)
 # Already-committed files: run `git rm -r --cached Assets/CMB/Processed/`
