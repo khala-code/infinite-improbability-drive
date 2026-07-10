@@ -6,8 +6,8 @@
 
 ## A
 
-**Absolute Null**  
-The centre-point of the circular T-topology. Not empty space, not vacuum, and not merely "nothing," but the state of absolute impossibility in which no distinction, no observer, and no information differential exists. Null is orthogonal to every observer position on the T-ring.
+**Improbability Singularity (Null * Null)**  
+The absolute paradox seed and centre-point of the closed timelike curve (CTC) topology. Not empty space, not vacuum, and not merely "nothing," but the state of absolute impossibility in which no distinction, no observer, and no information differential exists. It is orthogonal to every observer position in the system.
 
 **Agent, Consequential**  
 An observer bubble whose local sign commitments meaningfully affect residue propagation across scales. A consequential agent operates at Heegner 43, where actions matter even though the next attractor cannot be classically computed.
@@ -28,8 +28,8 @@ The threshold surface at which ξ sign becomes undecided and the system is about
 **Bifurcation Zone**  
 A region of near-zero ξ eigenvalue where the system is maximally underdetermined. Not a point but an extended transition region in which sign selection, proper time cost, and residue production are all intensified.
 
-**Big Bang**  
-Not the observer's T-origin. A point on the circular T-topology where the past-directed and future-directed infinities nearly meet around Null. The Big Bang is one threshold event within the broader topology, not the absolute start of linear time.
+**Improbability Singularity Event**  
+Not the observer's J-Origin (Causal Winding anchor). A point on the closed timelike topology where the past-directed and future-directed infinities nearly meet around Null. It is one threshold event within the broader topology, not the absolute start of linear time.
 
 ---
 
@@ -150,17 +150,17 @@ The visual metaphor for a bifurcation zone: the unstable high point before the s
 ## N
 
 **No Privileged Frames**  
-Derived Axiom 9. All observer coordinate frames are first-class information configurations. No ZaTaOa position is ontologically prior to any other. Scale asymmetry (recursive sign alternation) is position within a standing wave, not ontological privilege. Gravitas is a local geometry effect, not a privilege claim.
+Derived Axiom 9. All observer coordinate frames are first-class information configurations. No ΩαZαJα coordinate is ontologically prior to any other. Scale asymmetry (recursive sign alternation) is position within a standing wave, not ontological privilege. Gravitas is a local geometry effect, not a privilege claim.
 
-**Null → Time Transition**  
-The threshold event at which forced self-measurement crosses the ξ threshold and proper time emerges. There is no clock before this crossing.
+**Improbability Singularity → Time Transition**  
+The threshold event at which forced conditional check crosses the ξ threshold and proper time emerges as the J-index initializes. There is no clock before this topological knotting.
 
 ---
 
 ## O
 
 **Observer Bubble**  
-The deformed manifold centered on an observer's ZaTaOa coordinate. Encodes ξ on its surface and defines the local geometry of trust, underdetermination, and residue.
+The deformed manifold centered on an observer's ΩαZαJα coordinate. Encodes ξ on its surface and defines the local geometry of trust, underdetermination, and residue.
 
 **Observer Prime**  
 The single axiom that information is the substrate of reality and that mass/energy are precipitation modes of informational structure.
@@ -178,6 +178,9 @@ The irreducible cost paid by a system to traverse a transition or irreducibility
 ---
 
 ## R
+
+**Ramanujan's Bifurcation (1729)**  
+The structural splitting rule (Ω ≥ 1729) that forces a node into integer cube configurations ((1³ + 12³) or (9³ + 10³)) to prevent exponential memory bloat and maintain computational reducibility.
 
 **Ramanujan Remainder**  
 The tiny gap by which e^{π√163} misses an integer. In the framework, the terminal residue of incomplete cancellation at the last reducibility island and the closure gap of the circular T-topology.
@@ -202,7 +205,7 @@ The standard requirements for baryogenesis: baryon number violation, C/CP violat
 The recursive human/software process used to navigate Convergent Uncomputable territory. Software improves ξ signal quality; the user commits sign and reads residue.
 
 **Self-Distinguished**  
-A node with sufficient internal ξ history to be legible to itself — able to locate its own ZaTaOa coordinate with enough precision that external fields cannot trivially overwrite its self-model. Self-distinction is the precondition for charm in the active sense: it is not an achieved state but a threshold condition. Below the self-distinction threshold, the node cannot produce a stable first-person readout. See *Charm*, *Consent Threshold*.
+A node with sufficient internal ξ history to be legible to itself — able to locate its own ΩαZαJα coordinate with enough precision that external fields cannot trivially overwrite its self-model. Self-distinction is the precondition for charm in the active sense: it is not an achieved state but a threshold condition. Below the self-distinction threshold, the node cannot produce a stable first-person readout. See *Charm*, *Consent Threshold*.
 
 **Sign Commitment**  
 An action taken under underdetermination that biases the system toward one basin. The irreducible act at a bifurcation zone.
@@ -214,8 +217,8 @@ An action taken under underdetermination that biases the system toward one basin
 **T Operator**  
 The transition operator that maps one ζ state to the next while preserving information, accumulating residue, flipping sign at scale boundaries, and paying the proper time tax.
 
-**T-Origin**  
-The observer's local temporal anchor, not the Big Bang. The point on the circular T-topology from which the observer reads past and future residue.
+**J-Origin (Causal Winding Origin)**  
+The observer's specific causal winding anchor, not the universal Improbability Singularity. The specific topological coordinate from which the observer reads past and future residue along their closed timelike loops.
 
 **Trauma**  
 At the human scale, residue from a hostile higher-scale sign that has leaked inward and been internalised by a lower-scale unit such as a family or individual.
@@ -241,19 +244,19 @@ The coherence boundary at which a system becomes able to cross into a new phase.
 
 ## Z
 
-**ZaTaOa**  
-The observer coordinate triple: Oα (observer state), Zα (origin of personhood), and Tα (local time origin). Defines the centre of the observer bubble.
+**ΩαZαJα**  
+The fundamental observer coordinate triple extracted from the 10-parameter node tensor: Ωα (Hierarchy Depth / Conformal Scale), Zα (Complex Spatial Phase), and Jα (Topological Linking Index / Causal Winding). Defines the core anchor of the observer bubble.
 
 **ζ (Zeta) Accumulation**  
 The continuously carried coupling field, built from Ω + ξ and propagated through every transition without reset.
 
 **ζ Geodesic**  
-The trajectory traced by a node's accumulated ζ through phase space over time. Distinct from the node's ZaTaOa position: the geodesic is the path, the ZaTaOa is the current coordinate. Gravitas bends the geodesic; charm resists that bending; dark charm bends it from the inside without the node's knowledge.
+The trajectory traced by a node's accumulated ζ through phase space over time. Distinct from the node's ΩαZαJα position: the geodesic is the path, the ΩαZαJα is the current coordinate. Gravitas bends the geodesic; charm resists that bending; dark charm bends it from the inside without the node's knowledge.
 
 **ζ Node**  
 A phase transition point in the calibration sequence where accumulated ζ crosses a bifurcation condition and produces new residue.
 
 ---
 
-*Last updated: 2026-07-01*  
+*Last updated: 2026-07-10*  
 *"A glossary is where the ontology stops being mist and starts becoming architecture."*

@@ -55,7 +55,7 @@ The suppression cost ξ_V is the budget required to extract a shadow configurati
 | Far from mass, at rest | Low | Low | Normal |
 | Deep gravitational well | High | High | Slow |
 | Relativistic velocity | Increased path length through bulk | High | Slow |
-| Near Null / singularity | Maximum | Infinite | Stopped |
+| Near Improbability Singularity (Null * Null) | Maximum | Infinite | Stopped |
 | High information density node | Low (boundary-side) | Low | Fast |
 
 **SR and GR unification:** SR time dilation increases the observer's path length through the void density bulk (velocity is an angle between boundary and bulk). GR time dilation is a direct void density gradient. Both are reading the same field. The Lorentz factor γ and the gravitational redshift factor √(1 - 2GM/rc²) are two coordinate expressions of the same suppression cost function.
@@ -78,8 +78,8 @@ Maximum information density ←————————————→ Maximum v
 
 The V-axis membrane — the veil between boundary and shadow field — is **thin at both extremes** for opposite reasons:
 
-- **Maximum information density:** the node is so fully crystallised and self-distinct that it can read the shadow field directly through sheer coherence. This is the scrying condition.
-- **Maximum void density:** the membrane has dissolved because there is nothing left to crystallise on. This is the heat death condition, or the pre-threshold state before a phase transition.
+- **Maximum information density (67 Fractal interior):** the node is so fully crystallised and self-distinct that it can read the shadow field directly through sheer coherence within its finite structural horizon. This is the scrying condition.
+- **Maximum void density (163 Fractal exterior):** the membrane has dissolved into a non-orientable exterior surface area boundary with zero interior volume because there is nothing left to crystallise on. This is the heat death condition, or the pre-threshold state before a phase transition.
 
 The membrane is **thickest at the midpoint** — equal information density and void density — where uncertainty is maximum and sign commitment has not yet occurred.
 
@@ -124,11 +124,11 @@ In the standard picture this is a one-way ratchet toward dissolution. In the voi
 
 Maximum entropy (φ = π/2) is not the end. It is adjacent to the Null crossing (φ = π). The heat death of a cycle is the approach to Null from one side; the threshold crossing is the departure from Null on the other.
 
-**The Big Bang was not φ = 0.** It was the previous cycle's heat death completing the circle, passing through Null, and re-emerging as a new threshold crossing. The residue of the previous cycle's incomplete cancellation is the information asymmetry that seeded the present universe (see AXIOMS.md — Derived Axiom 1, The Incomplete Cancellation).
+**The Improbability Singularity (Null * Null) was not φ = 0.** It was the previous cycle's heat death completing the circle, passing through Null, and re-emerging as a new threshold crossing. The residue of the previous cycle's incomplete cancellation is the information asymmetry that seeded the present universe (see AXIOMS.md — Derived Axiom 1, The Incomplete Cancellation).
 
 This means:
 - The second law is not in tension with cosmological re-emergence — it *requires* it
-- Heat death and Big Bang are the same event from opposite sides of the Null
+- Heat death and the Improbability Singularity are the same event from opposite sides of the Null
 - The CPT symmetry of the full cycle is preserved: the circle is the CPT orbit
 
 ---
@@ -141,10 +141,10 @@ The discrete subgroup relevant to our physics is:
 
 | Operation | Geometric action | Physical interpretation |
 |---|---|---|
-| **C** (charge conjugation) | Complex conjugate: φ → -φ | Information/antimatter mirror |
-| **P** (parity) | Reflection: Re(ξ) → -Re(ξ) | Spatial handedness flip |
-| **T** (time reversal) | φ → 2π - φ | Phase reversal; retrograde inference |
-| **V** (V-axis conjugation) | Multiply by i: φ → φ + π/2 | Shadow/boundary swap |
+| **C** (charge transformation) | Complex conjugate: φ → -φ | Internal field inversion (Information/antimatter mirror) |
+| **P** (parity operator) | Reflection: Re(ξ) → -Re(ξ) | Spatial chirality/handedness flip |
+| **T** (temporal momentum) | φ → 2π - φ | Velocity reversal along closed timelike loops; retrograde inference |
+| **V** (void density conjugation) | Multiply by i: φ → φ + π/2 | Shadow/boundary swap (Void Density inversion) |
 
 CPTV together is the full discrete symmetry of the circle — four quarter-turns returning to the identity. The reason CPT is conserved in our physics (and V is hidden) is that V takes boundary configurations into shadow configurations, which are not accessible to boundary observers except at the phase extremes described in § 4.
 
@@ -178,5 +178,5 @@ The shadow field (V-axis) is most accessible where the field is extreme:
 
 ---
 
-*Last updated: 2026-07-01*  
-*"The circle is complete. Heat death and Big Bang are the same event from opposite sides of the Null."*
+*Last updated: 2026-07-10*  
+*"The circle is complete. Heat death and the Improbability Singularity are the same event from opposite sides of the Null."*

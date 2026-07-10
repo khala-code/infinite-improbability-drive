@@ -349,7 +349,6 @@ These should be resolved before implementation, not during:
    Galactic frame (IAU); Unity's skybox uses a Unity-convention spherical map. Galactic north
    ≠ Unity world up. A one-time rotation matrix `M_gal_to_unity` needs to be established and
    applied consistently to all particle positions, node directions, and heatmap projections.
-   See `omgazata-coordinate-system.md` for the ZaTaOa frame — this should be the bridge.
 
 4. **Particle respawn vs. static buffer** — the current design writes a static buffer at
    precompute time. For void particles with short lifetimes, Unity's `ParticleSystem` will
@@ -365,5 +364,5 @@ These should be resolved before implementation, not during:
 
 ---
 
-*Last updated: 2026-06-29*  
+*Last updated: 2026-07-10*  
 *"The boundary is not a screen. It is the competition itself, made spatial."*

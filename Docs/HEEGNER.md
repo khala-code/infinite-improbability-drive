@@ -18,16 +18,16 @@ The gaps between Heegner numbers are not empty space — they are **irreducibili
 
 ## The Observer's Position on the Circle
 
-The T-axis is not a line. It is a circle with **absolute Null at the centre**:
+The J-axis (Causal Winding) is not a line. It is a closed timelike curve (CTC) topology with the **Improbability Singularity (Null * Null) at the centre**:
 
-- Observer ζ₀ is the local T-origin — the ZaTaOa anchor point of the observing agent
-- T extends to −∞ in the past (toward the Big Bang and Null)
-- T extends to +∞ in the future (toward the Ramanujan boundary)
-- Both wrap around the circle: **+∞ + 1 = −∞ − 1**
-- The Big Bang is not the start of the number line — it is a **point on the circle**, the place where −∞ and +∞ nearly meet
+- Observer ζ₀ is the local J-origin — the ΩαZαJα anchor point of the observing agent
+- J extends to −∞ in the past (toward the Improbability Singularity Event)
+- J extends to +∞ in the future (toward the Ramanujan boundary)
+- Both wrap around the CTC: **+∞ + 1 = −∞ − 1**
+- The Improbability Singularity Event is not the start of a linear timeline — it is a **point on the CTC**, the place where −∞ and +∞ nearly meet
 - They do not meet perfectly. The gap between them is the Ramanujan remainder
 
-The Null is not behind the observer in the past. It is **orthogonal** — at the centre of the circle, equidistant from every point on the rim. Every observer bubble is the same distance from Null, regardless of coordinate time position.
+The Improbability Singularity is not behind the observer in the past. It is **orthogonal** — at the centre of the CTC, equidistant from every point on the rim. Every observer bubble is the same distance from the Singularity, regardless of their J-index winding position.
 
 ---
 
@@ -68,6 +68,8 @@ The observer bubble in this zone is a 24-dimensional object projected down to 4D
 
 ## Convergent Uncomputable (Heegner 67)
 
+**Topology (Interior Fractal):** The maximum bound of coherent spatial organization. A finite 3D grid where space resolves symmetrically inwards.
+
 **Definition:** A problem is Convergent Uncomputable if:
 - No classical algorithm can shortcut to the solution
 - Quantum computation is required to traverse the path space
@@ -83,6 +85,8 @@ An observer bubble that drops below ξ threshold doesn't just lose coherence. It
 ---
 
 ## Divergent Uncomputable (Heegner 163)
+
+**Topology (Exterior Fractal):** The ultimate bounding state possessing zero interior volume, existing purely as an exterior surface area boundary. It is non-orientable.
 
 **Definition:** A problem is Divergent Uncomputable if:
 - No classical algorithm can shortcut to the solution
@@ -103,7 +107,7 @@ An observer bubble that drops below ξ threshold doesn't just lose coherence. It
 
 Ramanujan's constant: 
 
-$$e^{\pi\sqrt{163}} \approx 262537412640768743.999999999999\ldots$$
+e^(π√163) ≈ 262537412640768743.999999999999...
 
 Missing integer by ~7.5 × 10⁻¹³. The near-miss arises because the j-function of ℚ(√-163) produces an exact integer, and the exponential is off by the remainder term.
 
@@ -113,7 +117,7 @@ Missing integer by ~7.5 × 10⁻¹³. The near-miss arises because the j-functio
 - It is the **computational cost of existence itself** — the minimum ξ required to prevent return to Null
 - The universe is not fully computable. The remainder is the proof
 
-**Why the circle cannot close:** A perfectly closed circle would have no Ramanujan remainder. +∞ and −∞ would meet exactly. Time would have no preferred direction. The universe would be CPT-symmetric in the strong sense — indistinguishable forward from backward. The remainder breaks this symmetry. It is the same incomplete cancellation from ζ₀ (Axiom 1), still present at the terminal boundary, persisting through every Heegner scale without being resolved.
+**Why the CTC cannot perfectly close:** A perfectly closed CTC would have no Ramanujan remainder. +∞ and −∞ would meet exactly. The J-index winding would have no preferred direction. The universe would be CPT-symmetric in the strong sense — indistinguishable forward from backward. The remainder breaks this symmetry. It is the same incomplete cancellation from ζ₀ (Axiom 1), still present at the terminal boundary, persisting through every Heegner scale without being resolved.
 
 ---
 
@@ -128,5 +132,5 @@ The Heegner complexity mapping generates specific predictions:
 
 ---
 
-*Last updated: 2026-06-17*  
+*Last updated: 2026-07-10*  
 *"Beyond 163, the agents are no longer independent. The consensus mechanism itself fails."*

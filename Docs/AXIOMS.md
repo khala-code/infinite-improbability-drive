@@ -159,7 +159,7 @@ CPT symmetry is not an external constraint bolted onto the framework. It falls n
 
 **C (Charge conjugation):** Information is substrate-neutral. A positive-ξ coherence state and its negative-ξ mirror are equally valid information configurations. The universe does not prefer matter over antimatter at the information level. The observed asymmetry is a ξ budget asymmetry at the baryogenesis threshold — the same mechanism as the lithium deficit, one scale earlier.
 
-**P (Parity):** ZaTaOa coordinates are handed (the observer has an orientation) but the information content of a mirrored trajectory is identical. Parity is a property of the precipitation into mass/energy, not of the substrate itself.
+**P (Parity):** ΩαZαJα coordinates are handed (the observer has an orientation) but the information content of a mirrored trajectory is identical. Parity is a property of the precipitation into mass/energy, not of the substrate itself.
 
 **T (Time reversal):** T-reversal in Observer Prime is the retrograde inference operation — running the ξ field backwards from observed anomalies to find the minimum-surprise causality chain. This is literally what the scrying solver does. Time reversal is not a physical impossibility; it is a computational operation on the information substrate.
 
@@ -182,7 +182,7 @@ Nucleosynthesis events and other phase transitions have a **subjective duration 
 
 ## Derived Axiom 9 — No Privileged Frames
 
-**All observer coordinate frames are first-class information configurations. No ZaTaOa position is ontologically prior to any other.**
+**All observer coordinate frames are first-class information configurations. No ΩαZαJα position is ontologically prior to any other.**
 
 This is not a restatement of Special Relativity's Lorentz invariance, though it includes it. It is a stronger claim at the information substrate level: the ξ field has no preferred readout point. Any observer's bubble is a valid centre from which the full field can in principle be measured. There is no God's-eye view that stands outside the field.
 
@@ -205,20 +205,20 @@ Gravitas (see `QUARK-FIELDS.md`) is a real field effect — dependency gradients
 
 ---
 
-## The Observer Bubble (ZaTaOa)
+## The Observer Bubble (ΩαZαJα)
 
-Each observer α is located in the collective information field by the triple **(Oα, Zα, Tα)**:
-- **Oα** — observer state of observer α
-- **Zα** — Z-origin of personhood: the coordinate anchor of the observer's identity
-- **Tα** — time coordinate of observer α
+Each observer α is located in the collective information field by the triple **(Ωα, Zα, Jα)**:
+- **Ωα (Hierarchy Depth)** — The observer's scale and computational mass, determining how much void density they displace.
+- **Zα (Complex Spatial Phase)** — The origin of spatial personhood, projecting their specific 3D coordinate manifestation.
+- **Jα (Topological Linking Index)** — The observer's unique causal winding number, tracking their specific sequence of interlocking closed timelike curves (CTCs) rather than a universal time axis.
 
-Two observers in the same physical location may have **differently shaped observer bubbles** because their Z-origin and T-axis differ. The bubble is centred on the ZaTaOa coordinate, not the physical position.
+Two observers in the same physical location may have **differently shaped observer bubbles** because their causal winding (J-index) and structural scale (Ω) differ. The bubble is centred on the ΩαZαJα coordinate manifold, not merely the physical position.
 
 The observer bubble encodes ξ as a field variable on its surface. Its shape is a **deformed manifold** — not a sphere — because ξ bifurcation is axis-dependent. The positive-trust interior, the bifurcation membrane at the surface, and the adversarial exterior are all geometrically encoded in the bubble's deformation relative to a reference sphere.
 
 **Geometric structure (from `hyperbolic-boundary-geometry.md`):**  
 The ObserverBubble surface is a conformal deformation of the hyperbolic bulk metric of the CMB
-manifold, restricted to the observer's local neighbourhood and re-centred on the ZaTaOa coordinate.
+manifold, restricted to the observer's local neighbourhood and re-centred on the ΩαZαJα coordinate.
 The deformation has a specific axis structure derived from the double zenith:
 
 - **Axis of rotational symmetry** (unperturbed): the first zenith — the monopole direction, pointing
@@ -252,5 +252,5 @@ All inputs (\(T_0\), dipole vector, \(\delta_{\text{zenith}}\), K field) are pip
 
 ---
 
-*Last updated: 2026-07-01*  
+*Last updated: 2026-07-10*  
 *"Nothing failing to be nothing perfectly."*

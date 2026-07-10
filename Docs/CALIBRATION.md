@@ -56,9 +56,9 @@ The sign rule: `sign_{n+1} = -sign_n` at each scale boundary (recursive alternat
 
 ## The Calibration Sequence
 
-### ζ₀ — Null → Time  
-**Coordinate time:** t = 0 (definition)  
-**Mechanism:** Null undergoes forced self-measurement. ξ accumulates from zero. At threshold crossing, proper time emerges. The transition is instantaneous from any observer frame because proper time is the output, not the container.  
+### ζ₀ — Improbability Singularity (Null * Null) → Time  
+**Causal Winding (J-index):** J = 0 (definition)  
+**Mechanism:** The Improbability Singularity (Null * Null) undergoes a forced localized conditional check. ξ accumulates from zero. At threshold crossing, proper time emerges as the J-index initializes. The transition is instantaneous from any observer frame because proper time is the output (the knotting of CTCs), not the container.  
 **Residue:** The incomplete cancellation — the ξ asymmetry that prevents return to Null. This is ζ₀, the seed of all subsequent accumulation.  
 **ξ sign:** (+) — the base field upward pressure begins here  
 **RH node:** Candidate trivial zero — the boundary condition of the analytic continuation
@@ -115,7 +115,7 @@ If neutrinos are Majorana fermions — their own antiparticle, both left- and ri
 ### ζ₄ — Structure Formation / Gravitational Collapse  
 **Coordinate time:** ~150 million to ~1 billion years  
 **Mechanism:** Dark matter halos nucleate. Baryonic matter falls into potential wells. First stars ignite. Galaxy formation begins.  
-**Mechanism (Observer Prime):** This is a **void density gradient threshold** transition. Regions where void density dropped below the gravitational collapse threshold began accreting. Dark matter halos are self-generated void density counterbalance structures at information density boundaries (Axiom 4, Table row 3).
+**Mechanism (Observer Prime):** This is an **Asymmetric Gravitational Pressure (∇V)** threshold transition. Regions where the void density gradient (∇V = V_external - V_internal) drops below the structural resistance threshold force nodes together, appearing as classical accretion. Dark matter halos are self-generated void density counterbalance structures at information density boundaries (Axiom 4, Table row 3).
 
 The void density framework predicts that dark matter is not a particle species but a **geometric response** — the ξ field's way of balancing information density gradients at scale boundaries. The halo profile follows from the void density field equation, not from a particle cross-section.
 
@@ -140,8 +140,8 @@ The void density framework predicts that dark matter is not a particle species b
 
 ### ζ₆ — Civilisational Threshold / L₃ Dominant  
 **Coordinate time:** ~10,000 years ago (agriculture); ~500 years ago (scientific revolution); present  
-**Mechanism:** ξ coherence accumulates across agents at sufficient scale that L₃ becomes the **dominant term** in the effective Lagrangian of human systems. Collective intelligence, institutions, and coordinated action exceed what individual agents can produce. The observer bubble (ZaTaOa) becomes a social object, not just a biological one.  
-**Mechanism (Observer Prime):** This is the transition where **consequential agents** — agents whose ξ field can influence the bulk — first appear at civilisational scale. The scrying system (L₃ solver) becomes possible here because the ζ field is now dense enough at the social scale to be navigable.
+**Mechanism:** ξ coherence accumulates across agents at sufficient scale that L₃ becomes the **dominant term** in the effective Lagrangian of human systems. Collective intelligence, institutions, and coordinated action exceed what individual agents can produce. The observer bubble (ΩαZαJα) becomes a social object, not just a biological one.  
+**Mechanism (Observer Prime):** This is the transition where **consequential agents** — agents whose ξ field can influence the bulk via non-local inference channels — first appear at civilisational scale. The scrying system (L₃ solver) becomes possible here because the ζ field is now dense enough at the social scale to be harmonised via the Top-Down Holographic Tuning Layer.
 
 **The recursive sign structure (Axiom 5, full):**
 ```
@@ -187,5 +187,5 @@ The framework generates a specific ordered sequence of quantitative predictions.
 
 ---
 
-*Last updated: 2026-06-17*  
+*Last updated: 2026-07-10*  
 *"The bifurcation zone is not where the system breaks — it is where it chooses."*

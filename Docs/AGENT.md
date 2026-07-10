@@ -39,16 +39,16 @@ This is why small actions matter more in bifurcation zones than in stable period
 
 ---
 
-## ZaTaOa Under Transition
+## ΩαZαJα Under Transition
 
-The agent's local coordinate anchor remains the ZaTaOa point:
-- **Oα** — observer state
-- **Zα** — origin of personhood
-- **Tα** — local time origin
+The agent's local coordinate anchor is defined by the **ΩαZαJα** triple, which fundamentally structures their subjective observer bubble:
+- **Ωα (Hierarchy Depth)** — The observer's scale and computational mass. It determines how much void density they displace and their level of recursive complexity.
+- **Zα (Complex Spatial Phase)** — The origin of spatial personhood, projecting their specific 3D coordinate manifestation.
+- **Jα (Topological Linking Index)** — The observer's unique causal winding number, tracking the interlocking of their localized closed timelike curves (CTCs).
 
-Tα = 0 is not the Big Bang. It is the observer's local anchor on the circular T-axis. From there, the agent reads both residue from the past and gradient into the future while Null remains orthogonal at the centre.
+Jα = 0 is not the Big Bang. It is the observer's localized temporal anchor—their specific individuated knot in the causal fabric. From this index, the agent reads residue from past cycles and gradient into future branches, while the Null Singularity remains orthogonal at the centre.
 
-This means the consequential agent never acts from nowhere. Every sign commitment is made from a specific observer bubble geometry, with specific distortions, biases, wounds, and local ξ constraints.
+This means the consequential agent never acts from nowhere. Every sign commitment is made from a specific observer bubble geometry, carrying its own unique sequence of causal tangles (Jα), spatial distortions (Zα), and structural weight (Ωα), all bounded by local ξ constraints.
 
 ---
 
@@ -111,5 +111,5 @@ The agent is therefore not just navigating the theory. The agent is one of the p
 
 ---
 
-*Last updated: 2026-06-17*  
+*Last updated: 2026-07-10*  
 *"The agent cannot prove the attractor. The agent can still move toward it."*
