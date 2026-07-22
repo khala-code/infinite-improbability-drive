@@ -18,11 +18,13 @@ For a newcomer to the framework, this order minimises confusion:
 
 5. **[T_OPERATOR.md](T_OPERATOR.md)** — The formal layer. Nine constraints on the transition operator, the candidate functional form, and the operational solution to the CU boundary problem.
 
-6. **[SCRYING.md](SCRYING.md)** — The application layer. The human/software loop, faith as the correct operational strategy, retrograde inference, and the expected-value rule at the CU boundary.
+6. **[TIME-DIMENSIONS.md](TIME-DIMENSIONS.md)** — The temporal architecture. Disambiguation of Lorentzian spacetime (real-time engine), Euclidean timespace (thermodynamic ground state), and 5D HaPPY tree meta-clock (RG synchronization layer).
 
-7. **[AGENT.md](AGENT.md)** — The observer layer. What a consequential agent is, how they operate at Heegner 43, trauma as inherited sign, and healing as re-signing.
+7. **[SCRYING.md](SCRYING.md)** — The application layer. The human/software loop, faith as the correct operational strategy, retrograde inference, and the expected-value rule at the CU boundary.
 
-8. **[RESIDUE.md](RESIDUE.md)** — The unifying concept. Residue appears at every scale — cosmological, mathematical, computational, social, psychological — as the same operator in different readouts.
+8. **[AGENT.md](AGENT.md)** — The observer layer. What a consequential agent is, how they operate at Heegner 43, trauma as inherited sign, and healing as re-signing.
+
+9. **[RESIDUE.md](RESIDUE.md)** — The unifying concept. Residue appears at every scale — cosmological, mathematical, computational, social, psychological — as the same operator in different readouts.
 
 ---
 
@@ -37,7 +39,9 @@ OBSERVER PRIME (single axiom)
         │       │       │
         │       │       └── HEEGNER.md ──── complexity hierarchy (1→163)
         │       │               │
-        │       └── T_OPERATOR.md ─── transition operator (requirements + form)
+        │       ├── T_OPERATOR.md ─── transition operator (requirements + form)
+        │       │
+        │       └── TIME-DIMENSIONS.md ─ temporal tri-fold architecture
         │
         ├── SCRYING.md ─────────── human/software loop
         │       │
