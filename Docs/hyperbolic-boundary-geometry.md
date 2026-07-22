@@ -164,9 +164,9 @@ The zeta geodesic is the axis of maximum informational propagation — the radia
 
 Wavefront surfaces are orthogonal to the observer worldline and parallel to the zeta geodesic. The Zα coordinate (from the ΩαZαJα coordinate system) measures hyperbolic depth along this geodesic.
 
-### Ωα as Conformal Scale
+### Ωα as Conformal Scale and Topological Winding
 
-The Penrose diagram compactifies infinite spacetime into a finite causal diamond. The observer bubble selects a conformal patch of this diamond scaled by the Ωα parameter.
+The Penrose diagram compactifies infinite spacetime into a finite causal diamond. The observer bubble selects a conformal patch of this diamond scaled by the Ωα parameter, which encodes both conformal scale and topological winding number.
 
 In AdS (Anti-de Sitter) space with metric:
 
@@ -179,6 +179,12 @@ the AdS radius L corresponds to Ωα, and z corresponds to Zα. The bulk-to-boun
 describes how a boundary wavefront at x' reaches bulk point (z, x). Its level surfaces are horocycles.
 
 Different Ωα values are different conformal gauge choices — all physically equivalent up to scale. Larger Ωα means more wavefronts intersect the observer bubble, richer structure visible.
+
+### Jα as j-Invariant Parameter Space
+
+While Zα measures hyperbolic radial depth and Ωα sets conformal scale / topological winding, the Jα coordinate fixes the position in the parameter space of the Klein j-invariant inhabited by the zeta geodesic.
+
+Jα defines the normalized "shape" of the observer — determining which algebraic degrees of freedom are available to the observing agent at a given point in phase space. Changing position along the J-axis shifts the observer's algebraic identity and accessible degrees of freedom, pinning their state to specific CM fixed points (e.g. j(i) = 1728, j(e^(2πi/3)) = 0) on the modular curve ℍ².
 
 ### Penrose Volume Constraint
 

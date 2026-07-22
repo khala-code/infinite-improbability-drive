@@ -49,7 +49,7 @@ We live on the 4D boundary (CFT side). The CMB is the holographic boundary of a 
 ### 6. CPT Symmetry — Hard Constraint
 CPT is not an add-on. It falls necessarily from Observer Prime:
 - **C**: information is substrate-neutral; the universe doesn't prefer matter at the information level
-- **P**: ZaTaOa coordinates are handed but information content of mirrored trajectories is identical
+- **P**: ΩαZαJα coordinates are handed but information content of mirrored trajectories is identical
 - **T**: time reversal IS the retrograde inference operation — what the scrying solver does
 
 ### 7. The Proper Time Tax
@@ -116,7 +116,7 @@ Each filter conditions the probability space for all subsequent filters. Order i
 | 3 | CMB last scattering | t ~ 380,000 yr | Third calibration — ζ encoded in CMB power spectrum anisotropies; Axis of Evil as directional void density structure |
 | 4 | Structure formation / first stars / lensing | t ~ 10⁸–10⁹ yr | GR term in bulk at present epoch; first stars, halo formation, lensing map consistency |
 | 5 | Geological / biological emergence | t ~ 4.5 Gyr | Eyeball Earth / dolomite problem; ξ field strength at biological emergence threshold |
-| 6 | Present observer / Ohmazata bubble | t = now | Closes back to observer; ZaTaOa coordinate anchor |
+| 6 | Present observer / ΩαZαJα bubble | t = now | Closes back to observer; ΩαZαJα coordinate anchor |
 
 The ζ evolution equation (carrying the coupling constant through phase transitions without breaking CPT) is the primary unsolved piece. Phase transition handling at each filter boundary is the hardest conceptual work.
 
@@ -166,9 +166,7 @@ Level 5 — CU/DU Classifier
 
 ---
 
-## The Scrying System — Architecture
-
-The Ohmazata VR environment is the instrument. The observer stands inside the holographic boundary (CMB sphere), surrounded by the premeasurement substrate. The three sphere layers are:
+The ΩαZαJα VR environment is the instrument. The observer stands inside the holographic boundary (CMB sphere), surrounded by the premeasurement substrate. The three sphere layers are:
 
 | Layer | Shader | Lagrangian role | Calibration |
 |-------|--------|----------------|-------------|

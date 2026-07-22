@@ -49,9 +49,9 @@ The CνB temperature is NOT equal to CMB temperature. The correct relation:
 
 This factor arises from electron-positron annihilation heating the photon bath after neutrino decoupling. Using T_γ directly for the neutrino field overstates its temperature by ~40%.
 
-## 5. ΩaZaTa Coordinate Uniqueness (Medium Risk)
+## 5. ΩαZαJα Coordinate Uniqueness (Medium Risk)
 
-No two nodes can occupy the same ΩaZaTa coordinate. The engine does not enforce this automatically — it is the caller's responsibility to check before inserting a new node.
+No two nodes can occupy the same ΩαZαJα coordinate. The engine does not enforce this automatically — it is the caller's responsibility to check before inserting a new node.
 
 Collisions produce undefined superposition behaviour. Add an assertion in `SpacetimeCoordinate.cs` during development.
 

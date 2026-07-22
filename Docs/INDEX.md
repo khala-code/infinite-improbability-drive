@@ -48,22 +48,4 @@ OBSERVER PRIME (single axiom)
 GLOSSARY.md ───────────────────── reference layer (all docs)
 ```
 
----
-
-## Legacy Docs
-
-Earlier documents from the pre-framework phase are preserved below. They contain the original architectural thinking that preceded the theoretical formalisation.
-
-| File | Content |
-|---|---|
-| `architecture.md` | Original VR engine architecture notes |
-| `two-layer-boundary.md` | CMB + CνB dual boundary layer design |
-| `hyperbolic-geometry.md` | Horocycle wavefront geometry |
-| `computational-reducibility.md` | Early reducibility thinking (superseded by HEEGNER.md) |
-| `omgazata-coordinate-system.md` | Original ΩaZaTa coordinate system spec |
-| `pulser-mesh-correspondence.md` | Pulser/mesh rendering correspondence |
-| `bug-danger-zones.md` | Known Unity/Quest 2 danger zones |
-
----
-
 *Last updated: 2026-06-17*

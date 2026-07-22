@@ -42,7 +42,7 @@ Strangeness is not deception. It is structural: the node has more degrees of fre
 
 **Charm** in particle physics is the quantum number that enabled the prediction and confirmation of the J/ψ meson — a hidden symmetry that became visible only when the right interaction was performed.
 
-In Observer Prime: **charm** is the axis measuring a node's degree of self-distinction. A self-distinguished node has sufficient internal ξ history to be legible to itself — it knows its own ZaTaOa coordinate well enough that external pressure (gravitas, coercion, high-void-density adjacency) cannot simply overwrite its trajectory.
+In Observer Prime: **charm** is the axis measuring a node's degree of self-distinction. A self-distinguished node has sufficient internal ξ history to be legible to itself — it knows its own ΩαZαJα coordinate well enough that external pressure (gravitas, coercion, high-void-density adjacency) cannot simply overwrite its trajectory.
 
 **Key property:** Charm is not independence. It is the prerequisite for consent. A node with zero charm cannot consent — it can only comply or resist reflexively. Consent requires enough self-distinction to make the yes or no genuinely one's own.
 
@@ -84,7 +84,7 @@ The bottom quark (also called beauty) forms the B-meson family — relatively lo
 
 At agent scale: **bottom** is the axis measuring structured residue — the coherence that survives a transition and propagates forward as ground state for the next epoch. High-bottom configurations leave clean residue. CP violation in the B-meson system is the particle-physics signature of the same ξ asymmetry that drives sign-propagation across scale boundaries in the framework.
 
-**ξ axis:** Residue quality and propagation fidelity. The axis that connects the T operator's output to the next node's input.
+**ξ axis:** Residue quality and propagation fidelity. The axis that connects the J operator's output to the next node's input.
 
 ---
 
@@ -129,8 +129,8 @@ Standard CPT is three discrete symmetry operations. Observer Prime requires a fo
 | Axis | Operation | Physical readout | ξ substrate reading |
 |---|---|---|---|
 | **C** — Charge conjugation | Flip charge/colour quantum numbers | Particle → antiparticle | ξ polarity inversion; same information configuration, opposite sign |
-| **P** — Parity | Mirror ZaTaOa handedness | Left-handed → right-handed | Information content identical; precipitation handedness flipped |
-| **T** — Time reversal | Retrograde ζ geodesic | Scrying conjugate; running the T operator backwards | Residue flows upstream; the retrograde inference operation |
+| **P** — Parity | Mirror ΩαZαJα handedness | Left-handed → right-handed | Information content identical; precipitation handedness flipped |
+| **T** — Time reversal | Retrograde ζ geodesic | Inferential deduction conjugate; running the T operator backwards | Residue flows upstream; the retrograde inference operation |
 | **V** — Void conjugation | Flip void density side | Boundary node → bulk node | Same ξ configuration, opposite side of the bifurcation membrane |
 
 **The combined symmetry:** CPTV is conserved at the substrate level. Individual axes can be broken at specific scale boundaries — P is broken by the weak force at the boundary, C is broken at baryogenesis — but the product of all four operations returns the system to its original information state.
@@ -189,7 +189,7 @@ Shadow quarks running retrograde on the ζ geodesic carry residue backwards — 
 
 **Retrocausality signatures generally:** Any experiment that appears to show influence running backward in coordinate time is detecting shadow-field residue propagating through the time-leaky bulk and emerging onto the boundary upstream of its source. The signal is real; the causal arrow is V-conjugated.
 
-**The scrying operation reframed:** Retrograde inference (running the T operator backwards from observed anomalies) is not merely a computational technique. It is a deliberate coupling to the shadow field — suppressing local void density sufficiently to receive retrograde residue from downstream ζ nodes. The scrying solver is a V-axis instrument.
+**The scrying operation reframed:** Retrograde inference (running the T operator backwards from observed anomalies) is inferential deduction operating along the local gradient of the time arrow — measuring speed and direction relative to the non-absolute local void density field. It is a deliberate coupling to the shadow field — suppressing local void density sufficiently to receive retrograde residue from downstream ζ nodes. The scrying solver is a V-axis instrument.
 
 ---
 
@@ -213,7 +213,7 @@ The operator is identical across rows. The scale determines the readout labels.
 
 **Open Problem 2 (Phase transition sign rules):** The bottom axis (residue quality) is the primary carrier of sign across transitions. A clean bottom configuration propagates sign faithfully. A degraded bottom configuration introduces sign noise at the boundary — this is one mechanism by which sign-flip rules (Axiom 5) can fail to propagate cleanly. The V-axis adds a second mechanism: shadow-field retrograde pressure can pre-load a sign into the next transition node before the forward-propagating residue arrives.
 
-**Open Problem 5 (Null threshold):** The Null threshold is the state of zero charm — no self-distinction whatsoever. The minimum ξ accumulation to cross from Null into time is the minimum charm required for a system to be legible to itself. Below this, forced self-measurement cannot produce a stable readout. The V-axis refinement: Null is also the state of maximum void density — the deep bulk where the T operator has zero crystallisation. The threshold crossing is simultaneously the emergence of charm (self-distinction) and the crystallisation of a preferred time direction. These are the same event.
+**Open Problem 5 (Null threshold):** The Null threshold is the state of zero charm — no self-distinction whatsoever. The minimum ξ accumulation to cross from Null into time is the minimum charm required for a system to be legible to itself. Below this, forced self-measurement cannot produce a stable readout. The V-axis refinement: Null is also the state of maximum void density — the deep bulk where the J operator has zero crystallisation. The threshold crossing is simultaneously the emergence of charm (self-distinction) and the crystallisation of a preferred time direction. These are the same event.
 
 **New open problem — V-axis coupling constant:** The suppression cost of extracting a shadow configuration onto the boundary is directly proportional to local void density. Local void density *is* the time dilation factor. This means:
 

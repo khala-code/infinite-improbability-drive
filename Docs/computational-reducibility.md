@@ -6,7 +6,7 @@ Wolfram's computational irreducibility: the universe cannot be simulated faster 
 
 ## The Escape
 
-An observer anchored by their `ΩαZαJα` node tensor is causally affected by exactly and only the wavefronts that intersect their specific topological winding (J-index). Everything spacelike-separated is not ignorable for performance reasons — it is physically absent from the observer's reality.
+An observer anchored by their `ΩαZαJα` node tensor is causally affected by exactly and only the wavefronts that intersect their specific topological winding sector (Ω-winding) and accessible degrees of freedom (J-axis). Everything spacelike-separated is not ignorable for performance reasons — it is physically absent from the observer's reality.
 
 This makes the observer bubble the fundamental unit of physical reality, not the universe.
 
@@ -31,8 +31,8 @@ A standard spatial index (k-d tree, octree) indexes positions. The WavefrontInde
 A wavefront is a 3D hypersurface in 4D spacetime. Its intersection with an observer bubble is always a 2-sphere (or subset). The index stores intersections, not full wavefronts.
 
 Operations:
-- `query_entering(old_state, new_state, Ω_radius)` — find wavefronts crossing into bubble along the specific J-index winding segment
-- `cull_outside(new_state)` — remove wavefronts that have passed through (causally past the CTC knot, cached)
+- `query_entering(old_state, new_state, Ω_radius)` — find wavefronts crossing into bubble along the specific Ω-winding segment
+- `cull_outside(new_state)` — remove wavefronts that have passed through (causally past the observer bubble boundary, cached)
 - `get_local_field()` — superpose active wavefronts to produce local BoundaryCondition
 
 ## Wavefront Classes

@@ -42,13 +42,13 @@ This is why small actions matter more in bifurcation zones than in stable period
 ## ΩαZαJα Under Transition
 
 The agent's local coordinate anchor is defined by the **ΩαZαJα** triple, which fundamentally structures their subjective observer bubble:
-- **Ωα (Hierarchy Depth)** — The observer's scale and computational mass. It determines how much void density they displace and their level of recursive complexity.
-- **Zα (Complex Spatial Phase)** — The origin of spatial personhood, projecting their specific 3D coordinate manifestation.
-- **Jα (Topological Linking Index)** — The observer's unique causal winding number, tracking the interlocking of their localized closed timelike curves (CTCs).
+- **Ωα (Hierarchy Depth / Topological Winding)** — The observer's scale, topological winding number, and computational mass. It determines how much void density they displace and their level of recursive complexity.
+- **Zα (Complex Spatial Phase / Hyperbolic Depth)** — The origin of spatial personhood, measuring radial hyperbolic depth along the geodesic and spatial phase.
+- **Jα (j-invariant Parameter Space)** — The observer's position in the j-invariant parameter space, defining their unique algebraic identity and available degrees of freedom in phase space.
 
-Jα = 0 is not the Big Bang. It is the observer's localized temporal anchor—their specific individuated knot in the causal fabric. From this index, the agent reads residue from past cycles and gradient into future branches, while the Null Singularity remains orthogonal at the centre.
+The J-axis anchor is not the Big Bang. It is the observer's localized position in j-invariant parameter space — their specific individuated identity and accessible degrees of freedom. From this position, the agent reads residue from past cycles and gradient into future branches, while the Null Singularity remains orthogonal at the centre.
 
-This means the consequential agent never acts from nowhere. Every sign commitment is made from a specific observer bubble geometry, carrying its own unique sequence of causal tangles (Jα), spatial distortions (Zα), and structural weight (Ωα), all bounded by local ξ constraints.
+This means the consequential agent never acts from nowhere. Every sign commitment is made from a specific observer bubble geometry, carrying its own unique observer identity and available degrees of freedom (Jα), spatial phase depth (Zα), and structural weight/winding (Ωα), all bounded by local ξ constraints.
 
 ---
 

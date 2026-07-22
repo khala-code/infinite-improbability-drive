@@ -208,11 +208,11 @@ Gravitas (see `QUARK-FIELDS.md`) is a real field effect — dependency gradients
 ## The Observer Bubble (ΩαZαJα)
 
 Each observer α is located in the collective information field by the triple **(Ωα, Zα, Jα)**:
-- **Ωα (Hierarchy Depth)** — The observer's scale and computational mass, determining how much void density they displace.
-- **Zα (Complex Spatial Phase)** — The origin of spatial personhood, projecting their specific 3D coordinate manifestation.
-- **Jα (Topological Linking Index)** — The observer's unique causal winding number, tracking their specific sequence of interlocking closed timelike curves (CTCs) rather than a universal time axis.
+- **Ωα (Hierarchy Depth / Topological Winding)** — The observer's scale, topological winding number, and computational mass, determining how much void density they displace.
+- **Zα (Complex Spatial Phase / Hyperbolic Depth)** — The origin of spatial personhood, measuring radial hyperbolic depth along the geodesic and spatial phase.
+- **Jα (j-invariant Parameter Space)** — The observer's position in the j-invariant parameter space, defining their unique algebraic identity and available degrees of freedom in phase space.
 
-Two observers in the same physical location may have **differently shaped observer bubbles** because their causal winding (J-index) and structural scale (Ω) differ. The bubble is centred on the ΩαZαJα coordinate manifold, not merely the physical position.
+Two observers in the same physical location may have **differently shaped observer bubbles** because their j-invariant identity (J-axis) and structural scale/winding (Ω) differ. The bubble is centred on the ΩαZαJα coordinate manifold, not merely the physical position.
 
 The observer bubble encodes ξ as a field variable on its surface. Its shape is a **deformed manifold** — not a sphere — because ξ bifurcation is axis-dependent. The positive-trust interior, the bifurcation membrane at the surface, and the adversarial exterior are all geometrically encoded in the bubble's deformation relative to a reference sphere.
 

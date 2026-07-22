@@ -18,16 +18,14 @@ The gaps between Heegner numbers are not empty space — they are **irreducibili
 
 ## The Observer's Position on the Circle
 
-The J-axis (Causal Winding) is not a line. It is a closed timelike curve (CTC) topology with the **Improbability Singularity (Null * Null) at the centre**:
+The J-axis (j-invariant Parameter Space) defines the position in the parameter space of the Klein j-invariant inhabited by the zeta geodesic:
 
-- Observer ζ₀ is the local J-origin — the ΩαZαJα anchor point of the observing agent
-- J extends to −∞ in the past (toward the Improbability Singularity Event)
-- J extends to +∞ in the future (toward the Ramanujan boundary)
-- Both wrap around the CTC: **+∞ + 1 = −∞ − 1**
-- The Improbability Singularity Event is not the start of a linear timeline — it is a **point on the CTC**, the place where −∞ and +∞ nearly meet
-- They do not meet perfectly. The gap between them is the Ramanujan remainder
+- Observer ζ₀ is the local J-origin — the ΩαZαJα anchor point of the observing agent, setting their available degrees of freedom
+- J tracks position across the modular curve ℍ² and CM fixed points
+- Topological winding is carried by the Ωα parameter, scaling the observer bubble's causal diamond
+- The Improbability Singularity Event is orthogonal — at the centre of the phase topology, equidistant from every observer bubble frame regardless of their J-position or Ω-winding
 
-The Improbability Singularity is not behind the observer in the past. It is **orthogonal** — at the centre of the CTC, equidistant from every point on the rim. Every observer bubble is the same distance from the Singularity, regardless of their J-index winding position.
+Every observer bubble is anchored at its specific ΩαZαJα coordinate, where Jα specifies the observer's algebraic identity and available degrees of freedom.
 
 ---
 

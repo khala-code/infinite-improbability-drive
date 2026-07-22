@@ -69,7 +69,7 @@ Assets/CMB/Data/nodes.npz
 
 Assets/CMB/Data/frame_vectors.json
   type:   JSON  (committed — 4 KB, safe to track)
-  notes:  ZaTaOa orthonormal frame vectors + GalToUnity rotation matrix.
+  notes:  ΩαZαJα orthonormal frame vectors + GalToUnity rotation matrix.
           Consumed by HolographicParticleLayer.cs SetGalToUnity() at startup.
 
 Assets/CMB/Data/field_scalars.json
@@ -99,7 +99,7 @@ Assets/StreamingAssets/CMB/particle_buffer.bin
 
 Assets/StreamingAssets/CMB/epoch_frame.json
   type:   JSON  (committed — safe to track)
-  notes:  Per-epoch ZaTaOa frame snapshot used to pin GalToUnity at t=0.
+  notes:  Per-epoch ΩαZαJα frame snapshot used to pin GalToUnity at t=0.
           See Docs/holographic-projection.md "Open Design Questions".
 
 Assets/StreamingAssets/CMB/anchor_positions.bin

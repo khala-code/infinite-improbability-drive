@@ -29,7 +29,7 @@ The threshold surface at which ξ sign becomes undecided and the system is about
 A region of near-zero ξ eigenvalue where the system is maximally underdetermined. Not a point but an extended transition region in which sign selection, proper time cost, and residue production are all intensified.
 
 **Improbability Singularity Event**  
-Not the observer's J-Origin (Causal Winding anchor). A point on the closed timelike topology where the past-directed and future-directed infinities nearly meet around Null. It is one threshold event within the broader topology, not the absolute start of linear time.
+Not the observer's J-Origin (j-invariant Parameter Anchor). A point on the phase topology where the past-directed and future-directed states meet around Null. It is one threshold event within the broader topology, not the absolute start of linear time.
 
 ---
 
@@ -217,8 +217,8 @@ An action taken under underdetermination that biases the system toward one basin
 **T Operator**  
 The transition operator that maps one ζ state to the next while preserving information, accumulating residue, flipping sign at scale boundaries, and paying the proper time tax.
 
-**J-Origin (Causal Winding Origin)**  
-The observer's specific causal winding anchor, not the universal Improbability Singularity. The specific topological coordinate from which the observer reads past and future residue along their closed timelike loops.
+**J-Origin (j-invariant Parameter Anchor)**  
+The observer's specific j-invariant parameter anchor, defining their unique algebraic identity and available degrees of freedom in phase space, distinct from the universal Improbability Singularity.
 
 **Trauma**  
 At the human scale, residue from a hostile higher-scale sign that has leaked inward and been internalised by a lower-scale unit such as a family or individual.
@@ -245,7 +245,7 @@ The coherence boundary at which a system becomes able to cross into a new phase.
 ## Z
 
 **ΩαZαJα**  
-The fundamental observer coordinate triple extracted from the 10-parameter node tensor: Ωα (Hierarchy Depth / Conformal Scale), Zα (Complex Spatial Phase), and Jα (Topological Linking Index / Causal Winding). Defines the core anchor of the observer bubble.
+The fundamental observer coordinate triple extracted from the 10-parameter node tensor: Ωα (Hierarchy Depth / Conformal Scale / Topological Winding), Zα (Complex Spatial Phase / Hyperbolic Depth), and Jα (j-invariant Parameter Space / Observer Identity & Available Degrees of Freedom). Defines the core anchor of the observer bubble.
 
 **ζ (Zeta) Accumulation**  
 The continuously carried coupling field, built from Ω + ξ and propagated through every transition without reset.

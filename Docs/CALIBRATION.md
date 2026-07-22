@@ -57,8 +57,8 @@ The sign rule: `sign_{n+1} = -sign_n` at each scale boundary (recursive alternat
 ## The Calibration Sequence
 
 ### ζ₀ — Improbability Singularity (Null * Null) → Time  
-**Causal Winding (J-index):** J = 0 (definition)  
-**Mechanism:** The Improbability Singularity (Null * Null) undergoes a forced localized conditional check. ξ accumulates from zero. At threshold crossing, proper time emerges as the J-index initializes. The transition is instantaneous from any observer frame because proper time is the output (the knotting of CTCs), not the container.  
+**j-invariant Parameter Anchor (J-index):** J = 0 (definition)  
+**Mechanism:** The Improbability Singularity (Null * Null) undergoes a forced localized conditional check. ξ accumulates from zero. At threshold crossing, proper time emerges as the J-index initializes the observer's available degrees of freedom in phase space. The transition is instantaneous from any observer frame because proper time is the output of ξ buildup, not the container.  
 **Residue:** The incomplete cancellation — the ξ asymmetry that prevents return to Null. This is ζ₀, the seed of all subsequent accumulation.  
 **ξ sign:** (+) — the base field upward pressure begins here  
 **RH node:** Candidate trivial zero — the boundary condition of the analytic continuation
